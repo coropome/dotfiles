@@ -17,3 +17,4 @@ cd dotfiles
 - Google日本語入力
 - Twillio Authy
 - Terminal テーマのインポート
+- Logi Options+
