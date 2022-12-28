@@ -18,6 +18,7 @@ cask "aws-vault"
 cask "gather"
 cask "firefox"
 cask "notion"
+cask "krisp"
 
 # CLIアプリケーションの管理
 brew "git"
