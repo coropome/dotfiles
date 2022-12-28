@@ -19,6 +19,8 @@ cask "gather"
 cask "firefox"
 cask "notion"
 cask "krisp"
+cask "microsoft-teams"
+cask "utm"
 
 # CLIアプリケーションの管理
 brew "git"
