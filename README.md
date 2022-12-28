@@ -1,12 +1,19 @@
 # Dotfiles
 
-## スクリプトの実行
-ターミナル起動 & スクリプト実行
+## Usage
 
-bash -c "$( curl -fsSL https://raw.github.com/coropome/dotfiles/master/setup.sh )"
+is This script is for Mac only for Apple Sillicon.
 
-## その他
-### 手動インストール
+```
+git clone git@github.com:coropome/dotfiles.git
+cd dotfiles
+./setup.sh
+```
+
+## Other
+
+### Manuall install
+
 - Google日本語入力
-- BetterTouchTool
 - Twillio Authy
+- Terminal テーマのインポート
