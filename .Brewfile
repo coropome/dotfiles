@@ -15,6 +15,7 @@ cask "aws-cli"
 cask "clipy"
 cask "powershell"
 cask "aws-vault"
+cask "gather"
 
 # CLIアプリケーションの管理
 brew "git"
