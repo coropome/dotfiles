@@ -3,7 +3,7 @@
 echo "Xcodeをインストールします..."
 xcode-select --install
 
-# rosettaのインストール。不要であれば下記1行削除してください
+# rosettaのインストール
 sudo softwareupdate --install-rosetta --agree-to-licensesudo softwareupdate --install-rosetta --agree-to-license
 
 #------------------------------------------
