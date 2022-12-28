@@ -16,6 +16,8 @@ cask "clipy"
 cask "powershell"
 cask "aws-vault"
 cask "gather"
+cask "firefox"
+cask "notion"
 
 # CLIアプリケーションの管理
 brew "git"
