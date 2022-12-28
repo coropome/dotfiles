@@ -25,8 +25,6 @@ brew "docker"
 brew "awscli"
 brew "mas"
 brew "tfenv"
+brew "zsh-completions"
 
 # Mac App Storeのアプリケーションを管理
-mas "RunCat", id: 1429033973
-mas "Magnet", id: 441258766
-mas "Todoist", id: 585829637
