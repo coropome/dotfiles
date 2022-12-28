@@ -7,13 +7,11 @@ tap "homebrew/cask"
 
 # デスクトップアプリケーションの管理
 cask "visual-studio-code"
-cask "google-chrome"
+## cask "google-chrome"
 cask "docker"
 cask "postman"
 cask "drawio"
 cask "aws-cli"
-cask "azure-cli"
-cask "ffmpeg"
 cask "clipy"
 cask "powershell"
 cask "aws-vault"
@@ -26,5 +24,12 @@ brew "awscli"
 brew "mas"
 brew "tfenv"
 brew "zsh-completions"
+brew "ffmpeg"
+brew "azure-cli"
 
 # Mac App Storeのアプリケーションを管理
+mas "EasyRes", id: 688211836 #解像度変更ツール
+mas "MUT", id: 1133234759 #Jamf インポートツール
+mas "RunCat", id: 1429033973 #リソース監視ツール
+mas "Microsoft Remote Desktop", id: 1295203466 #RDPツール
+mas "BetterSnapTool", id: 417375580 #画面分割ツール
