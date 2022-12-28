@@ -2,10 +2,10 @@
 
 ## Usage
 
-is This script is for Mac only for Apple Sillicon.
+This script is for Mac only for Apple Sillicon.
 
 ```
-git clone git@github.com:coropome/dotfiles.git
+cd ~ && git clone git@github.com:coropome/dotfiles.git
 cd dotfiles
 ./setup.sh
 ```
