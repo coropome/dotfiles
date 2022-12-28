@@ -27,6 +27,9 @@ which /opt/homebrew/bin/brew >/dev/null 2>&1 && brew bundle --file ./.Brewfile -
 echo "brew cleanupを実行します..."
 which brew >/dev/null 2>&1 && brew cleanup --verbose
 
+echo "その他ツールをインストールします..."
+./_tools.sh
+
 ### シンボリックリンクの作成
 echo "シンボリックリンクを作成します..."
 ./_link.sh
