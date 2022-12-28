@@ -8,7 +8,4 @@ bash -c "$( curl -fsSL https://raw.github.com/${github-username}/dotfiles/master
 ## その他
 ### 手動インストール
 - Google日本語入力
-- Karabiner-Elements
-- Karabiner-ElementViewer
 - BetterTouchTool
-- DisplayLink Manager
