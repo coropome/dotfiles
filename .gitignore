@@ -1,0 +1,15 @@
+### all ignore ###
+/*
+/.**
+
+### not ignore ###
+!/_link.sh
+!/_tools.sh
+!/.Brewfile
+!/.zprofile
+!/.zshrc
+!/setup.sh
+!/theme.terminal
+
+!/.README.md
+!/.gitignore
