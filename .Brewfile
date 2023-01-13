@@ -23,6 +23,8 @@ cask "microsoft-teams"
 cask "utm"
 cask "google-cloud-sdk"
 cask "rancher"
+cask "vincelwt-chatgpt"
+cask "deepl"
 
 # CLIアプリケーションの管理
 brew "git"
