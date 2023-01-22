@@ -26,7 +26,8 @@ cask "rancher"
 cask "bitwarden"
 cask "discord"
 cask "background-music"
-
+cask "vincelwt-chatgpt"
+cask "deepl"
 
 # CLIアプリケーションの管理
 brew "git"
