@@ -23,6 +23,10 @@ cask "microsoft-teams"
 cask "utm"
 cask "google-cloud-sdk"
 cask "rancher"
+cask "bitwarden"
+cask "discord"
+cask "background-music"
+
 
 # CLIアプリケーションの管理
 brew "git"
@@ -40,6 +44,7 @@ brew "wimlib"
 brew "cdrtools" 
 brew "sidneys/homebrew/chntpw"
 brew "github"
+brew "node"
 # brew "docker-compose"
 
 # Mac App Storeのアプリケーションを管理

@@ -149,5 +149,14 @@ setopt PROMPT_SUBST ; PS1='%F{green}%n@%m%f: %F{cyan}%~%f %F{red}$(__git_ps1 "(%
 alias python=python3
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/y.uchiyama/.rd/bin:$PATH"
+export PATH="~/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+
+#rbenv
+ [[ -d ~/.rbenv  ]] && \
+  export PATH=${HOME}/.rbenv/bin:${PATH} && \
+  eval "$(rbenv init -)"
+
+#chruby
+#source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+#source /opt/homebrew/opt/chruby/share/chruby/auto.sh

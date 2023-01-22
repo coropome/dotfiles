@@ -2,7 +2,7 @@
 
 ## Usage
 
-This script is for Mac only for Apple Sillicon.
+This script is only Mac for Apple Sillicon.
 
 ```
 cd ~ && git clone git@github.com:coropome/dotfiles.git
@@ -18,3 +18,4 @@ cd dotfiles
 - Twillio Authy
 - Terminal テーマのインポート
 - Logi Options+
+- Prallels Desktop
