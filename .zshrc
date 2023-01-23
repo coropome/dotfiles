@@ -10,11 +10,6 @@ export LANG=ja_JP.UTF-8
 autoload -Uz colors
 colors
 
-# ヒストリの設定
-HISTFILE=~/.zsh_history
-HISTSIZE=1000000
-SAVEHIST=1000000
-
 # プロンプト
 # 1行表示
 # PROMPT="%~ %# "
@@ -148,6 +143,18 @@ setopt PROMPT_SUBST ; PS1='%F{green}%n@%m%f: %F{cyan}%~%f %F{red}$(__git_ps1 "(%
 # python
 alias python=python3
 
+
+# ヒストリの設定
+HISTFILE=~/.zsh_history
+HISTSIZE=1000000
+SAVEHIST=1000000
+setopt append_history
+setopt share_history
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+
+bindkey '^R' history-incremental-search-backward
+
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/y.uchiyama/.rd/bin:$PATH"
+export PATH="~/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)

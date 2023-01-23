@@ -4,11 +4,11 @@ cask_args appdir: "/Applications"
 # 外部ライブラリをインストール
 tap "homebrew/core"
 tap "homebrew/cask"
+tap "sanemat/font"
 
 # デスクトップアプリケーションの管理
 cask "visual-studio-code"
 ## cask "google-chrome"
-## cask "docker"
 cask "postman"
 cask "drawio"
 cask "aws-cli"
@@ -29,7 +29,6 @@ cask "deepl"
 # CLIアプリケーションの管理
 brew "git"
 brew "git-lfs"
-# brew "docker"
 brew "awscli"
 brew "mas"
 brew "tfenv"
@@ -42,7 +41,7 @@ brew "wimlib"
 brew "cdrtools" 
 brew "sidneys/homebrew/chntpw"
 brew "github"
-# brew "docker-compose"
+brew "ricty"
 
 # Mac App Storeのアプリケーションを管理
 mas "EasyRes", id: 688211836 #解像度変更ツール
