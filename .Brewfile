@@ -23,6 +23,9 @@ cask "microsoft-teams"
 cask "utm"
 cask "google-cloud-sdk"
 cask "rancher"
+cask "bitwarden"
+cask "discord"
+cask "background-music"
 cask "vincelwt-chatgpt"
 cask "deepl"
 
@@ -41,6 +44,7 @@ brew "wimlib"
 brew "cdrtools" 
 brew "sidneys/homebrew/chntpw"
 brew "github"
+brew "node"
 brew "ricty"
 
 # Mac App Storeのアプリケーションを管理
