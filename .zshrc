@@ -105,6 +105,9 @@ alias la="ls -laG"
 # sudo の後のコマンドでエイリアスを有効にする
 alias sudo='sudo '
 
+# aws vault の省略
+alias av='aws-vault exec'
+
 # 個別設定
 
 # homebrew 用
@@ -118,10 +121,9 @@ autoload bashcompinit && bashcompinit
 complete -C '/opt/homebrew/bin/aws_completer' aws
 
 # Terraform の補完機能
-complete -o nospace -C /opt/homebrew/Cellar/tfenv/2.2.3/versions/1.1.6/terraform terraform
-complete -o nospace -C /opt/homebrew/Cellar/tfenv/2.2.3/versions/1.0.11/terraform terraform
-complete -o nospace -C /opt/homebrew/Cellar/tfenv/2.2.3/versions/0.15.3/terraform terraform
-complete -o nospace -C /opt/homebrew/Cellar/tfenv/2.2.3/versions/0.13.5/terraform terraform
+if type terraform &> /dev/null; then
+    complete -C terraform terraform
+fi
 
 # git-promptの読み込み
 source ~/.zsh/git-prompt.sh
@@ -143,7 +145,6 @@ setopt PROMPT_SUBST ; PS1='%F{green}%n@%m%f: %F{cyan}%~%f %F{red}$(__git_ps1 "(%
 # python
 alias python=python3
 
-
 # ヒストリの設定
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
@@ -154,18 +155,3 @@ setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 
 bindkey '^R' history-incremental-search-backward
-
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="~/.rd/bin:$PATH"
-export PATH="~/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
-
-#rbenv
- [[ -d ~/.rbenv  ]] && \
-  export PATH=${HOME}/.rbenv/bin:${PATH} && \
-  eval "$(rbenv init -)"
-
-#chruby
-#source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-#source /opt/homebrew/opt/chruby/share/chruby/auto.sh
-
