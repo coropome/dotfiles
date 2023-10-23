@@ -31,9 +31,11 @@ brew "wimlib"
 brew "cdrtools" 
 brew "github"
 brew "hstr"
+brew "azure-cli"
 
 # Mac App Storeのアプリケーションを管理
 mas "EasyRes", id: 688211836 #解像度変更ツール
 mas "MUT", id: 1133234759 #Jamf インポートツール
 mas "Microsoft Remote Desktop", id: 1295203466 #RDPツール
 mas "BetterSnapTool", id: 417375580 #画面分割ツール
+mas "Clipboard Manager — Pasty", id:1544620654 # クリップボードツール
