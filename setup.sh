@@ -1,37 +1,93 @@
 #!/bin/bash
 
-echo "Xcodeをインストールします..."
-xcode-select --install
+# エラーが発生したら即座に終了
+set -e
 
-# rosettaのインストール
-sudo softwareupdate --install-rosetta --agree-to-licensesudo softwareupdate --install-rosetta --agree-to-license
+# ログ出力用の関数
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
 
-#------------------------------------------
-# homebrew(arm64)
-#------------------------------------------
-echo "homebrewをインストールします..."
-which /opt/homebrew/bin/brew >/dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# エラーハンドリング
+error_handler() {
+    log "エラーが発生しました: $1"
+    exit 1
+}
 
-echo "brew doctorを実行します..."
-which /opt/homebrew/bin/brew >/dev/null 2>&1 && brew doctor
+# コマンドの存在確認
+check_command() {
+    if ! command -v "$1" &> /dev/null; then
+        error_handler "$1 が見つかりません"
+    fi
+}
 
-echo "brew updateを実行します..."
-which /opt/homebrew/bin/brew >/dev/null 2>&1 && brew update --verbose
+# Xcodeインストール
+log "Xcodeコマンドラインツールのインストールを確認中..."
+if ! xcode-select -p &> /dev/null; then
+    log "Xcodeコマンドラインツールをインストールします..."
+    xcode-select --install
+    # インストールダイアログが表示されるため、ユーザーの操作を待つ
+    read -p "Xcodeのインストールが完了したらEnterを押してください..."
+fi
 
-echo "brew upgradeを実行します..."
-which /opt/homebrew/bin/brew >/dev/null 2>&1 && brew upgrade --verbose
+# Rosettaのインストール
+log "Rosetta 2のインストールを開始します..."
+if ! pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto &> /dev/null; then
+    sudo softwareupdate --install-rosetta --agree-to-license
+fi
 
-echo ".Brewfileで管理しているアプリケーションをインストールします..."
-which /opt/homebrew/bin/brew >/dev/null 2>&1 && brew bundle --file ./.Brewfile --verbose
+# Homebrewのインストール
+log "Homebrewの確認とインストール..."
+if ! command -v brew &> /dev/null; then
+    log "Homebrewをインストールします..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Apple Silicon Macの場合のPATH設定
+    if [[ $(uname -m) == "arm64" ]]; then
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+fi
 
-echo "brew cleanupを実行します..."
-which brew >/dev/null 2>&1 && brew cleanup --verbose
+# Homebrewのセットアップと更新
+log "Homebrewの診断を実行します..."
+brew doctor || true  # エラーが出ても続行
 
-echo "その他ツールをインストールします..."
-./_tools.sh
+log "Homebrewをアップデートします..."
+brew update --verbose
 
-### シンボリックリンクの作成
-echo "シンボリックリンクを作成します..."
-./_link.sh
+log "Homebrewパッケージをアップグレードします..."
+brew upgrade --verbose
 
+# Brewfileからのインストール
+if [ -f "./.Brewfile" ]; then
+    log ".Brewfileからパッケージをインストールします..."
+    brew bundle --file ./.Brewfile --verbose
+else
+    log ".Brewfileが見つかりません"
+fi
+
+# クリーンアップ
+log "不要なファイルを削除します..."
+brew cleanup --verbose
+
+# 追加ツールのインストール
+if [ -f "./_tools.sh" ]; then
+    log "追加ツールをインストールします..."
+    chmod +x ./_tools.sh
+    ./_tools.sh
+else
+    log "_tools.shが見つかりません"
+fi
+
+# シンボリックリンクの作成
+if [ -f "./_link.sh" ]; then
+    log "シンボリックリンクを作成します..."
+    chmod +x ./_link.sh
+    ./_link.sh
+else
+    log "_link.shが見つかりません"
+fi
+
+# シェルの再起動
+log "セットアップが完了しました。シェルを再起動します..."
 exec $SHELL -l
