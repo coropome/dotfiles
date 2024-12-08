@@ -14,8 +14,5 @@ cd dotfiles
 
 ### Manuall install
 
-- Google日本語入力
-- Twillio Authy
 - Terminal テーマのインポート
-- Logi Options+
 - Prallels Desktop
