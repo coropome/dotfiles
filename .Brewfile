@@ -35,9 +35,9 @@ brew "hstr"                         # ヒストリ検索補助
 brew "mas"                          # Mac App Store CLI
 brew "node"                         # Node.js ランタイム
 brew "tfenv"                        # Terraform バージョン管理
-brew "transmission-cli"             # Transmission CLI
 brew "wimlib"                       # WIM ファイル操作
 brew "zsh-completions"              # Zsh 補完
+brew "autojump"                     # Autojump
 
 # ---------------------------------------
 # Mac App Store アプリ
