@@ -48,6 +48,61 @@ function apply_theme() {
     echo "Please set the imported theme as default in terminal preferences."
 }
 
+# Oh My Zsh のセットアップ
+function setup_oh_my_zsh() {
+    echo -e "${GREEN}Setting up Oh My Zsh...${NC}"
+
+    # ~/.zshrc が存在しない場合は作成
+    if [ ! -f ~/.zshrc ]; then
+        echo "Creating a new .zshrc file..."
+        touch ~/.zshrc
+    fi
+
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        echo "Installing Oh My Zsh..."
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    else
+        echo "Oh My Zsh is already installed."
+    fi
+
+    echo "Installing Zsh plugins..."
+    ZSH_CUSTOM=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}
+    git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions || true
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting $ZSH_CUSTOM/plugins/zsh-syntax-highlighting || true
+
+    echo "Configuring .zshrc for Oh My Zsh..."
+    if ! grep -q "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" ~/.zshrc; then
+        sed -i '' 's/^plugins=(.*)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc || true
+    fi
+
+    echo "Updating Zsh theme to 'agnoster'..."
+    sed -i '' 's/^ZSH_THEME=".*"/ZSH_THEME="agnoster"/' ~/.zshrc || true
+}
+
+# VS Code のセットアップ
+function setup_vscode() {
+    echo -e "${GREEN}Setting up Visual Studio Code...${NC}"
+
+    # デフォルトエディタを VS Code に設定
+    if [ ! -f ~/.zshrc ]; then
+        echo "Creating a new .zshrc file..."
+        touch ~/.zshrc
+    fi
+
+    if ! grep -q "export EDITOR='code --wait'" ~/.zshrc; then
+        echo "export EDITOR='code --wait'" >> ~/.zshrc
+    fi
+    git config --global core.editor "code --wait"
+
+    # VS Code 拡張機能のインストール
+    echo "Installing VS Code extensions..."
+    code --install-extension ms-python.python
+    code --install-extension ms-vscode.cpptools
+    code --install-extension esbenp.prettier-vscode
+    code --install-extension eamodio.gitlens
+    code --install-extension ms-azuretools.vscode-docker
+}
+
 # メイン処理
 case "$1" in
     install)
@@ -62,6 +117,8 @@ case "$1" in
     all|"")
         install_tools
         create_links
+        setup_oh_my_zsh
+        setup_vscode
         apply_theme
         ;;
     help)
