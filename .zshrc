@@ -26,7 +26,7 @@ ZSH_THEME="robbyrussell"
 plugins=(
   git                 # Git サポート
   zsh-autosuggestions # コマンド補完
-  zsh-syntax-highlighting # コマンドの構文強調表示
+  zsh-syntax-highlighting # コマンドの構文強調
 )
 
 # Oh My Zsh をロード
@@ -37,22 +37,22 @@ source $ZSH/oh-my-zsh.sh
 # ---------------------------------------
 
 # よく使うコマンドを短縮
-alias ll='ls -la'                # 詳細なファイル一覧
-alias gs='git status'            # Git ステータス確認
-alias ga='git add .'             # 全ファイル追加
-alias gp='git push'              # Git プッシュ
-alias gl='git log --oneline'     # Git の簡易ログ
-alias cd..='cd ..'               # 1階層上に移動
+alias ll='ls -laG'                # 詳細なファイル一覧（カラー表示）
+alias gs='git status'             # Git ステータス確認
+alias ga='git add .'              # 全ファイル追加
+alias gp='git push'               # Git プッシュ
+alias gl='git log --oneline'      # Git の簡易ログ
+alias cd..='cd ..'                # 1階層上に移動
 
 # VS Code 用エイリアス
-alias codez="code ~/.zshrc"      # .zshrc を VS Code で開く
-alias reloadz="source ~/.zshrc"  # .zshrc を再読み込み
+alias codez="code ~/.zshrc"       # .zshrc を VS Code で開く
+alias reloadz="source ~/.zshrc"   # .zshrc を再読み込み
+
+# AWS Vault の省略形
+alias av='aws-vault exec'
 
 # Python のエイリアス
-alias python='python3'
-
-# aws-vault のエイリアス
-alias av='aws-vault exec'
+alias python=python3
 
 # ---------------------------------------
 # ターミナルの見た目と動作設定
@@ -70,27 +70,40 @@ export LSCOLORS="ExFxBxDxCxegedabagacad"
 # ターミナルタイトルの自動設定を無効化
 DISABLE_AUTO_TITLE="true"
 
-# ヒストリの設定
+# ---------------------------------------
+# ヒストリ設定
+# ---------------------------------------
+
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
+
+# ヒストリを共有する
 setopt append_history
 setopt share_history
 setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 
-# Ctrl+R での履歴検索を有効化
+# Ctrl+R での履歴検索を強化
 bindkey '^R' history-incremental-search-backward
 
-# HSTR (hh) の設定
-alias hh=hstr
-setopt histignorespace
-export HSTR_CONFIG=hicolor
-bindkey -s "\C-r" "\C-a hstr -- \C-j"
-export HSTR_TIOCSTI=y
+# ---------------------------------------
+# ユーザー定義の関数
+# ---------------------------------------
 
-# zsh-autosuggestions の読み込み
-source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+# 現在のディレクトリを ZIP 圧縮
+function ziphere() {
+  zip -r "${PWD##*/}.zip" .
+}
 
-# zsh-syntax-highlighting の読み込み
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# ゴミ箱に移動する（rm の代わり）
+function trash() {
+  mv "$@" ~/.Trash/
+}
+
+# ---------------------------------------
+# Homebrew 設定
+# ---------------------------------------
+
+# Homebrew の環境変数
+eval "$(/opt/homebrew/bin/brew shellenv)"
