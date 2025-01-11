@@ -44,9 +44,13 @@ function create_links() {
 # ターミナルテーマ適用
 function apply_theme() {
     echo -e "${GREEN}Applying terminal theme...${NC}"
-    # ターミナル設定ファイル（theme.terminal）をダブルクリックで開く
+    
+    # テーマのインポート
     open "$(pwd)/theme.terminal"
-    echo "Please set the imported theme as default in terminal preferences."
+    
+    # ユーザーに手動でデフォルトテーマに設定を促すメッセージ
+    echo -e "${GREEN}Please set the imported theme as default in Terminal preferences.${NC}"
+    echo -e "${GREEN}After setting the theme, please restart your Terminal.${NC}"
 }
 
 # メイン処理
