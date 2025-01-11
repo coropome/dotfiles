@@ -2,7 +2,7 @@
 
 # エラーハンドリング
 set -e
-trap 'echo "Error: Something went wrong!"' ERR
+trap 'echo -e "${RED}Error: Something went wrong at step $BASH_COMMAND!${NC}"' ERR
 
 # カラー表示用
 GREEN='\033[0;32m'
@@ -26,9 +26,12 @@ function install_tools() {
     echo -e "${GREEN}Installing required tools...${NC}"
     if command -v brew >/dev/null 2>&1; then
         echo "Homebrew found, installing packages..."
-        brew bundle --file=.Brewfile
+        if ! brew bundle --file=.Brewfile; then
+            echo -e "${RED}Error: Failed to install packages with Homebrew.${NC}"
+            exit 1
+        fi
     else
-        echo "Homebrew not found. Please install it first."
+        echo -e "${RED}Error: Homebrew not found. Please install it first.${NC}"
         exit 1
     fi
 }
@@ -36,9 +39,18 @@ function install_tools() {
 # シンボリックリンク作成
 function create_links() {
     echo -e "${GREEN}Creating symbolic links...${NC}"
-    ln -sf "$(pwd)/.zshrc" "$HOME/.zshrc"
-    ln -sf "$(pwd)/.vimrc" "$HOME/.vimrc"
-    ln -sf "$(pwd)/.gitconfig" "$HOME/.gitconfig"
+    if ! ln -sf "$(pwd)/.zshrc" "$HOME/.zshrc"; then
+        echo -e "${RED}Error: Failed to create .zshrc symlink.${NC}"
+        exit 1
+    fi
+    if ! ln -sf "$(pwd)/.vimrc" "$HOME/.vimrc"; then
+        echo -e "${RED}Error: Failed to create .vimrc symlink.${NC}"
+        exit 1
+    fi
+    if ! ln -sf "$(pwd)/.gitconfig" "$HOME/.gitconfig"; then
+        echo -e "${RED}Error: Failed to create .gitconfig symlink.${NC}"
+        exit 1
+    fi
 }
 
 # ターミナルテーマ適用
