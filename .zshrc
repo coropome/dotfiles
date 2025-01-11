@@ -1,26 +1,21 @@
-# ---------------------------------------
-# 基本設定
-# ---------------------------------------
+# 少し凝った zshrc
+# License : MIT
+# http://mollifier.mit-license.org/
 
-# パスの設定
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:$PATH"
+########################################
+# 環境変数
+export LANG=ja_JP.UTF-8
 
-# デフォルトのエディタ
-export EDITOR="code --wait"
+# 色を使用出来るようにする
+autoload -Uz colors
+colors
 
-# 言語環境
-export LANG="ja_JP.UTF-8"
-export LC_ALL="ja_JP.UTF-8"
-
-# Oh My Zsh のインストールパス
-export ZSH="$HOME/.oh-my-zsh"
-
-# ---------------------------------------
-# Oh My Zsh の設定
-# ---------------------------------------
-
-# 使用するテーマ
-ZSH_THEME="robbyrussell"
+# プロンプト
+# 1行表示
+# PROMPT="%~ %# "
+# 2行表示
+PROMPT="%{${fg[green]}%}[%n@%m]%{${reset_color}%} %~
+%# "
 
 # プラグインの設定
 plugins=(
@@ -70,12 +65,27 @@ export LSCOLORS="ExFxBxDxCxegedabagacad"
 # ターミナルタイトルの自動設定を無効化
 DISABLE_AUTO_TITLE="true"
 
-# ヒストリの設定
+# ---------------------------------------
+# ターミナルの見た目と動作設定
+# ---------------------------------------
+
+# 補完待機中の表示設定
+COMPLETION_WAITING_DOTS="true"
+
+# ls コマンドのカラーを有効化
+export LSCOLORS="ExFxBxDxCxegedabagacad"
+
+# ---------------------------------------
+# ヒストリ設定
+# ---------------------------------------
+
 HISTFILE=~/.zsh_history
-HISTSIZE=1000000
-SAVEHIST=1000000
-setopt append_history
+HISTSIZE=10000
+SAVEHIST=10000
+
+# ヒストリを共有する
 setopt share_history
+setopt append_history
 setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 
