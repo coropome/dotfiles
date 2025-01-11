@@ -1,93 +1,77 @@
 #!/bin/bash
 
-# エラーが発生したら即座に終了
-set -e
-
-# ログ出力用の関数
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
-}
-
 # エラーハンドリング
-error_handler() {
-    log "エラーが発生しました: $1"
-    exit 1
+set -e
+trap 'echo "Error: Something went wrong!"' ERR
+
+# カラー表示用
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+# ヘルプメッセージ
+function show_help() {
+    echo "Usage: ./setup.sh [option]"
+    echo ""
+    echo "Options:"
+    echo "  install      Install required tools and packages"
+    echo "  link         Create symbolic links for dotfiles"
+    echo "  theme        Apply terminal theme"
+    echo "  all          Run all steps (default)"
+    echo "  help         Show this help message"
 }
 
-# コマンドの存在確認
-check_command() {
-    if ! command -v "$1" &> /dev/null; then
-        error_handler "$1 が見つかりません"
+# パッケージのインストール
+function install_tools() {
+    echo -e "${GREEN}Installing required tools...${NC}"
+    if command -v brew >/dev/null 2>&1; then
+        echo "Homebrew found, installing packages..."
+        brew bundle --file=.Brewfile
+    else
+        echo "Homebrew not found. Please install it first."
+        exit 1
     fi
 }
 
-# Xcodeインストール
-log "Xcodeコマンドラインツールのインストールを確認中..."
-if ! xcode-select -p &> /dev/null; then
-    log "Xcodeコマンドラインツールをインストールします..."
-    xcode-select --install
-    # インストールダイアログが表示されるため、ユーザーの操作を待つ
-    read -p "Xcodeのインストールが完了したらEnterを押してください..."
-fi
+# シンボリックリンク作成
+function create_links() {
+    echo -e "${GREEN}Creating symbolic links...${NC}"
+    ln -sf "$(pwd)/.zshrc" "$HOME/.zshrc"
+    ln -sf "$(pwd)/.vimrc" "$HOME/.vimrc"
+    ln -sf "$(pwd)/.gitconfig" "$HOME/.gitconfig"
+}
 
-# Rosettaのインストール
-log "Rosetta 2のインストールを開始します..."
-if ! pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto &> /dev/null; then
-    sudo softwareupdate --install-rosetta --agree-to-license
-fi
+# ターミナルテーマ適用
+function apply_theme() {
+    echo -e "${GREEN}Applying terminal theme...${NC}"
+    open "$(pwd)/theme.terminal"
+    echo "Please set the imported theme as default in terminal preferences."
+}
 
-# Homebrewのインストール
-log "Homebrewの確認とインストール..."
-if ! command -v brew &> /dev/null; then
-    log "Homebrewをインストールします..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    # Apple Silicon Macの場合のPATH設定
-    if [[ $(uname -m) == "arm64" ]]; then
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
-fi
+# メイン処理
+case "$1" in
+    install)
+        install_tools
+        ;;
+    link)
+        create_links
+        ;;
+    theme)
+        apply_theme
+        ;;
+    all|"")
+        install_tools
+        create_links
+        apply_theme
+        ;;
+    help)
+        show_help
+        ;;
+    *)
+        echo -e "${RED}Invalid option: $1${NC}"
+        show_help
+        exit 1
+        ;;
+esac
 
-# Homebrewのセットアップと更新
-log "Homebrewの診断を実行します..."
-brew doctor || true  # エラーが出ても続行
-
-log "Homebrewをアップデートします..."
-brew update --verbose
-
-log "Homebrewパッケージをアップグレードします..."
-brew upgrade --verbose
-
-# Brewfileからのインストール
-if [ -f "./.Brewfile" ]; then
-    log ".Brewfileからパッケージをインストールします..."
-    brew bundle --file ./.Brewfile --verbose
-else
-    log ".Brewfileが見つかりません"
-fi
-
-# クリーンアップ
-log "不要なファイルを削除します..."
-brew cleanup --verbose
-
-# 追加ツールのインストール
-if [ -f "./_tools.sh" ]; then
-    log "追加ツールをインストールします..."
-    chmod +x ./_tools.sh
-    ./_tools.sh
-else
-    log "_tools.shが見つかりません"
-fi
-
-# シンボリックリンクの作成
-if [ -f "./_link.sh" ]; then
-    log "シンボリックリンクを作成します..."
-    chmod +x ./_link.sh
-    ./_link.sh
-else
-    log "_link.shが見つかりません"
-fi
-
-# シェルの再起動
-log "セットアップが完了しました。シェルを再起動します..."
-exec $SHELL -l
+echo -e "${GREEN}Setup completed successfully!${NC}"
