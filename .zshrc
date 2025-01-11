@@ -163,8 +163,8 @@ git_prompt_info() {
     fi
 }
 
-# プロンプトの設定（1行表示）
-PROMPT='%{$fg[green]%}%/%{$reset_color%} '                      # フルパス
+# プロンプトの設定（1行表示、相対パス）
+PROMPT='%{$fg[green]%}%~%{$reset_color%} '                      # 相対パス
 PROMPT+='%{$fg[magenta]%}$(git_prompt_info)%{$reset_color%} '    # Git情報
 PROMPT+='%{$fg[blue]%}→%{$reset_color%} '                         # プロンプトの矢印
 
