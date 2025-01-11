@@ -1,15 +1,57 @@
-### all ignore ###
+# ---------------------------------------
+# 全体を無視する基本ルール
+# ---------------------------------------
 /*
 /.**
 
-### not ignore ###
-!/_link.sh
-!/_tools.sh
+# ---------------------------------------
+# 追跡対象とする例外ファイル
+# ---------------------------------------
+!/.gitignore
 !/.Brewfile
 !/.zprofile
 !/.zshrc
 !/setup.sh
 !/theme.terminal
+!/README.md
 
-!/.README.md
-!/.gitignore
+# ---------------------------------------
+# OS やツールによる生成ファイルの無視
+# ---------------------------------------
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# エディタと IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.un~
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.venv
+*.env
+*.pyo
+*.egg-info/
+
+# ログファイル
+*.log
+*.tmp
+*.pid
+*.seed
+*.lock
+*.gz
+
+# Git
+!.gitignore
