@@ -1,149 +1,74 @@
-# 少し凝った zshrc
-# License : MIT
-# http://mollifier.mit-license.org/
+# ---------------------------------------
+# 基本設定
+# ---------------------------------------
 
-########################################
-# 環境変数
-export LANG=ja_JP.UTF-8
+# パスの設定
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:$PATH"
 
-# 色を使用出来るようにする
-autoload -Uz colors
-colors
+# デフォルトのエディタ
+export EDITOR="code --wait"
 
-# プロンプト
-# 1行表示
-# PROMPT="%~ %# "
-# 2行表示
-PROMPT="%{${fg[green]}%}[%n@%m]%{${reset_color}%} %~
-%# "
+# 言語環境
+export LANG="ja_JP.UTF-8"
+export LC_ALL="ja_JP.UTF-8"
 
-# 単語の区切り文字を指定する
-# autoload -Uz select-word-style
-# select-word-style default
-# ここで指定した文字は単語区切りとみなされる
-# / も区切りと扱うので、^W でディレクトリ１つ分を削除できる
-# zstyle ':zle:*' word-chars " /=;@:{},|"
-# zstyle ':zle:*' word-style unspecified
+# Oh My Zsh のインストールパス
+export ZSH="$HOME/.oh-my-zsh"
 
-########################################
-# 補完
-# 補完機能を有効にする
-autoload -Uz compinit
-compinit
+# ---------------------------------------
+# Oh My Zsh の設定
+# ---------------------------------------
 
-# 補完で小文字でも大文字にマッチさせる
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+# 使用するテーマ
+ZSH_THEME="robbyrussell"
 
-# ../ の後は今いるディレクトリを補完しない
-zstyle ':completion:*' ignore-parents parent pwd ..
+# プラグインの設定
+plugins=(
+  git                 # Git サポート
+  zsh-autosuggestions # コマンド補完
+  zsh-syntax-highlighting # コマンドの構文強調表示
+)
 
-# sudo の後ろでコマンド名を補完する
-zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin \
-                    /usr/sbin /usr/bin /sbin /bin /usr/X11R6/bin
+# Oh My Zsh をロード
+source $ZSH/oh-my-zsh.sh
 
-# ps コマンドのプロセス名補完
- zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
+# ---------------------------------------
+# カスタムエイリアス
+# ---------------------------------------
 
+# よく使うコマンドを短縮
+alias ll='ls -la'                # 詳細なファイル一覧
+alias gs='git status'            # Git ステータス確認
+alias ga='git add .'             # 全ファイル追加
+alias gp='git push'              # Git プッシュ
+alias gl='git log --oneline'     # Git の簡易ログ
+alias cd..='cd ..'               # 1階層上に移動
 
-########################################
-# vcs_info
-# autoload -Uz vcs_info
-# autoload -Uz add-zsh-hook
+# VS Code 用エイリアス
+alias codez="code ~/.zshrc"      # .zshrc を VS Code で開く
+alias reloadz="source ~/.zshrc"  # .zshrc を再読み込み
 
-# zstyle ':vcs_info:*' formats '%F{green}(%s)-[%b]%f'
-# zstyle ':vcs_info:*' actionformats '%F{red}(%s)-[%b|%a]%f'
+# Python のエイリアス
+alias python='python3'
 
-# function _update_vcs_info_msg() {
-#    LANG=en_US.UTF-8 vcs_info
-#    RPROMPT="${vcs_info_msg_0_}"
-# }
-# add-zsh-hook precmd _update_vcs_info_msg
-
-
-########################################
-# オプション
-# 日本語ファイル名を表示可能にする
-# setopt print_eight_bit
-
-# beep を無効にする
-setopt no_beep
-
-# フローコントロールを無効にする
-# setopt no_flow_control
-
-# Ctrl+Dでzshを終了しない
-# setopt ignore_eof
-
-# '#' 以降をコメントとして扱う
-# setopt interactive_comments
-
-# ディレクトリ名だけでcdする
-# setopt auto_cd
-
-# cd したら自動的にpushdする
-# setopt auto_pushd
-# 重複したディレクトリを追加しない
-# setopt pushd_ignore_dups
-
-# 同時に起動したzshの間でヒストリを共有する
-setopt share_history
-
-# 同じコマンドをヒストリに残さない
-setopt hist_ignore_all_dups
-
-# スペースから始まるコマンド行はヒストリに残さない
-setopt hist_ignore_space
-
-# ヒストリに保存するときに余分なスペースを削除する
-setopt hist_reduce_blanks
-
-export LSCOLORS=Gxfxcxdxbxegedabagacad
-alias ls="ls -G"
-alias ll="ls -lG"
-alias la="ls -laG"
-
-# sudo の後のコマンドでエイリアスを有効にする
-alias sudo='sudo '
-
-# aws vault の省略
+# aws-vault のエイリアス
 alias av='aws-vault exec'
 
-# 個別設定
+# ---------------------------------------
+# ターミナルの見た目と動作設定
+# ---------------------------------------
 
-# homebrew 用
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# 補完待機中の表示設定
+COMPLETION_WAITING_DOTS="true"
 
-# git の補完機能
-fpath+=($(brew --prefix)/share/zsh+/site-functions)
+# コマンド履歴の日付フォーマット
+HIST_STAMPS="yyyy-mm-dd"
 
-# aws cli の補完機能
-autoload bashcompinit && bashcompinit
-complete -C '/opt/homebrew/bin/aws_completer' aws
+# ls コマンドのカラーを有効化
+export LSCOLORS="ExFxBxDxCxegedabagacad"
 
-# Terraform の補完機能
-if type terraform &> /dev/null; then
-    complete -C terraform terraform
-fi
-
-# git-promptの読み込み
-source ~/.zsh/git-prompt.sh
-
-# git-completionの読み込み
-fpath=(~/.zsh $fpath)
-zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.bash
-autoload -Uz compinit && compinit
-
-# プロンプトのオプション表示設定
-GIT_PS1_SHOWDIRTYSTATE=true
-GIT_PS1_SHOWUNTRACKEDFILES=true
-GIT_PS1_SHOWSTASHSTATE=true
-GIT_PS1_SHOWUPSTREAM=auto
-
-setopt PROMPT_SUBST ; PS1='%F{green}%n@%m%f: %F{cyan}%~%f %F{red}$(__git_ps1 "(%s)")%f
-\$ '
-
-# python
-alias python=python3
+# ターミナルタイトルの自動設定を無効化
+DISABLE_AUTO_TITLE="true"
 
 # ヒストリの設定
 HISTFILE=~/.zsh_history
@@ -154,13 +79,18 @@ setopt share_history
 setopt hist_ignore_all_dups
 setopt hist_reduce_blanks
 
+# Ctrl+R での履歴検索を有効化
 bindkey '^R' history-incremental-search-backward
 
-# HSTR configuration - add this to ~/.zshrc
-alias hh=hstr                    # hh to be alias for hstr
-setopt histignorespace           # skip cmds w/ leading space from history
-export HSTR_CONFIG=hicolor       # get more colors
-bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+# HSTR (hh) の設定
+alias hh=hstr
+setopt histignorespace
+export HSTR_CONFIG=hicolor
+bindkey -s "\C-r" "\C-a hstr -- \C-j"
 export HSTR_TIOCSTI=y
 
+# zsh-autosuggestions の読み込み
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# zsh-syntax-highlighting の読み込み
+source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
