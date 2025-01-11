@@ -107,3 +107,4 @@ function trash() {
 
 # Homebrew の環境変数
 eval "$(/opt/homebrew/bin/brew shellenv)"
+export EDITOR='code --wait'
