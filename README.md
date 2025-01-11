@@ -1,18 +1,77 @@
-# Dotfiles
+以下のように `README.md` を修正しました。これで Markdown 構文として正しく表示されるはずです。
 
-## Usage
+```markdown
+# Dotfiles セットアップ
 
-This script is only Mac for Apple Sillicon.
+このリポジトリには、macOS の設定を行うための個人的な dotfiles が含まれています。提供された `setup.sh` スクリプトを使用することで、簡単に環境をセットアップできます。
 
-```
-cd ~ && git clone git@github.com:coropome/dotfiles.git
+## 機能
+- 必要なツールを Homebrew でインストール
+- dotfiles (`.zshrc`, `.vimrc` など) のシンボリックリンクを作成
+- ターミナルテーマを自動で適用（MesloLGS Nerd Font）
+
+## 必要条件
+- [Homebrew](https://brew.sh/) がインストールされていること
+- macOS と `Terminal` アプリが必要です
+
+## セットアップ
+
+### 1. リポジトリのクローン
+
+まず、リポジトリをローカルにクローンします：
+
+```bash
+git clone https://github.com/yoheiuc/dotfiles.git
 cd dotfiles
-./setup.sh
 ```
 
-## Other
+### 2. セットアップスクリプトを実行
 
-### Manuall install
+`setup.sh` スクリプトを実行することで、必要なツールをインストールし、dotfiles のシンボリックリンクを作成し、ターミナルテーマを適用します。
 
-- Terminal テーマのインポート
-- Prallels Desktop
+以下のコマンドを実行してください：
+
+```bash
+./setup.sh all
+```
+
+このコマンドにより、以下の処理が行われます：
+- `.Brewfile` に記載された必要なツールを Homebrew でインストール
+- dotfiles（例えば、`.zshrc`, `.vimrc` など）のシンボリックリンクを作成
+- ターミナルテーマ（`theme.terminal`）を適用
+
+### 3. ターミナルテーマの適用
+
+スクリプト実行後、現在のターミナルウィンドウは自動的に終了し、新しいターミナルウィンドウが開きます。インポートされたテーマをデフォルトとして設定する必要があります：
+
+1. ターミナルアプリを開く
+2. **Terminal** → **設定** に移動
+3. `Profiles` タブを選択し、新しくインポートしたテーマを選択
+4. 右クリックして「デフォルトとして使用」を選択
+
+> **注意**: この設定を完全に自動化することはできませんので、手動で設定を行ってください。
+
+### 4. デフォルトエディタの設定
+
+スクリプトでは、Visual Studio Code (`VSCode`) をデフォルトエディタとして設定します。以下のコマンドで `.zshrc` を VSCode で開くことができます：
+
+```bash
+code ~/.zshrc
+```
+
+これにより、設定ファイルが VSCode で開かれ、簡単にカスタマイズできます。
+
+## インストールされるプラグイン
+- **zsh-autosuggestions**: 履歴に基づいてコマンドを補完
+- **zsh-syntax-highlighting**: コマンドの構文を強調表示
+
+## トラブルシューティング
+- ターミナルテーマが自動的に適用されない場合は、手動で `theme.terminal` ファイルをターミナルにインポートしてください。
+- Homebrew が正しくインストールされていることを確認し、`.Brewfile` に記載されたツールがすべてインストールされているか確認してください。
+
+## ライセンス
+MIT ライセンスです。詳細は [LICENSE](LICENSE) ファイルを参照してください。
+
+---
+
+このセットアップは自由にフォークや修正をして、個人用にカスタマイズしてお使いください。
