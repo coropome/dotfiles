@@ -27,7 +27,7 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # Oh My Zsh の設定
 # ==================================
 
-ZSH_THEME="robbyrussell"
+ZSH_THEME="candy"
 
 # 必要なプラグイン
 plugins=(
@@ -136,37 +136,6 @@ extract() {
 # lsコマンドの色設定
 export LSCOLORS="ExFxBxDxCxegedabagacad"
 export LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
-
-# Git情報を含むカスタムプロンプト
-git_prompt_info() {
-    local git_info=""
-    
-    # Gitリポジトリ内かチェック
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-        # ブランチ名を取得
-        local current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-        
-        # ステータスチェック
-        local status_symbol=""
-        if git diff --quiet 2>/dev/null; then
-            status_symbol="%{$fg[green]%}✔%{$reset_color%}"  # 変更がない場合は緑の ✔
-        else
-            status_symbol="%{$fg[red]%}✘%{$reset_color%}"  # 変更がある場合は赤の ✘
-        fi
-        
-        if [[ -n "$current_branch" ]]; then
-            # ブランチ名と状態を表示
-            git_info=" %{$fg[yellow]%}[$current_branch]%{$reset_color%} $status_symbol"
-        fi
-        
-        echo "$git_info"
-    fi
-}
-
-# プロンプトの設定（1行表示、相対パス）
-PROMPT='%{$fg[green]%}%~%{$reset_color%} '                      # 相対パス
-PROMPT+='%{$fg[magenta]%}$(git_prompt_info)%{$reset_color%} '    # Git情報
-PROMPT+='%{$fg[blue]%}→%{$reset_color%} '                         # プロンプトの矢印
 
 # ==================================
 # 補完システム
