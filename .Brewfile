@@ -14,7 +14,6 @@ cask "discord"                      # コミュニケーションツール
 cask "drawio"                       # ダイアグラム作成ツール
 cask "firefox"                      # ウェブブラウザ
 cask "font-meslo-lg-nerd-font"      # ターミナル向け Nerd フォント
-cask "google-chrome"                # ウェブブラウザ
 cask "google-cloud-sdk"             # GCP CLI
 cask "google-japanese-ime"          # 日本語入力
 cask "logi-options+"                # ロジクール製品の設定ツール
