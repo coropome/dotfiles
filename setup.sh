@@ -58,11 +58,7 @@ brew update
 
 # 必要なツールのインストール
 echo "必要なツールをインストールしています..."
-brew install git autojump
-
-# インストール確認
-check_installation git
-check_installation autojump
+brew bundle --file="$HOME/dotfiles/.Brewfile"
 
 # ---------------------------------
 # Oh My Zsh のインストール
