@@ -11,6 +11,7 @@ COPY_LOG="$TMPDIR_ROOT/copy.log"
 CLAUDE_LOG="$TMPDIR_ROOT/claude.log"
 CODEX_LOG="$TMPDIR_ROOT/codex.log"
 GEMINI_LOG="$TMPDIR_ROOT/gemini.log"
+GH_LOG="$TMPDIR_ROOT/gh.log"
 TMUX_STATE="$TMPDIR_ROOT/tmux.state"
 ORIG_PATH="$PATH"
 
@@ -128,7 +129,13 @@ set -euo pipefail
 printf "gemini %s\n" "\$*" >> "$GEMINI_LOG"
 EOF
 
-  chmod +x "$STUB_BIN/git" "$STUB_BIN/tmux" "$STUB_BIN/open" "$STUB_BIN/pbcopy" "$STUB_BIN/claude" "$STUB_BIN/codex" "$STUB_BIN/gemini"
+  cat > "$STUB_BIN/gh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+printf "gh %s\n" "\$*" >> "$GH_LOG"
+EOF
+
+  chmod +x "$STUB_BIN/git" "$STUB_BIN/tmux" "$STUB_BIN/open" "$STUB_BIN/pbcopy" "$STUB_BIN/claude" "$STUB_BIN/codex" "$STUB_BIN/gemini" "$STUB_BIN/gh"
 }
 
 assert_contains() {
@@ -202,6 +209,15 @@ assert_contains "$CODEX_LOG" "codex --latest-trends"
 eval_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" eval review)"
 [[ "$eval_output" == *"mode: local-structure-check"* ]] || fail "ai eval did not run the local evaluation flow"
 [[ "$eval_output" == *"hosted_hint: gh models eval --file"* ]] || fail "ai eval did not print the hosted fallback hint"
+
+PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" eval --hosted review >/dev/null
+assert_contains "$GH_LOG" "gh models eval --file $REPO/prompts/review.prompt.yml"
+
+rm -f "$STUB_BIN/gh"
+hosted_failure="$(
+  PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai" eval --hosted review 2>&1 >/dev/null || true
+)"
+[[ "$hosted_failure" == *"hosted eval requires GitHub CLI"* ]] || fail "ai eval did not explain missing hosted eval backend"
 
 local_workflows_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
 [[ "$local_workflows_output" == *"native"* ]] || fail "local workflows override did not load"
