@@ -3,6 +3,7 @@
 ## Task 1
 
 Title: Promote `ai start` to the primary beginner entrypoint
+Tracking: #1
 
 Problem:
 The repo still exposes multiple bootstrap commands that assume shell and tmux knowledge.
@@ -19,6 +20,7 @@ Beginners can start productive work with one command.
 ## Task 2
 
 Title: Add role-aware agent launching
+Tracking: #2
 
 Problem:
 The current scaffold maps workflow names to tools, but not to prompt files or startup instructions.
@@ -35,6 +37,7 @@ Multi-agent workflows become more repeatable.
 ## Task 3
 
 Title: Expand Linux and WSL compatibility layer
+Tracking: #6
 
 Problem:
 The OS abstraction layer exists, but install and service behavior are still minimal outside macOS.
@@ -51,6 +54,7 @@ More of the AI Dev OS workflow works outside macOS.
 ## Task 4
 
 Title: Prefer native MCP and settings over wrapper reimplementation
+Tracking: #3
 
 Problem:
 Modern AI CLIs increasingly expose MCP, hooks, and local settings directly, but the current scaffold still trends toward wrapper logic.
@@ -67,6 +71,7 @@ When vendors add MCP servers, hooks, headless flags, or subagent features, users
 ## Task 5
 
 Title: Add prompt artifacts and evals as first-class repo assets
+Tracking: #4
 
 Problem:
 Prompt iteration is still implicit in Markdown files, which makes regression testing and cross-model comparison weak.
@@ -83,6 +88,7 @@ Prompt quality becomes reviewable, repeatable, and easier to compare across vend
 ## Task 6
 
 Title: Ship trust policies for MCP and autonomous agents
+Tracking: #5
 
 Problem:
 MCP and agentic coding features increase capability, but also raise the risk of over-broad permissions and unsafe network access.

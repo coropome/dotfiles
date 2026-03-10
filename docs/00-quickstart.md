@@ -9,7 +9,10 @@
 1. iTerm2 をインストール（任意：標準Terminalでも可）
 2. `make install` を実行
    - Homebrew の core パッケージ導入と dotfiles のリンクをまとめて行う
-3. 新しいターミナルで `tnew`
+3. 必要なら `make mac` と `make agent` を実行
+4. 新しいターミナルで `ai start`
+
+tmux を直接扱いたい時だけ `tnew` を使う。
 
 追加で入れるもの:
 
@@ -34,7 +37,7 @@
 ## よくあるつまずき
 
 - tmuxから「抜けたい」: `Ctrl-a d`（detach）
-  - また戻る: `tgo`（または `tnew`）
+  - また戻る: `ai start` / `tgo` / `tnew`
 - 再起動後に作業を戻したい: `tnew` で tmux を起動すると、保存済み session が自動復元される
   - 手動保存: `Ctrl-a Ctrl-s`
   - 手動復元: `Ctrl-a Ctrl-r`

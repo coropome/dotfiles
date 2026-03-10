@@ -188,6 +188,13 @@ verify_layout_scaffold() {
   assert_file "$REPO/tmux/layout.conf"
 }
 
+verify_ai_dev_os_docs() {
+  grep -Fq "ai start" "$REPO/README.md" \
+    || fail "README.md does not mention ai start"
+  grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ai start"
+}
+
 verify_layout_scaffold
 verify_links_manifest
 verify_helper_inventory
@@ -195,5 +202,6 @@ verify_tmux_plugin_manifest
 verify_git_layout
 verify_tmux_compatibility_hooks
 verify_package_manifests
+verify_ai_dev_os_docs
 
 echo "repository structure test passed"

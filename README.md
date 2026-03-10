@@ -2,7 +2,8 @@
 
 Mac + zsh + iTerm2 + tmux を「最初から」使うための dotfiles。
 
-- 入口は **`tnew`**（tmux セッション作成/復帰の入口）
+- beginner 向けの入口は **`ai start`**
+- tmux を直接使う場合の入口は **`tnew`**
 
 設計思想: `docs/90-philosophy.md`
 管理境界: `docs/91-state-ownership.md`
@@ -25,8 +26,8 @@ make mac
 # （任意）キーボード調整（挙動が変わるので分離）
 make keyboard
 
-# 新しいターミナルを開いたら（または手動で）
-tnew
+# 新しいターミナルを開いたら
+ai start
 ```
 
 前提:
@@ -52,9 +53,12 @@ tnew
 
 ## まず覚える（これだけ）
 
+- `ai start`：AI Dev OS の workspace を起動
+- `ai code` / `ai review` / `ai agents`：AI workflow の入口
+- `tnew`：tmux を直接扱いたい時の入口
+
 prefix は **Ctrl-a**（互換: **Ctrl-b** もOK）
 
-- `tnew`：迷ったらこれ
 - `prefix + |` / `prefix + -`：pane 分割
 - `prefix + d`：detach
 - `prefix + ?` / `prefix + /`：help
@@ -136,10 +140,10 @@ git layer の構成と include の仕組み、optional signing の考え方は `
 - まずは `make help`
 - `make install`：core setup
 - `make mac`：アプリ / CLI 導入
+- `make agent`：AI agent CLI セットアップ
 - `make doctor`：状態確認
 - `make test`：回帰確認
 - `make uninstall`：symlink と git include を戻す
-- `make agent`：agent CLI セットアップ
 - 詳細な target 一覧: `make help`
 - macOS 系 target の説明: `docs/30-mac-setup.md`
 - support boundary と manual apply: `docs/31-support-matrix.md`

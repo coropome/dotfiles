@@ -145,11 +145,21 @@ printf "copied" | PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-copy"
 [[ "$(cat "$COPY_LOG")" == "copied" ]] || fail "ai-copy did not forward stdin"
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-start" --repo "$TEST_REPO" >/dev/null || true
+[[ -f "$TEST_REPO/.context/summary.md" ]] || fail "ai-start did not refresh summary.md"
 assert_contains "$TMUX_LOG" "new-session -d -s ai-dev-os-project -n workspace -c $TEST_REPO"
-assert_contains "$TMUX_LOG" "send-keys -t ai-dev-os-project:workspace.1 $REPO/bin/ai-context --repo $TEST_REPO --show"
+assert_contains "$TMUX_LOG" "split-window -v -t ai-dev-os-project:workspace.1 -c $TEST_REPO"
+assert_contains "$TMUX_LOG" "send-keys -t ai-dev-os-project:workspace.2 $REPO/bin/ai-context --repo $TEST_REPO --show"
+assert_contains "$TMUX_LOG" "select-layout -t ai-dev-os-project:workspace tiled"
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" stop --repo "$TEST_REPO" >/dev/null
 assert_contains "$TMUX_LOG" "kill-session -t ai-dev-os-project"
+
+rm -f "$STUB_BIN/tmux"
+start_failure="$(
+  PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" 2>&1 >/dev/null || true
+)"
+[[ "$start_failure" == *"missing dependency: tmux"* ]] || fail "ai-start did not explain missing tmux"
+[[ "$start_failure" == *"run: make install"* ]] || fail "ai-start did not show tmux remediation"
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" code >/dev/null
 assert_contains "$CLAUDE_LOG" "claude "

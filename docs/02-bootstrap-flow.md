@@ -86,6 +86,7 @@ make install
 make install
 make mac
 make agent
+ai start
 ```
 
 挙動変更も入れるなら:
