@@ -87,6 +87,9 @@ run_doctor
 
 assert_contains "[WARN] not macOS (bootstrap is macOS-first; doctor is best-effort here)"
 assert_contains "[NG] brew not found (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] claude not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] gemini not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] codex not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[NG] $TEST_HOME/.zshrc missing (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[NG] git include.path missing (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[..] xcode-select: skipped on non-macOS"

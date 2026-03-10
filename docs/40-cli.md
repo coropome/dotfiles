@@ -4,7 +4,7 @@
 
 ## agent CLI の位置づけ
 
-`make mac` で `node` / `npm` / `uv` / `python3` などの実行環境を揃え、`make agent` で以下の CLI を入れる想定。
+`make mac` で `node` / `uv` / `python3` などの実行環境を揃え、`make agent` で以下の CLI を Homebrew 経由で入れる想定。
 
 ```bash
 claude --version

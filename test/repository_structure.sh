@@ -70,6 +70,7 @@ verify_helper_inventory() {
   local manifest="$REPO/manifests/helpers.txt"
   local helper
   local -a helpers=()
+  local required
 
   assert_file "$manifest"
   while IFS= read -r helper || [[ -n "${helper:-}" ]]; do
@@ -79,6 +80,11 @@ verify_helper_inventory() {
   done < "$manifest"
 
   [[ ${#helpers[@]} -gt 0 ]] || fail "no helpers found in $manifest"
+
+  for required in ai ai-start ai-agent ai-context ai-task ai-install ai-copy ai-open; do
+    printf '%s\n' "${helpers[@]}" | grep -Fxq "$required" \
+      || fail "missing helper '$required' in $manifest"
+  done
 }
 
 verify_tmux_plugin_manifest() {
@@ -131,7 +137,8 @@ verify_package_manifests() {
     "$REPO/manifests/packages/core-brew.txt" \
     "$REPO/manifests/packages/macos-brew.txt" \
     "$REPO/manifests/packages/macos-cask.txt" \
-    "$REPO/manifests/packages/agent-npm.txt"
+    "$REPO/manifests/packages/agent-brew.txt" \
+    "$REPO/manifests/packages/agent-cask.txt"
   do
     assert_file "$manifest"
     line="$(grep -Ev '^\s*(#|$)' "$manifest" | head -1 || true)"
@@ -142,6 +149,13 @@ verify_package_manifests() {
 }
 
 verify_layout_scaffold() {
+  assert_file "$REPO/install"
+  assert_executable "$REPO/install"
+  assert_dir "$REPO/ai"
+  assert_dir "$REPO/os"
+  assert_dir "$REPO/prompts"
+  assert_dir "$REPO/context"
+  assert_dir "$REPO/tasks"
   assert_dir "$REPO/lib/bootstrap"
   assert_dir "$REPO/lib/dotfiles"
   assert_dir "$REPO/manifests/bootstrap"
@@ -149,6 +163,19 @@ verify_layout_scaffold() {
   assert_dir "$REPO/manifests/tmux"
   assert_dir "$REPO/zsh/modules"
   assert_dir "$REPO/tmux/conf.d"
+  assert_file "$REPO/ai/agents.yml"
+  assert_file "$REPO/ai/workflows.yml"
+  assert_file "$REPO/os/mac.sh"
+  assert_file "$REPO/os/linux.sh"
+  assert_file "$REPO/os/wsl.sh"
+  assert_file "$REPO/prompts/architect.md"
+  assert_file "$REPO/prompts/implementer.md"
+  assert_file "$REPO/prompts/reviewer.md"
+  assert_file "$REPO/prompts/researcher.md"
+  assert_file "$REPO/context/build-context.sh"
+  assert_executable "$REPO/context/build-context.sh"
+  assert_file "$REPO/tasks/backlog.md"
+  assert_file "$REPO/tmux/layout.conf"
 }
 
 verify_layout_scaffold

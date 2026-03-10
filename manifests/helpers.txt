@@ -11,3 +11,11 @@ _platform
 _clipboard_copy
 _open
 _tmux_help
+ai
+ai-start
+ai-agent
+ai-context
+ai-task
+ai-install
+ai-copy
+ai-open

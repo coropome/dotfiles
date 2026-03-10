@@ -1,0 +1,25 @@
+agents:
+  claude:
+    command: claude
+    role: coding-agent
+    description: Claude Code interactive coding agent
+  codex:
+    command: codex
+    role: coding-agent
+    description: OpenAI Codex CLI for repository work
+  architect:
+    command: claude
+    role: architect
+    description: Drafts plans and high-level system changes
+  implementer:
+    command: claude
+    role: implementer
+    description: Applies changes for the current task
+  reviewer:
+    command: codex
+    role: reviewer
+    description: Reviews code for regressions and risks
+  researcher:
+    command: codex
+    role: researcher
+    description: Investigates tooling and workflow ideas

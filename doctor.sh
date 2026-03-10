@@ -76,11 +76,13 @@ platform_name="$(uname -s)"
 if [[ "$platform_name" == "Darwin" ]]; then
   bootstrap_hint="run: make install"
   package_hint="run: make mac"
+  agent_cli_hint="run: make agent"
   ok "macOS"
   info "macOS version: $(sw_vers -productVersion 2>/dev/null || echo '?')"
 else
   bootstrap_hint="manual bootstrap on non-macOS; see docs/31-support-matrix.md"
   package_hint="manual package setup on non-macOS; see docs/31-support-matrix.md"
+  agent_cli_hint="manual agent setup on non-macOS; see docs/31-support-matrix.md"
   warn "not macOS (bootstrap is macOS-first; doctor is best-effort here)"
   info "platform: $platform_name"
 fi
@@ -109,19 +111,19 @@ done
 if command -v claude >/dev/null 2>&1; then
   ok "claude: $(command -v claude)"
 else
-  ng "claude not found (run: npm install -g @anthropic-ai/claude-code)"
+  ng "claude not found ($agent_cli_hint)"
 fi
 
 if command -v gemini >/dev/null 2>&1; then
   ok "gemini: $(command -v gemini)"
 else
-  ng "gemini not found (run: npm install -g @google/gemini-cli)"
+  ng "gemini not found ($agent_cli_hint)"
 fi
 
 if command -v codex >/dev/null 2>&1; then
   ok "codex: $(command -v codex)"
 else
-  ng "codex not found (run: npm install -g @openai/codex)"
+  ng "codex not found ($agent_cli_hint)"
 fi
 
 # core extras (used by gitconfig / lint)

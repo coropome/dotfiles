@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+usage() {
+  cat <<'EOF'
+usage: ai <command> [args...]
+
+Commands:
+  start         launch the AI Dev OS workspace
+  stop          stop the AI Dev OS workspace
+  agents        list configured agents
+  agent         run or inspect a configured agent
+  context       build repository context
+  task          show the current backlog
+  code          launch the default coding agent
+  review        launch the default review agent
+  install       run the OS abstraction install wrapper
+  copy          copy stdin through the AI clipboard wrapper
+  open          open a path or URL through the AI open wrapper
+EOF
+}
+
+command_name="${1:-}"
+if [[ -z "$command_name" ]]; then
+  usage
+  exit 2
+fi
+shift || true
+
+case "$command_name" in
+  start)
+    exec "$BIN_DIR/ai-start" "$@"
+    ;;
+  stop)
+    exec "$BIN_DIR/ai-start" --stop "$@"
+    ;;
+  agents)
+    exec "$BIN_DIR/ai-agent" --list "$@"
+    ;;
+  agent)
+    exec "$BIN_DIR/ai-agent" "$@"
+    ;;
+  context)
+    exec "$BIN_DIR/ai-context" "$@"
+    ;;
+  task)
+    exec "$BIN_DIR/ai-task" "$@"
+    ;;
+  code)
+    exec "$BIN_DIR/ai-agent" "$(awk '
+      $0 ~ "^workflows:" { in_section=1; next }
+      in_section && $0 ~ "^  code:" { in_workflow=1; next }
+      in_workflow && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
+      in_workflow && $0 ~ "^    default_agent:" {
+        sub("^    default_agent: ", "", $0)
+        print $0
+        exit
+      }
+    ' "$BIN_DIR/../ai/workflows.yml")" "$@"
+    ;;
+  review)
+    exec "$BIN_DIR/ai-agent" "$(awk '
+      $0 ~ "^workflows:" { in_section=1; next }
+      in_section && $0 ~ "^  review:" { in_workflow=1; next }
+      in_workflow && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
+      in_workflow && $0 ~ "^    default_agent:" {
+        sub("^    default_agent: ", "", $0)
+        print $0
+        exit
+      }
+    ' "$BIN_DIR/../ai/workflows.yml")" "$@"
+    ;;
+  install)
+    exec "$BIN_DIR/ai-install" "$@"
+    ;;
+  copy)
+    exec "$BIN_DIR/ai-copy" "$@"
+    ;;
+  open)
+    exec "$BIN_DIR/ai-open" "$@"
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    echo "unknown ai command: $command_name" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

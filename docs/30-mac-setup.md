@@ -7,7 +7,7 @@
 - `make install` は最小構成の導入
 - Homebrew の core パッケージは `Brewfile` で導入し、`.zprofile` / zsh / tmux / git / helper commands を有効化する
 - `make mac` は安全側（アプリ導入と、agent用ランタイムの準備まで）
-- `make agent` で Claude Code / Gemini / Codex CLI を入れる
+- `make agent` で Claude Code / Gemini / Codex CLI を Homebrew で入れる
 - `make defaults` / `make keyboard` / `make dock` / `make ssh` は挙動変更や状態変更を伴うので phase を分ける
 - キーボード/OS設定は環境差が大きいので **オプション**（`make keyboard`）
 

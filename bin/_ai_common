@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ai_script_path() {
+  local script_path="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
+
+  if [[ -L "$script_path" ]]; then
+    script_path="$(readlink "$script_path")"
+  fi
+
+  printf '%s\n' "$script_path"
+}
+
+ai_bin_dir() {
+  local script_path="${1:-$(ai_script_path)}"
+  cd "$(dirname "$script_path")" && pwd -P
+}
+
+ai_repo_root() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+  cd "$bin_dir/.." && pwd -P
+}
+
+ai_detect_os() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+
+  case "$("$bin_dir/_platform" --variant)" in
+    darwin)
+      printf 'mac\n'
+      ;;
+    linux)
+      printf 'linux\n'
+      ;;
+    wsl)
+      printf 'wsl\n'
+      ;;
+    *)
+      printf 'unknown\n'
+      ;;
+  esac
+}
+
+ai_target_repo_root() {
+  local target_dir="${1:-$PWD}"
+
+  if git -C "$target_dir" rev-parse --show-toplevel >/dev/null 2>&1; then
+    git -C "$target_dir" rev-parse --show-toplevel
+  else
+    cd "$target_dir" && pwd -P
+  fi
+}
+
+ai_context_dir() {
+  local target_repo="${1:-$(ai_target_repo_root)}"
+  printf '%s/.context\n' "$target_repo"
+}
+
+ai_load_os_layer() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+  local repo_root="${2:-$(ai_repo_root "$bin_dir")}"
+
+  AI_OS="${AI_OS:-$(ai_detect_os "$bin_dir")}"
+  export AI_OS
+
+  if [[ ! -f "$repo_root/os/$AI_OS.sh" ]]; then
+    echo "unsupported AI_OS: $AI_OS" >&2
+    return 1
+  fi
+
+  # shellcheck source=/dev/null
+  source "$repo_root/os/$AI_OS.sh"
+}
+
+ai_agents_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  printf '%s/ai/agents.yml\n' "$repo_root"
+}
+
+ai_workflows_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  printf '%s/ai/workflows.yml\n' "$repo_root"
+}
+
+ai_config_value() {
+  local file="$1"
+  local section="$2"
+  local key="$3"
+  local nested_key="${4:-}"
+
+  awk -v section="$section" -v key="$key" -v nested_key="$nested_key" '
+    $0 ~ "^" section ":" { in_section=1; next }
+    in_section && $0 ~ "^[A-Za-z0-9_-]+:" { exit }
+    in_section && $0 ~ "^  " key ":" {
+      if (nested_key == "") {
+        line=$0
+        sub("^  " key ": ", "", line)
+        print line
+        exit
+      }
+      in_key=1
+      next
+    }
+    in_key && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
+    in_key && $0 ~ "^    " nested_key ":" {
+      line=$0
+      sub("^    " nested_key ": ", "", line)
+      print line
+      exit
+    }
+  ' "$file"
+}
+
+ai_session_name() {
+  local repo_root="$1"
+  local tmux_layout="$2"
+  local prefix base
+
+  prefix="$(
+    awk -F= '
+      /^AI_TMUX_SESSION_PREFIX=/{print $2; found=1; exit}
+      /^AI_SESSION_PREFIX=/{print $2; found=1; exit}
+      /^AI_TMUX_SESSION_NAME=/{print $2; found=1; exit}
+      END { if (!found) print "" }
+    ' "$tmux_layout"
+  )"
+  prefix="${prefix%\"}"
+  prefix="${prefix#\"}"
+  [[ -n "$prefix" ]] || prefix="ai-dev-os"
+
+  base="$(basename "$repo_root")"
+  base="${base//[^A-Za-z0-9_-]/-}"
+  base="${base##-}"
+  base="${base%%-}"
+  [[ -n "$base" ]] || base="workspace"
+
+  printf '%s-%s\n' "$prefix" "$base"
+}

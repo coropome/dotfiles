@@ -1,0 +1,10 @@
+workflows:
+  code:
+    default_agent: implementer
+    description: Launch the primary implementation agent
+  review:
+    default_agent: reviewer
+    description: Launch the default review agent
+  task:
+    default_agent: architect
+    description: Inspect the current backlog

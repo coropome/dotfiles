@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+AGENTS_FILE="$(ai_agents_file "$REPO_ROOT")"
+
+usage() {
+  cat <<'EOF'
+usage: ai-agent [--list] [--describe agent-name] [agent-name [args...]]
+EOF
+}
+
+list_agents() {
+  awk '
+    /^agents:/ { in_section=1; next }
+    in_section && /^[A-Za-z0-9_-]+:/ { exit }
+    in_section && /^  [A-Za-z0-9_-]+:/ {
+      line=$0
+      sub(/^  /, "", line)
+      sub(/:$/, "", line)
+      print line
+    }
+  ' "$AGENTS_FILE"
+}
+
+if [[ "${1:-}" == "--list" ]]; then
+  list_agents
+  exit 0
+fi
+
+describe_requested=0
+if [[ "${1:-}" == "--describe" ]]; then
+  describe_requested=1
+  shift || true
+fi
+
+agent_name="${1:-}"
+if [[ -z "$agent_name" ]]; then
+  usage
+  exit 2
+fi
+shift || true
+
+command_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "command")"
+role_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "role")"
+
+if [[ -z "$command_name" ]]; then
+  echo "unknown agent: $agent_name" >&2
+  exit 2
+fi
+
+if [[ $describe_requested -eq 1 ]]; then
+  printf 'agent: %s\n' "$agent_name"
+  printf 'command: %s\n' "$command_name"
+  printf 'role: %s\n' "${role_name:-unknown}"
+  exit 0
+fi
+
+exec "$command_name" "$@"

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+usage() {
+  cat <<'EOF'
+usage: ai-context [--repo PATH] [--show|--print-dir]
+EOF
+}
+
+repo_path=""
+args=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      repo_path="$2"
+      shift 2
+      ;;
+    --show|--print-dir)
+      args+=("$1")
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+if [[ -n "$repo_path" ]]; then
+  if [[ ${#args[@]} -gt 0 ]]; then
+    exec "$BIN_DIR/../context/build-context.sh" --repo "$repo_path" "${args[@]}"
+  fi
+  exec "$BIN_DIR/../context/build-context.sh" --repo "$repo_path"
+fi
+
+if [[ ${#args[@]} -gt 0 ]]; then
+  exec "$BIN_DIR/../context/build-context.sh" "${args[@]}"
+fi
+
+exec "$BIN_DIR/../context/build-context.sh"

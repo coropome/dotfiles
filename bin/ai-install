@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+ai_load_os_layer "$BIN_DIR" "$REPO_ROOT"
+
+usage() {
+  cat <<'EOF'
+usage: ai-install <packages|apps> [name...]
+EOF
+}
+
+mode="${1:-}"
+if [[ -z "$mode" ]]; then
+  usage
+  exit 2
+fi
+shift || true
+
+case "$mode" in
+  packages)
+    ai_os_install_packages "$@"
+    ;;
+  apps|casks)
+    ai_os_install_apps "$@"
+    ;;
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "unknown ai-install mode: $mode" >&2
+    exit 2
+    ;;
+esac
