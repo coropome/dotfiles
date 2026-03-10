@@ -210,8 +210,22 @@ verify_layout_scaffold() {
 verify_ai_dev_os_docs() {
   grep -Fq "ai start" "$REPO/README.md" \
     || fail "README.md does not mention ai start"
+  grep -Fq "./install" "$REPO/README.md" \
+    || fail "README.md does not contain the OSS quickstart install path"
+  grep -Fq "Beginner path" "$REPO/README.md" \
+    || fail "README.md does not distinguish the beginner path"
+  grep -Fq "Advanced / manual path" "$REPO/README.md" \
+    || fail "README.md does not distinguish the advanced path"
   grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
     || fail "docs/00-quickstart.md does not mention ai start"
+  grep -Fq "./install" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ./install"
+  grep -Fq "Beginner Path" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not have a beginner path section"
+  grep -Fq "Advanced Path" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not have an advanced path section"
+  grep -Fq "make agent" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not cover missing agent CLIs"
   grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
   grep -Fq ".claude/settings.json" "$REPO/docs/40-cli.md" \
