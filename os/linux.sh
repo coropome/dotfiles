@@ -7,6 +7,8 @@ ai_os_linux_pkg_manager() {
     printf 'dnf\n'
   elif command -v pacman >/dev/null 2>&1; then
     printf 'pacman\n'
+  elif command -v apk >/dev/null 2>&1; then
+    printf 'apk\n'
   else
     printf '\n'
   fi
@@ -26,6 +28,9 @@ ai_os_install_packages() {
     pacman)
       exec sudo pacman -S --noconfirm "$@"
       ;;
+    apk)
+      exec sudo apk add "$@"
+      ;;
     *)
       echo "no supported Linux package manager found" >&2
       return 1
@@ -39,6 +44,10 @@ ai_os_install_apps() {
 }
 
 ai_os_open() {
+  if ! command -v xdg-open >/dev/null 2>&1; then
+    echo "xdg-open not found; install xdg-utils or use a supported desktop environment" >&2
+    return 1
+  fi
   exec xdg-open "$1"
 }
 
@@ -49,5 +58,9 @@ ai_os_copy() {
   if command -v xclip >/dev/null 2>&1; then
     exec xclip -selection clipboard
   fi
-  exec xsel --clipboard --input
+  if command -v xsel >/dev/null 2>&1; then
+    exec xsel --clipboard --input
+  fi
+  echo "no supported Linux clipboard tool found; install wl-copy, xclip, or xsel" >&2
+  return 1
 }

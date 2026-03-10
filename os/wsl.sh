@@ -21,9 +21,20 @@ ai_os_open() {
   if command -v wslview >/dev/null 2>&1; then
     exec wslview "$1"
   fi
-  exec explorer.exe "$1"
+  if command -v explorer.exe >/dev/null 2>&1; then
+    exec explorer.exe "$1"
+  fi
+  if command -v xdg-open >/dev/null 2>&1; then
+    exec xdg-open "$1"
+  fi
+  echo "no supported WSL opener found; install wslu or ensure explorer.exe is available" >&2
+  return 1
 }
 
 ai_os_copy() {
-  exec clip.exe
+  if command -v clip.exe >/dev/null 2>&1; then
+    exec clip.exe
+  fi
+  echo "clip.exe not found; run from WSL with Windows integration enabled" >&2
+  return 1
 }

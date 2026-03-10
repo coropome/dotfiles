@@ -43,6 +43,28 @@ Linux / WSL では、現状は **自己責任の手動適用** 扱い。
 `make doctor` は Linux / WSL でも使えるが、出力は best-effort health check。
 不足項目の remediation は `make install` / `make mac` ではなく、manual setup を案内する。
 
+### current wrapper behavior
+
+- Linux package manager detection
+  - `apt-get`
+  - `dnf`
+  - `pacman`
+  - `apk`
+- Linux open wrapper
+  - `xdg-open`
+- Linux clipboard wrapper
+  - `wl-copy`
+  - `xclip`
+  - `xsel`
+- WSL open wrapper
+  - `wslview`
+  - `explorer.exe`
+  - `xdg-open`
+- WSL clipboard wrapper
+  - `clip.exe`
+
+どれも見つからない場合は raw failure ではなく remediation message を返す。
+
 ## ドキュメントの読み方
 
 - macOS で導入する: `docs/02-bootstrap-flow.md`
