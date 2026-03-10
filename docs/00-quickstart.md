@@ -12,6 +12,15 @@
 3. 必要なら `make mac` と `make agent` を実行
 4. 新しいターミナルで `ai start`
 
+別の Git repo を AI Dev OS で使いたい時は:
+
+1. その repo に移動
+2. `ai init`
+3. `ai workflows`
+4. `ai start`
+
+`ai init` は repo root に `.ai-dev-os/` を作り、既存ファイルがあれば skip する。
+
 tmux を直接扱いたい時だけ `tnew` を使う。
 
 追加で入れるもの:

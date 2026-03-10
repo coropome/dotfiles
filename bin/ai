@@ -20,6 +20,7 @@ usage: ai <command> [args...]
 Main Commands:
   start         launch the AI Dev OS workspace
   stop          stop the AI Dev OS workspace
+  init          scaffold project-local AI Dev OS config in the current repo
   workflows     list configured workflows with descriptions
   agents        list configured agents with provider and role metadata
   agent         run or inspect a configured agent
@@ -70,6 +71,9 @@ case "$command_name" in
     ;;
   stop)
     exec "$BIN_DIR/ai-start" --stop "$@"
+    ;;
+  init)
+    exec "$BIN_DIR/ai-init" "$@"
     ;;
   agents)
     exec "$BIN_DIR/ai-agent" --list "$@"

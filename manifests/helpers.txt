@@ -12,6 +12,7 @@ _clipboard_copy
 _open
 _tmux_help
 ai
+ai-init
 ai-start
 ai-agent
 ai-context

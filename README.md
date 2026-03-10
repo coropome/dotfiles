@@ -42,6 +42,19 @@ ai start
 サポート範囲: `docs/31-support-matrix.md`
 最短の導入ガイド: `docs/00-quickstart.md`
 
+### 別の repo で AI Dev OS を使う
+
+dotfiles 自体を入れたあと、作業したい repo では次だけで始められる。
+
+```bash
+cd /path/to/your-repo
+ai init
+ai workflows
+ai start
+```
+
+`ai init` は `.ai-dev-os/` を project-local に生成し、既存ファイルは上書きしない。
+
 ### install の挙動（重要）
 
 - `make install` は Homebrew で core パッケージを入れたうえで、`.zshrc` / `.zprofile` / tmux / git / helper commands を **シンボリックリンクで差し替え**ます

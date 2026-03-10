@@ -88,7 +88,7 @@ verify_helper_inventory() {
 
   [[ ${#helpers[@]} -gt 0 ]] || fail "no helpers found in $manifest"
 
-  for required in ai ai-start ai-agent ai-context ai-task ai-eval ai-install ai-copy ai-open; do
+  for required in ai ai-init ai-start ai-agent ai-context ai-task ai-eval ai-install ai-copy ai-open; do
     printf '%s\n' "${helpers[@]}" | grep -Fxq "$required" \
       || fail "missing helper '$required' in $manifest"
   done
@@ -212,8 +212,12 @@ verify_ai_dev_os_docs() {
     || fail "README.md does not mention ai start"
   grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
     || fail "docs/00-quickstart.md does not mention ai start"
+  grep -Fq "ai init" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ai init"
   grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
+  grep -Fq "ai init" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document ai init"
   grep -Fq ".claude/settings.json" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document vendor-native config boundaries"
   grep -Fq "ai eval" "$REPO/docs/40-cli.md" \
