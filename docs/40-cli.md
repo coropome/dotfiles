@@ -55,6 +55,32 @@ agents:
 
 この形なら、AI Dev OS の shell code を編集せずに repo ごとの workflow を差し替えられる。
 
+## 新しい role を足す
+
+role を増やす時は `bin/` を編集しない。
+
+1. `ai/agents.yml` か `.ai-dev-os/agents.yml` に agent を追加する
+2. `command`, `role`, `prompt_file` を入れる
+3. 必要なら `user_config`, `project_config`, `mcp_config` を足す
+4. `ai/workflows.yml` か `.ai-dev-os/workflows.yml` で workflow からその role を参照する
+5. `ai-agent --describe <role>` で metadata を確認する
+
+例:
+
+```yaml
+agents:
+  local_architect:
+    command: claude
+    role: architect
+    prompt_file: prompts/architect.md
+```
+
+```yaml
+workflows:
+  plan:
+    default_agent: local_architect
+```
+
 ## ai eval
 
 prompt artifact を repo asset として扱う入口は `ai eval`。

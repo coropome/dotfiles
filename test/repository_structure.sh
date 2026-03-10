@@ -200,6 +200,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document vendor-native config boundaries"
   grep -Fq "ai eval" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai eval"
+  grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not explain role metadata"
 }
 
 verify_layout_scaffold

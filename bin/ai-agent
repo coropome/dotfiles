@@ -74,6 +74,7 @@ project_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project
 project_extensions="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_extensions")"
 mcp_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "mcp_config")"
 automation_mode="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "automation_mode")"
+prompt_file="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "prompt_file")"
 
 if [[ -z "$command_name" ]]; then
   echo "unknown agent: $agent_name" >&2
@@ -94,6 +95,7 @@ if [[ $describe_requested -eq 1 ]]; then
   [[ -n "$project_config" ]] && printf 'project_config: %s\n' "$project_config"
   [[ -n "$project_extensions" ]] && printf 'project_extensions: %s\n' "$project_extensions"
   [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
+  [[ -n "$prompt_file" ]] && printf 'prompt_file: %s\n' "$prompt_file"
   exit 0
 fi
 

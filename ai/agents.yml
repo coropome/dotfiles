@@ -4,6 +4,7 @@ agents:
     command: claude
     role: coding-agent
     description: Claude Code interactive coding agent
+    prompt_file: prompts/implementer.md
     docs_url: https://code.claude.com/docs/en/settings
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -15,6 +16,7 @@ agents:
     command: gemini
     role: coding-agent
     description: Gemini CLI terminal agent with MCP and headless workflows
+    prompt_file: prompts/researcher.md
     docs_url: https://github.com/google-gemini/gemini-cli
     user_config: ~/.gemini/settings.json
     mcp_config: ~/.gemini/settings.json
@@ -24,6 +26,7 @@ agents:
     command: codex
     role: coding-agent
     description: OpenAI Codex CLI for repository work
+    prompt_file: prompts/reviewer.md
     docs_url: https://developers.openai.com/codex/cloud
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
@@ -33,6 +36,7 @@ agents:
     command: claude
     role: architect
     description: Drafts plans and high-level system changes
+    prompt_file: prompts/architect.md
     docs_url: https://code.claude.com/docs/en/sub-agents
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -44,6 +48,7 @@ agents:
     command: claude
     role: implementer
     description: Applies changes for the current task
+    prompt_file: prompts/implementer.md
     docs_url: https://code.claude.com/docs/en/sub-agents
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -55,6 +60,7 @@ agents:
     command: codex
     role: reviewer
     description: Reviews code for regressions and risks
+    prompt_file: prompts/reviewer.md
     docs_url: https://developers.openai.com/codex/cloud
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
@@ -64,6 +70,7 @@ agents:
     command: codex
     role: researcher
     description: Investigates tooling and workflow ideas
+    prompt_file: prompts/researcher.md
     docs_url: https://docs.github.com/en/github-models/about-github-models
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
