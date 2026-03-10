@@ -11,8 +11,8 @@ messages:
       {{change_request}}
 testData:
   - change_request: |
-      Add a new CLI command that touches project bootstrap.
+      Add a project-local AI workflow scaffold for this repository.
 evaluators:
-  - name: Mentions regression risk
+  - name: Mentions rollout risk
     string:
       contains: risk

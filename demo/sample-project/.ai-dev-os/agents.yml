@@ -1,9 +1,13 @@
 agents:
-  implementer:
+  local_implementer:
+    provider: anthropic
     command: claude
     role: implementer
-    prompt_file: prompts/review.prompt.yml
-  reviewer:
+    description: Project-local implementation workflow
+    prompt_file: .ai-dev-os/prompts/implementer.md
+  local_reviewer:
+    provider: openai
     command: codex
     role: reviewer
-    prompt_file: prompts/review.prompt.yml
+    description: Project-local review workflow
+    prompt_file: .ai-dev-os/prompts/review.prompt.yml

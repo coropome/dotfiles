@@ -174,7 +174,8 @@ init_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" init --repo "$INIT_REP
 [[ "$init_output" == *".ai-dev-os/agents.yml"* ]] || fail "ai init did not generate agents.yml"
 [[ -f "$INIT_REPO/.ai-dev-os/agents.yml" ]] || fail "ai init did not create .ai-dev-os/agents.yml"
 [[ -f "$INIT_REPO/.ai-dev-os/workflows.yml" ]] || fail "ai init did not create .ai-dev-os/workflows.yml"
-[[ -f "$INIT_REPO/prompts/review.prompt.yml" ]] || fail "ai init did not create starter prompt artifact"
+[[ -f "$INIT_REPO/.ai-dev-os/prompts/review.prompt.yml" ]] || fail "ai init did not create starter prompt artifact"
+[[ -f "$INIT_REPO/.ai-dev-os/prompts/implementer.md" ]] || fail "ai init did not create the starter implementer prompt"
 [[ -f "$INIT_REPO/.ai-dev-os/README.md" ]] || fail "ai init did not create trust-template pointer doc"
 assert_contains "$INIT_REPO/.ai-dev-os/README.md" "templates/ai-trust/claude-settings.json"
 

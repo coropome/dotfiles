@@ -28,7 +28,8 @@ mkdir -p "$GENERATED"
 assert_same_file "$GENERATED/.ai-dev-os/agents.yml" "$DEMO/.ai-dev-os/agents.yml"
 assert_same_file "$GENERATED/.ai-dev-os/workflows.yml" "$DEMO/.ai-dev-os/workflows.yml"
 assert_same_file "$GENERATED/.ai-dev-os/README.md" "$DEMO/.ai-dev-os/README.md"
-assert_same_file "$GENERATED/prompts/review.prompt.yml" "$DEMO/prompts/review.prompt.yml"
+assert_same_file "$GENERATED/.ai-dev-os/prompts/implementer.md" "$DEMO/.ai-dev-os/prompts/implementer.md"
+assert_same_file "$GENERATED/.ai-dev-os/prompts/review.prompt.yml" "$DEMO/.ai-dev-os/prompts/review.prompt.yml"
 
 grep -Fq "ai start" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai start"

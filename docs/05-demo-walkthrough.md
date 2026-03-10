@@ -47,7 +47,8 @@ ai eval review
 
 - `.ai-dev-os/agents.yml`
 - `.ai-dev-os/workflows.yml`
-- `prompts/review.prompt.yml`
+- `.ai-dev-os/prompts/implementer.md`
+- `.ai-dev-os/prompts/review.prompt.yml`
 
 ## Notes
 

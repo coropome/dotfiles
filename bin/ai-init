@@ -60,7 +60,7 @@ write_if_missing() {
     return 0
   fi
 
-  printf '%s' "$content" > "$path"
+  printf '%s\n' "$content" > "$path"
   printf 'generated: %s\n' "$path"
 }
 
