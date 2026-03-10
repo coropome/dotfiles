@@ -25,6 +25,7 @@ Commands:
   agent         run or inspect a configured agent
   context       build repository context
   task          show the current backlog
+  init          generate starter AI Dev OS project files
   code          launch the configured code workflow
   review        launch the configured review workflow
   eval          inspect or validate prompt artifacts
@@ -62,6 +63,9 @@ case "$command_name" in
     ;;
   task)
     exec "$BIN_DIR/ai-task" "$@"
+    ;;
+  init)
+    exec "$BIN_DIR/ai-init" "$@"
     ;;
   code)
     exec "$BIN_DIR/ai-agent" --workflow code "$@"

@@ -103,6 +103,25 @@ hosted eval が必要なら、出力される `gh models eval --file ...` をそ
 3. `ai eval <name>` で local check を通す
 4. 必要なら `gh models eval --file prompts/<name>.prompt.yml` で hosted eval に流す
 
+## ai init
+
+新しい repo で AI Dev OS の local override を始める時は `ai init` を使う。
+
+```bash
+ai init
+ai init --repo /path/to/project
+```
+
+生成するもの:
+
+- `.ai-dev-os/agents.yml`
+- `.ai-dev-os/workflows.yml`
+- `prompts/review.prompt.yml`
+- `.ai-dev-os/README.md`
+
+`ai init` は workflow routing と prompt artifact を生成するだけで、vendor-native config は直接上書きしない。
+trust policy は生成された `.ai-dev-os/README.md` から `templates/ai-trust/` を参照する。
+
 ## rg（ripgrep）: 最強の全文検索
 
 ```bash

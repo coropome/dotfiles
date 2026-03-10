@@ -4,6 +4,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMPDIR_ROOT="$(mktemp -d)"
 TEST_REPO="$TMPDIR_ROOT/project"
+INIT_REPO="$TMPDIR_ROOT/init-project"
 STUB_BIN="$TMPDIR_ROOT/bin"
 TMUX_LOG="$TMPDIR_ROOT/tmux.log"
 OPEN_LOG="$TMPDIR_ROOT/open.log"
@@ -25,7 +26,7 @@ fail() {
 }
 
 setup_project() {
-  mkdir -p "$TEST_REPO/.git" "$TEST_REPO/.ai-dev-os" "$STUB_BIN"
+  mkdir -p "$TEST_REPO/.git" "$TEST_REPO/.ai-dev-os" "$INIT_REPO" "$STUB_BIN"
   printf "hello\n" > "$TEST_REPO/README.md"
   cat > "$TEST_REPO/.ai-dev-os/agents.yml" <<'EOF'
 agents:
@@ -150,6 +151,14 @@ workflows_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
 
 eval_list_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-eval" --list)"
 [[ "$eval_list_output" == *"review"* ]] || fail "ai-eval did not list review prompt"
+
+init_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" init --repo "$INIT_REPO")"
+[[ "$init_output" == *".ai-dev-os/agents.yml"* ]] || fail "ai init did not generate agents.yml"
+[[ -f "$INIT_REPO/.ai-dev-os/agents.yml" ]] || fail "ai init did not create .ai-dev-os/agents.yml"
+[[ -f "$INIT_REPO/.ai-dev-os/workflows.yml" ]] || fail "ai init did not create .ai-dev-os/workflows.yml"
+[[ -f "$INIT_REPO/prompts/review.prompt.yml" ]] || fail "ai init did not create starter prompt artifact"
+[[ -f "$INIT_REPO/.ai-dev-os/README.md" ]] || fail "ai init did not create trust-template pointer doc"
+assert_contains "$INIT_REPO/.ai-dev-os/README.md" "templates/ai-trust/claude-settings.json"
 
 describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe claude)"
 [[ "$describe_output" == *"project_config: .claude/settings.json"* ]] || fail "ai-agent describe missing project config"
