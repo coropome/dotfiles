@@ -38,6 +38,7 @@ ai start
 次に読む:
 
 - 最短の導入ガイド: `docs/00-quickstart.md`
+- 10分 demo: `docs/05-demo-walkthrough.md`
 - フェーズ説明: `docs/02-bootstrap-flow.md`
 - サポート範囲: `docs/31-support-matrix.md`
 

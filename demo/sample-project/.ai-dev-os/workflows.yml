@@ -1,0 +1,7 @@
+workflows:
+  code:
+    default_agent: implementer
+    description: Local project implementation workflow
+  review:
+    default_agent: reviewer
+    description: Local project review workflow

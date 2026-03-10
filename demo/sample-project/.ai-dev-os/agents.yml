@@ -1,0 +1,9 @@
+agents:
+  implementer:
+    command: claude
+    role: implementer
+    prompt_file: prompts/review.prompt.yml
+  reviewer:
+    command: codex
+    role: reviewer
+    prompt_file: prompts/review.prompt.yml

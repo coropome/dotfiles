@@ -82,5 +82,6 @@ advanced user は必要に応じて以下へ分岐してよい。
 ## チュートリアル
 
 - 5〜10分で慣れる: `ttutor`
+- 10分 demo: `docs/05-demo-walkthrough.md`
 - bootstrap の全体像: `docs/02-bootstrap-flow.md`
 - サポート範囲: `docs/31-support-matrix.md`
