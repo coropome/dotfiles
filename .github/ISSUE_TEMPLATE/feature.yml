@@ -1,0 +1,52 @@
+name: Feature
+description: Track a new capability or workflow improvement.
+title: "feat: "
+labels:
+  - type:feature
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or operator problem are we solving?
+      placeholder: The current workflow requires...
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What outcome should this change produce?
+      placeholder: Users can run...
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What is intentionally out of scope?
+      placeholder: We are not redesigning...
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the intended implementation direction.
+      placeholder: Add a config-driven workflow that...
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Flat checklist of verifiable outcomes.
+      placeholder: |
+        - `ai start` launches the workspace
+        - docs explain the new flow
+        - tests cover the happy path
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Notes / Links
+      description: Related docs, references, or prior issues.

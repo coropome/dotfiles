@@ -73,11 +73,25 @@ ai_load_os_layer() {
 
 ai_agents_file() {
   local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+
+  if [[ -f "$target_repo/.ai-dev-os/agents.yml" ]]; then
+    printf '%s/.ai-dev-os/agents.yml\n' "$target_repo"
+    return
+  fi
+
   printf '%s/ai/agents.yml\n' "$repo_root"
 }
 
 ai_workflows_file() {
   local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+
+  if [[ -f "$target_repo/.ai-dev-os/workflows.yml" ]]; then
+    printf '%s/.ai-dev-os/workflows.yml\n' "$target_repo"
+    return
+  fi
+
   printf '%s/ai/workflows.yml\n' "$repo_root"
 }
 
@@ -108,6 +122,30 @@ ai_config_value() {
       exit
     }
   ' "$file"
+}
+
+ai_section_keys() {
+  local file="$1"
+  local section="$2"
+
+  awk -v section="$section" '
+    $0 ~ "^" section ":" { in_section=1; next }
+    in_section && /^[A-Za-z0-9_-]+:/ { exit }
+    in_section && /^  [A-Za-z0-9_-]+:/ {
+      line=$0
+      sub(/^  /, "", line)
+      sub(/:$/, "", line)
+      print line
+    }
+  ' "$file"
+}
+
+ai_has_named_key() {
+  local file="$1"
+  local section="$2"
+  local key="$3"
+
+  ai_section_keys "$file" "$section" | grep -Fxq "$key"
 }
 
 ai_session_name() {

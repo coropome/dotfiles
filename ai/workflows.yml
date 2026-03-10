@@ -5,6 +5,9 @@ workflows:
   review:
     default_agent: reviewer
     description: Launch the default review agent
+  improve:
+    default_agent: researcher
+    description: Explore new tools, prompts, and workflow improvements
   task:
     default_agent: architect
     description: Inspect the current backlog

@@ -47,3 +47,51 @@ Teach `os/linux.sh` and `os/wsl.sh` to cover more package managers and runtime c
 
 Expected Impact:
 More of the AI Dev OS workflow works outside macOS.
+
+## Task 4
+
+Title: Prefer native MCP and settings over wrapper reimplementation
+
+Problem:
+Modern AI CLIs increasingly expose MCP, hooks, and local settings directly, but the current scaffold still trends toward wrapper logic.
+
+Improvement Idea:
+Treat Claude, Codex, and Gemini as native runtimes and let AI Dev OS orchestrate them through config discovery instead of feature-by-feature shell code.
+
+Implementation Hint:
+Support project-level `.ai-dev-os/agents.yml` and `.ai-dev-os/workflows.yml`, surface each agent's native config files, and keep vendor-specific behavior in `.claude/`, `.codex/`, or `~/.gemini/` rather than in `bin/`.
+
+Expected Impact:
+When vendors add MCP servers, hooks, headless flags, or subagent features, users can adopt them mostly through config changes.
+
+## Task 5
+
+Title: Add prompt artifacts and evals as first-class repo assets
+
+Problem:
+Prompt iteration is still implicit in Markdown files, which makes regression testing and cross-model comparison weak.
+
+Improvement Idea:
+Store reusable prompts and evaluation datasets in repo-native files so they can run in CI and in GitHub Models without custom tooling.
+
+Implementation Hint:
+Add `.prompt.yml` files under `prompts/` and wire `gh models eval` into an optional `ai eval` flow.
+
+Expected Impact:
+Prompt quality becomes reviewable, repeatable, and easier to compare across vendors and model upgrades.
+
+## Task 6
+
+Title: Ship trust policies for MCP and autonomous agents
+
+Problem:
+MCP and agentic coding features increase capability, but also raise the risk of over-broad permissions and unsafe network access.
+
+Improvement Idea:
+Define opinionated project templates for allowed MCP servers, filesystem scopes, and internet access so beginners get safe defaults.
+
+Implementation Hint:
+Generate starter config for `.claude/settings.json`, `~/.codex/config.toml`, and `.gemini/settings.json` with documented permission boundaries and per-project overrides.
+
+Expected Impact:
+Users can adopt powerful new AI features with fewer security surprises.

@@ -123,6 +123,14 @@ agents_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" agents)"
 [[ "$agents_output" == *"claude"* ]] || fail "ai agents did not list claude"
 [[ "$agents_output" == *"reviewer"* ]] || fail "ai agents did not list reviewer"
 
+workflows_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
+[[ "$workflows_output" == *"code"* ]] || fail "ai workflows did not list code"
+[[ "$workflows_output" == *"improve"* ]] || fail "ai workflows did not list improve"
+
+describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe claude)"
+[[ "$describe_output" == *"project_config: .claude/settings.json"* ]] || fail "ai-agent describe missing project config"
+[[ "$describe_output" == *"mcp_config: .claude/settings.json"* ]] || fail "ai-agent describe missing mcp config"
+
 task_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" task)"
 [[ "$task_output" == *"AI Dev OS Backlog"* ]] || fail "ai task did not print the backlog"
 
@@ -148,5 +156,8 @@ assert_contains "$CLAUDE_LOG" "claude "
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" review >/dev/null
 assert_contains "$CODEX_LOG" "codex "
+
+PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" improve --latest-trends >/dev/null
+assert_contains "$CODEX_LOG" "codex --latest-trends"
 
 echo "ai cli test passed"

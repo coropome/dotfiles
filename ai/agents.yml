@@ -1,25 +1,70 @@
 agents:
   claude:
+    provider: anthropic
     command: claude
     role: coding-agent
     description: Claude Code interactive coding agent
+    docs_url: https://code.claude.com/docs/en/settings
+    user_config: ~/.claude/settings.json
+    project_config: .claude/settings.json
+    project_extensions: .claude/agents/
+    mcp_config: .claude/settings.json
+    automation_mode: native-subagents-hooks
+  gemini:
+    provider: google
+    command: gemini
+    role: coding-agent
+    description: Gemini CLI terminal agent with MCP and headless workflows
+    docs_url: https://github.com/google-gemini/gemini-cli
+    user_config: ~/.gemini/settings.json
+    mcp_config: ~/.gemini/settings.json
+    automation_mode: native-mcp-headless
   codex:
+    provider: openai
     command: codex
     role: coding-agent
     description: OpenAI Codex CLI for repository work
+    docs_url: https://developers.openai.com/codex/cloud
+    user_config: ~/.codex/config.toml
+    mcp_config: ~/.codex/config.toml
+    automation_mode: native-skills-mcp
   architect:
+    provider: anthropic
     command: claude
     role: architect
     description: Drafts plans and high-level system changes
+    docs_url: https://code.claude.com/docs/en/sub-agents
+    user_config: ~/.claude/settings.json
+    project_config: .claude/settings.json
+    project_extensions: .claude/agents/
+    mcp_config: .claude/settings.json
+    automation_mode: native-subagents-hooks
   implementer:
+    provider: anthropic
     command: claude
     role: implementer
     description: Applies changes for the current task
+    docs_url: https://code.claude.com/docs/en/sub-agents
+    user_config: ~/.claude/settings.json
+    project_config: .claude/settings.json
+    project_extensions: .claude/agents/
+    mcp_config: .claude/settings.json
+    automation_mode: native-subagents-hooks
   reviewer:
+    provider: openai
     command: codex
     role: reviewer
     description: Reviews code for regressions and risks
+    docs_url: https://developers.openai.com/codex/cloud
+    user_config: ~/.codex/config.toml
+    mcp_config: ~/.codex/config.toml
+    automation_mode: native-skills-mcp
   researcher:
+    provider: google
     command: codex
     role: researcher
     description: Investigates tooling and workflow ideas
+    docs_url: https://docs.github.com/en/github-models/about-github-models
+    user_config: ~/.codex/config.toml
+    mcp_config: ~/.codex/config.toml
+    automation_mode: native-mcp-evals

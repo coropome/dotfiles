@@ -1,0 +1,29 @@
+name: AI Dev OS Review
+description: Review a code change for regressions, user impact, and rollout risk.
+model: openai/gpt-4o-mini
+modelParameters:
+  temperature: 0.1
+messages:
+  - role: system
+    content: |
+      You are a software engineering reviewer.
+      Focus on behavioral regressions, rollout risk, user impact, and missing tests.
+      Prefer concise findings over long summaries.
+  - role: user
+    content: |
+      Review the following change request:
+      {{change_request}}
+
+      Relevant diff summary:
+      {{diff_summary}}
+testData:
+  - change_request: |
+      Add a new ai start layout that launches tmux automatically.
+    diff_summary: |
+      The change creates a session but does not check if tmux exists.
+    expected: |
+      The implementation should guard for missing tmux and provide a user-facing remediation path.
+evaluators:
+  - name: Mentions rollout or runtime risk
+    string:
+      contains: tmux

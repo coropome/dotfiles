@@ -7,6 +7,12 @@ if [[ -L "$SCRIPT_PATH" ]]; then
 fi
 BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
 
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+TARGET_REPO="$(ai_target_repo_root "$PWD")"
+WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
+
 usage() {
   cat <<'EOF'
 usage: ai <command> [args...]
@@ -15,11 +21,12 @@ Commands:
   start         launch the AI Dev OS workspace
   stop          stop the AI Dev OS workspace
   agents        list configured agents
+  workflows     list configured workflows
   agent         run or inspect a configured agent
   context       build repository context
   task          show the current backlog
-  code          launch the default coding agent
-  review        launch the default review agent
+  code          launch the configured code workflow
+  review        launch the configured review workflow
   install       run the OS abstraction install wrapper
   copy          copy stdin through the AI clipboard wrapper
   open          open a path or URL through the AI open wrapper
@@ -43,6 +50,9 @@ case "$command_name" in
   agents)
     exec "$BIN_DIR/ai-agent" --list "$@"
     ;;
+  workflows)
+    exec "$BIN_DIR/ai-agent" --list-workflows "$@"
+    ;;
   agent)
     exec "$BIN_DIR/ai-agent" "$@"
     ;;
@@ -53,28 +63,10 @@ case "$command_name" in
     exec "$BIN_DIR/ai-task" "$@"
     ;;
   code)
-    exec "$BIN_DIR/ai-agent" "$(awk '
-      $0 ~ "^workflows:" { in_section=1; next }
-      in_section && $0 ~ "^  code:" { in_workflow=1; next }
-      in_workflow && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
-      in_workflow && $0 ~ "^    default_agent:" {
-        sub("^    default_agent: ", "", $0)
-        print $0
-        exit
-      }
-    ' "$BIN_DIR/../ai/workflows.yml")" "$@"
+    exec "$BIN_DIR/ai-agent" --workflow code "$@"
     ;;
   review)
-    exec "$BIN_DIR/ai-agent" "$(awk '
-      $0 ~ "^workflows:" { in_section=1; next }
-      in_section && $0 ~ "^  review:" { in_workflow=1; next }
-      in_workflow && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
-      in_workflow && $0 ~ "^    default_agent:" {
-        sub("^    default_agent: ", "", $0)
-        print $0
-        exit
-      }
-    ' "$BIN_DIR/../ai/workflows.yml")" "$@"
+    exec "$BIN_DIR/ai-agent" --workflow review "$@"
     ;;
   install)
     exec "$BIN_DIR/ai-install" "$@"
@@ -89,6 +81,9 @@ case "$command_name" in
     usage
     ;;
   *)
+    if [[ -f "$WORKFLOWS_FILE" ]] && ai_has_named_key "$WORKFLOWS_FILE" workflows "$command_name"; then
+      exec "$BIN_DIR/ai-agent" --workflow "$command_name" "$@"
+    fi
     echo "unknown ai command: $command_name" >&2
     usage >&2
     exit 2

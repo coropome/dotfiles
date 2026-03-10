@@ -10,29 +10,31 @@ BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
 # shellcheck source=/dev/null
 source "$BIN_DIR/_ai_common"
 REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
-AGENTS_FILE="$(ai_agents_file "$REPO_ROOT")"
+TARGET_REPO="$(ai_target_repo_root "$PWD")"
+AGENTS_FILE="$(ai_agents_file "$REPO_ROOT" "$TARGET_REPO")"
+WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
 
 usage() {
   cat <<'EOF'
-usage: ai-agent [--list] [--describe agent-name] [agent-name [args...]]
+usage: ai-agent [--list|--list-workflows] [--describe agent-name] [--workflow name [args...]] [agent-name [args...]]
 EOF
 }
 
 list_agents() {
-  awk '
-    /^agents:/ { in_section=1; next }
-    in_section && /^[A-Za-z0-9_-]+:/ { exit }
-    in_section && /^  [A-Za-z0-9_-]+:/ {
-      line=$0
-      sub(/^  /, "", line)
-      sub(/:$/, "", line)
-      print line
-    }
-  ' "$AGENTS_FILE"
+  ai_section_keys "$AGENTS_FILE" agents
+}
+
+list_workflows() {
+  ai_section_keys "$WORKFLOWS_FILE" workflows
 }
 
 if [[ "${1:-}" == "--list" ]]; then
   list_agents
+  exit 0
+fi
+
+if [[ "${1:-}" == "--list-workflows" ]]; then
+  list_workflows
   exit 0
 fi
 
@@ -42,15 +44,36 @@ if [[ "${1:-}" == "--describe" ]]; then
   shift || true
 fi
 
+workflow_name=""
+if [[ "${1:-}" == "--workflow" ]]; then
+  [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+  workflow_name="$2"
+  shift 2
+fi
+
 agent_name="${1:-}"
-if [[ -z "$agent_name" ]]; then
+if [[ -n "$workflow_name" ]]; then
+  agent_name="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "default_agent")"
+  if [[ -z "$agent_name" ]]; then
+    echo "unknown workflow: $workflow_name" >&2
+    exit 2
+  fi
+elif [[ -z "$agent_name" ]]; then
   usage
   exit 2
+else
+  shift || true
 fi
-shift || true
 
 command_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "command")"
 role_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "role")"
+provider_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "provider")"
+docs_url="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "docs_url")"
+user_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "user_config")"
+project_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_config")"
+project_extensions="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_extensions")"
+mcp_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "mcp_config")"
+automation_mode="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "automation_mode")"
 
 if [[ -z "$command_name" ]]; then
   echo "unknown agent: $agent_name" >&2
@@ -59,8 +82,18 @@ fi
 
 if [[ $describe_requested -eq 1 ]]; then
   printf 'agent: %s\n' "$agent_name"
+  if [[ -n "$workflow_name" ]]; then
+    printf 'workflow: %s\n' "$workflow_name"
+  fi
   printf 'command: %s\n' "$command_name"
   printf 'role: %s\n' "${role_name:-unknown}"
+  [[ -n "$provider_name" ]] && printf 'provider: %s\n' "$provider_name"
+  [[ -n "$automation_mode" ]] && printf 'automation_mode: %s\n' "$automation_mode"
+  [[ -n "$docs_url" ]] && printf 'docs_url: %s\n' "$docs_url"
+  [[ -n "$user_config" ]] && printf 'user_config: %s\n' "$user_config"
+  [[ -n "$project_config" ]] && printf 'project_config: %s\n' "$project_config"
+  [[ -n "$project_extensions" ]] && printf 'project_extensions: %s\n' "$project_extensions"
+  [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
   exit 0
 fi
 
