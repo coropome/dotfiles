@@ -8,6 +8,7 @@ Mac + zsh + iTerm2 + tmux を「最初から」使うための dotfiles。
 設計思想: `docs/90-philosophy.md`
 管理境界: `docs/91-state-ownership.md`
 開発ルール: `docs/92-development-workflow.md`
+agent instruction: `AGENTS.md`
 
 ---
 

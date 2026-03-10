@@ -28,6 +28,13 @@ assert_executable() {
   [[ -x "$path" ]] || fail "expected executable: $path"
 }
 
+assert_symlink_target() {
+  local path="$1"
+  local expected="$2"
+  [[ -L "$path" ]] || fail "expected symlink: $path"
+  [[ "$(readlink "$path")" == "$expected" ]] || fail "$path points to $(readlink "$path"), expected $expected"
+}
+
 verify_links_manifest() {
   local manifest="$REPO/manifests/bootstrap/links.tsv"
   local line target source type source_path
@@ -150,6 +157,11 @@ verify_package_manifests() {
 
 verify_layout_scaffold() {
   assert_file "$REPO/install"
+  assert_file "$REPO/AGENTS.md"
+  assert_exists "$REPO/CLAUDE.md"
+  assert_exists "$REPO/GEMINI.md"
+  assert_symlink_target "$REPO/CLAUDE.md" "AGENTS.md"
+  assert_symlink_target "$REPO/GEMINI.md" "AGENTS.md"
   assert_executable "$REPO/install"
   assert_dir "$REPO/ai"
   assert_dir "$REPO/os"
@@ -183,6 +195,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/.github/ISSUE_TEMPLATE/feature.yml"
   assert_file "$REPO/.github/ISSUE_TEMPLATE/bug.yml"
   assert_file "$REPO/.github/ISSUE_TEMPLATE/config.yml"
+  assert_file "$REPO/.github/copilot-instructions.md"
   assert_file "$REPO/.github/pull_request_template.md"
   assert_file "$REPO/context/build-context.sh"
   assert_executable "$REPO/context/build-context.sh"
@@ -211,6 +224,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not mention trust templates"
   grep -Fq "project-only" "$REPO/docs/41-ai-trust.md" \
     || fail "docs/41-ai-trust.md does not document trust defaults"
+  grep -Fq "AGENTS.md" "$REPO/docs/92-development-workflow.md" \
+    || fail "docs/92-development-workflow.md does not mention AGENTS.md"
+  grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
+    || fail ".github/copilot-instructions.md does not enforce issue-first work"
 }
 
 verify_layout_scaffold
