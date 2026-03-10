@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-mini}"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+tmux_version() {
+  if [[ -n "${DITFILES_TEST_TMUX_VERSION:-}" ]]; then
+    printf "%s\n" "$DITFILES_TEST_TMUX_VERSION"
+    return 0
+  fi
+
+  tmux display-message -p '#{version}' 2>/dev/null \
+    || tmux -V 2>/dev/null | awk '{print $2}'
+}
+
+tmux_supports_popup() {
+  local version major minor remainder
+
+  version="$(tmux_version || true)"
+  version="${version#next-}"
+  [[ -n "$version" ]] || return 1
+
+  major="${version%%.*}"
+  remainder="${version#*.}"
+  if [[ "$remainder" == "$version" ]]; then
+    minor=0
+  else
+    minor="${remainder%%[^0-9]*}"
+    [[ -n "$minor" ]] || minor=0
+  fi
+
+  [[ "$major" =~ ^[0-9]+$ ]] || return 1
+  [[ "$minor" =~ ^[0-9]+$ ]] || return 1
+
+  (( major > 3 || (major == 3 && minor >= 2) ))
+}
+
+help_cmd=("$script_dir/thelp")
+case "$mode" in
+  mini|"")
+    ;;
+  full)
+    help_cmd+=(full)
+    ;;
+  *)
+    echo "usage: _tmux_help [mini|full]" >&2
+    exit 2
+    ;;
+esac
+
+if tmux_supports_popup; then
+  exec tmux display-popup -E "${help_cmd[*]}"
+fi
+
+exec tmux split-window -v "${help_cmd[*]}; printf '\nPress Enter to close...'; read -r _"

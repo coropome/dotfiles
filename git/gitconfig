@@ -1,0 +1,11 @@
+# ditfiles git config (included from your ~/.gitconfig)
+#
+# Keep this file as the stable entrypoint that install.sh links into
+# ~/.config/ditfiles/gitconfig. Ordered fragments below make the git layer
+# easier to review and extend without changing the include.path contract.
+
+[include]
+  path = conf.d/00-core.gitconfig
+  path = conf.d/10-delta.gitconfig
+  path = conf.d/20-workflow.gitconfig
+  path = conf.d/90-aliases.gitconfig

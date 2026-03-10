@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+uname_s="${DITFILES_TEST_UNAME_S:-$(uname -s)}"
+proc_version="${DITFILES_TEST_PROC_VERSION:-}"
+
+if [[ -z "$proc_version" && -r /proc/version ]]; then
+  proc_version="$(</proc/version)"
+fi
+
+platform_variant() {
+  case "$uname_s" in
+    Darwin)
+      printf "darwin\n"
+      ;;
+    Linux)
+      if [[ "$proc_version" == *Microsoft* || "$proc_version" == *WSL* ]]; then
+        printf "wsl\n"
+      else
+        printf "linux\n"
+      fi
+      ;;
+    *)
+      printf "unknown\n"
+      ;;
+  esac
+}
+
+platform_family() {
+  case "$(platform_variant)" in
+    darwin)
+      printf "darwin\n"
+      ;;
+    linux|wsl)
+      printf "linux\n"
+      ;;
+    *)
+      printf "unknown\n"
+      ;;
+  esac
+}
+
+case "${1:-}" in
+  ""|--variant)
+    platform_variant
+    ;;
+  --family)
+    platform_family
+    ;;
+  --is-darwin)
+    [[ "$(platform_variant)" == "darwin" ]]
+    ;;
+  --is-linux)
+    [[ "$(platform_family)" == "linux" ]]
+    ;;
+  --is-wsl)
+    [[ "$(platform_variant)" == "wsl" ]]
+    ;;
+  *)
+    echo "usage: _platform [--variant|--family|--is-darwin|--is-linux|--is-wsl]" >&2
+    exit 2
+    ;;
+esac

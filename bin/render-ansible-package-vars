@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BREW_MANIFEST="$REPO/manifests/packages/macos-brew.txt"
+CASK_MANIFEST="$REPO/manifests/packages/macos-cask.txt"
+
+for manifest in "$BREW_MANIFEST" "$CASK_MANIFEST"; do
+  if [[ ! -f "$manifest" ]]; then
+    echo "package manifest not found: $manifest" >&2
+    exit 1
+  fi
+done
+
+render_list() {
+  local key="$1"
+  local manifest="$2"
+
+  printf '%s:\n' "$key"
+  while IFS= read -r package || [[ -n "${package:-}" ]]; do
+    [[ -z "${package:-}" || "${package:0:1}" == "#" ]] && continue
+    printf '  - %s\n' "$package"
+  done < "$manifest"
+}
+
+cat <<'EOF'
+# Generated from manifests/packages/macos-brew.txt and manifests/packages/macos-cask.txt
+# by bin/render-ansible-package-vars. Keep this file committed for Ansible compatibility.
+
+EOF
+
+render_list brew_packages "$BREW_MANIFEST"
+printf '\n'
+render_list brew_casks "$CASK_MANIFEST"

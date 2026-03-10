@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# tnew: create/attach a tmux session.
+#
+# Goals:
+# - Beginners: just run `tnew` and start working.
+# - If sessions already exist, offer to pick one (fzf) to reduce confusion.
+#
+# Usage:
+#   tnew
+#   tnew [name]
+#   tnew [name] --layout dev
+#   tnew --layout dev [name]
+#
+# Layouts:
+#   dev : 2 panes (editor top, shell bottom) for everyday coding
+
+layout=""
+legacy_layout=""
+name=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --layout)
+      if [[ $# -lt 2 || -z "${2:-}" ]]; then
+        echo "error: --layout requires a value (e.g. --layout dev)" >&2
+        exit 2
+      fi
+      layout="$2"
+      shift 2
+      ;;
+    --layout=*)
+      layout="${1#*=}"
+      shift
+      ;;
+    -h|--help)
+      echo "usage: tnew [name] [--layout dev]";
+      exit 0
+      ;;
+    *)
+      if [[ -z "$name" ]]; then
+        name="$1"
+      else
+        echo "unknown arg: $1" >&2
+        exit 2
+      fi
+      shift
+      ;;
+  esac
+done
+
+case "$layout" in
+  ai|codex)
+    legacy_layout="$layout"
+    layout="dev"
+    ;;
+esac
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "tmux not found. Run: make install" >&2
+  exit 1
+fi
+
+if [[ -n "$legacy_layout" ]]; then
+  echo "warning: --layout $legacy_layout is deprecated; using --layout dev" >&2
+  echo "warning: start agent CLIs manually in panes if needed" >&2
+fi
+
+# If no name given and sessions exist, offer to pick (interactive) to lower barrier.
+if [[ -z "$name" ]]; then
+  if tmux list-sessions >/dev/null 2>&1; then
+    sel=$("$(dirname "$0")/_tpick" "tmux attach (or cancel for new)> " || true)
+    if [[ -n "$sel" ]]; then
+      exec tmux attach -t "$sel"
+    fi
+  fi
+fi
+
+# default name from directory
+if [[ -z "$name" ]]; then
+  base="$(basename "$(pwd)")"
+  name="${base//[^a-zA-Z0-9_-]/-}"
+  # strip leading/trailing dashes that result from special-char directory names
+  name="${name##-}"
+  name="${name%%-}"
+  [[ -z "$name" ]] && name="work"
+fi
+
+# attach if exists
+if tmux has-session -t "$name" 2>/dev/null; then
+  exec tmux attach -t "$name"
+fi
+
+# create session detached, then shape layout, then attach
+if [[ -z "$layout" ]]; then
+  exec tmux new -s "$name"
+fi
+
+case "$layout" in
+  dev)
+    # Layout: top 70% = editor | bottom 30% = shell
+    #   +-------------------------+
+    #   |        editor           |
+    #   +-------------------------+
+    #   |        shell            |
+    #   +-------------------------+
+    tmux new-session -d -s "$name" -n main
+    tmux split-window -v -p 30 -t "$name:main"
+
+    tmux select-pane -t "$name:main.0" -T "editor"
+    tmux select-pane -t "$name:main.1" -T "shell"
+
+    # focus editor pane
+    tmux select-pane -t "$name:main.0"
+
+    exec tmux attach -t "$name"
+    ;;
+  *)
+    echo "unknown layout: $layout" >&2
+    echo "available: dev" >&2
+    exit 2
+    ;;
+esac

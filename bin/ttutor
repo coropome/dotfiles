@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve symlink so we can find the repo even when run via ~/.local/bin/ttutor
+SCRIPT="$(readlink "$0" 2>/dev/null || echo "$0")"
+repo_root="$(cd "$(dirname "$SCRIPT")/.." && pwd)"
+file="$repo_root/docs/01-tutorial.md"
+
+# Prefer $PAGER, fallback to less.
+pager="${PAGER:-less}"
+
+if [[ ! -f "$file" ]]; then
+  echo "tutorial not found: $file" >&2
+  exit 1
+fi
+
+# Treat $PAGER as a command plus arguments, not shell code.
+read -r -a pager_cmd <<<"$pager"
+exec "${pager_cmd[@]}" "$file"

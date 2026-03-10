@@ -1,0 +1,9 @@
+# Core Homebrew packages installed by make install.
+git
+tmux
+git-delta
+shellcheck
+fzf
+starship
+zsh-autosuggestions
+zsh-syntax-highlighting

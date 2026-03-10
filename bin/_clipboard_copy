@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+need() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+variant="$("$(dirname "$0")/_platform" --variant)"
+
+case "$variant" in
+  darwin)
+    if need pbcopy; then
+      exec pbcopy
+    fi
+    ;;
+  wsl)
+    if need clip.exe; then
+      exec clip.exe
+    fi
+    ;;
+  linux)
+    if need wl-copy; then
+      exec wl-copy
+    fi
+    if need xclip; then
+      exec xclip -selection clipboard
+    fi
+    if need xsel; then
+      exec xsel --clipboard --input
+    fi
+    ;;
+esac
+
+echo "No supported clipboard copy command found for platform: $variant" >&2
+exit 1

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Kill a tmux session. If none specified, pick interactively.
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "tmux not found. Run: make install" >&2
+  exit 1
+fi
+
+name="${1:-}"
+
+if [[ -z "$name" ]]; then
+  name=$("$(dirname "$0")/_tpick" "kill session> " || true)
+  [[ -z "$name" ]] && exit 0
+fi
+
+if ! tmux has-session -t "$name" 2>/dev/null; then
+  echo "tmux session not found: $name" >&2
+  exit 1
+fi
+
+tmux kill-session -t "$name"
+echo "killed: $name"

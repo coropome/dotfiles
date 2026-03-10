@@ -1,0 +1,13 @@
+# User-facing helper commands linked into ~/.local/bin.
+tnew
+thelp
+tlist
+tgo
+tkill
+_tpick
+ttutor
+p
+_platform
+_clipboard_copy
+_open
+_tmux_help

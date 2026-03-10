@@ -1,0 +1,35 @@
+# ditfiles zshrc
+
+ditfiles_source_dir() {
+  print -r -- "${${(%):-%x}:A:h}"
+}
+
+DITFILES_ZSH_DIR="$(ditfiles_source_dir)"
+
+if [[ -n "${ZSH_PROFILE:-}" ]]; then
+  zmodload zsh/zprof
+fi
+
+for module in \
+  00-lib \
+  10-env \
+  15-local-pre \
+  20-options-history \
+  30-completion \
+  40-prompt \
+  50-editor \
+  60-aliases-functions \
+  70-tools \
+  80-autosuggestions \
+  90-local-overrides \
+  99-syntax-highlighting
+do
+  source "$DITFILES_ZSH_DIR/modules/${module}.zsh"
+done
+
+if [[ -n "${ZSH_PROFILE:-}" ]]; then
+  zprof
+fi
+
+unset -f ditfiles_source_dir
+unset DITFILES_ZSH_DIR

@@ -1,0 +1,22 @@
+# Managed Homebrew formulae installed by make mac.
+git
+tmux
+fzf
+ripgrep
+jq
+gh
+fd
+bat
+htop
+eza
+git-delta
+shellcheck
+starship
+zoxide
+lazydocker
+node
+uv
+python@3.12
+zsh-autosuggestions
+zsh-syntax-highlighting
+dockutil

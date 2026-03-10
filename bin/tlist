@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "tmux not found. Run: make install" >&2
+  exit 1
+fi
+
+tmux list-sessions 2>/dev/null || echo "(no sessions)"

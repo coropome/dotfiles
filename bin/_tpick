@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# _tpick: pick a tmux session name.
+# - uses fzf if available
+# - else uses bash select
+
+prompt="${1:-session}> "
+
+if ! command -v tmux >/dev/null 2>&1; then
+  echo "tmux not found" >&2
+  exit 1
+fi
+
+sessions=()
+while IFS= read -r line; do
+  sessions+=("$line")
+done < <(tmux list-sessions -F "#{session_name}" 2>/dev/null || true)
+if [[ ${#sessions[@]} -eq 0 ]]; then
+  exit 3
+fi
+
+if command -v fzf >/dev/null 2>&1; then
+  sel=$(printf "%s\n" "${sessions[@]}" | fzf --prompt="$prompt" || true)
+  [[ -n "$sel" ]] && echo "$sel"
+  exit 0
+fi
+
+echo "Select a tmux session:" >&2
+select s in "${sessions[@]}" "(cancel)"; do
+  if [[ "$REPLY" == "$(( ${#sessions[@]} + 1 ))" || "$s" == "(cancel)" || -z "$s" ]]; then
+    exit 2
+  fi
+  echo "$s"
+  exit 0
+done

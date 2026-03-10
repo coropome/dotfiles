@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+need() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+if [[ $# -ne 1 ]]; then
+  echo "usage: _open <path-or-url>" >&2
+  exit 2
+fi
+
+target="$1"
+variant="$("$(dirname "$0")/_platform" --variant)"
+
+case "$variant" in
+  darwin)
+    if need open; then
+      exec open "$target"
+    fi
+    ;;
+  wsl)
+    if need wslview; then
+      exec wslview "$target"
+    fi
+    if need xdg-open; then
+      exec xdg-open "$target"
+    fi
+    ;;
+  linux)
+    if need xdg-open; then
+      exec xdg-open "$target"
+    fi
+    ;;
+esac
+
+echo "No supported open command found for platform: $variant" >&2
+exit 1

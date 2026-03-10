@@ -1,0 +1,11 @@
+[merge]
+  conflictstyle = zdiff3
+
+[push]
+  autoSetupRemote = true
+
+[pull]
+  rebase = false
+
+[rebase]
+  autoStash = true

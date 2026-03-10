@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-mini}"
+
+mini() {
+cat <<'TXT'
+TMUX QUICK KEYS (ditfiles)
+
+prefix: Ctrl-a (also Ctrl-b works)
+
+- split vertical:   prefix + |
+- split horizontal: prefix + -
+- move pane:        prefix + ←/↓/↑/→
+- next pane:        prefix + Tab
+- detach (back to normal shell): prefix + d
+- scroll/copy: prefix + [
+- save session:     prefix + Ctrl-s
+- restore session:  prefix + Ctrl-r
+- help:             prefix + ?
+
+More: thelp full
+TXT
+}
+
+full() {
+cat <<'TXT'
+TMUX KEYS (ditfiles) - FULL
+
+[Core]
+prefix: Ctrl-a
+- split vertical:   prefix + |
+- split horizontal: prefix + -
+- move pane:        prefix + ←/↓/↑/→
+- next pane:        prefix + Tab
+- resize pane:      prefix + H/J/K/L
+- copy mode:        prefix + [   (tmux default)
+- reload config:    prefix + r
+- detach:           prefix + d
+- save session:     prefix + Ctrl-s
+- restore session:  prefix + Ctrl-r
+- help popup:       prefix + ?
+- full help popup:  prefix + /
+
+[Tips]
+- Exit a pane/shell with: exit
+- List sessions: tlist
+- Attach/pick:  tgo
+- New session:  tnew
+- Auto-save: every 1 minute; after reboot, start tmux to restore
+
+[ditfiles commands]
+- tnew [name] [--layout dev] : create/attach a session
+- tlist : list sessions
+- tgo [name] : attach (interactive)
+- tkill [name] : kill a session (interactive)
+- thelp [mode] : show help (mini/full)
+TXT
+}
+
+case "$mode" in
+  mini|"" ) mini;;
+  full ) full;;
+  * ) echo "usage: thelp [mini|full]" >&2; exit 2;;
+esac

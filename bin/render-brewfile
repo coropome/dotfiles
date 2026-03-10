@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST="$REPO/manifests/packages/core-brew.txt"
+
+if [[ ! -f "$MANIFEST" ]]; then
+  echo "core package manifest not found: $MANIFEST" >&2
+  exit 1
+fi
+
+cat <<'EOF'
+# Generated from manifests/packages/core-brew.txt by bin/render-brewfile.
+# Keep this file committed for brew bundle compatibility.
+
+# core
+EOF
+
+while IFS= read -r package || [[ -n "${package:-}" ]]; do
+  [[ -z "${package:-}" || "${package:0:1}" == "#" ]] && continue
+  printf 'brew "%s"\n' "$package"
+done < "$MANIFEST"

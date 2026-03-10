@@ -1,0 +1,21 @@
+# target	source	type
+~/.zprofile	.zprofile	file
+~/.zshrc	zsh/zshrc	file
+~/.config/tmux/tmux.conf	tmux/tmux.conf	file
+~/.config/tmux/conf.d	tmux/conf.d	directory
+~/.config/ditfiles/gitconfig	git/gitconfig	file
+~/.config/ditfiles/conf.d	git/conf.d	directory
+~/.config/ditfiles/gitignore_global	git/gitignore_global	file
+~/.config/starship.toml	zsh/starship.toml	file
+~/.local/bin/tnew	bin/tnew	executable
+~/.local/bin/thelp	bin/thelp	executable
+~/.local/bin/tlist	bin/tlist	executable
+~/.local/bin/tgo	bin/tgo	executable
+~/.local/bin/tkill	bin/tkill	executable
+~/.local/bin/_tpick	bin/_tpick	executable
+~/.local/bin/ttutor	bin/ttutor	executable
+~/.local/bin/p	bin/p	executable
+~/.local/bin/_platform	bin/_platform	executable
+~/.local/bin/_clipboard_copy	bin/_clipboard_copy	executable
+~/.local/bin/_open	bin/_open	executable
+~/.local/bin/_tmux_help	bin/_tmux_help	executable

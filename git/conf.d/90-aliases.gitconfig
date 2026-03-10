@@ -1,0 +1,27 @@
+[alias]
+  # status / diff
+  s = status -sb
+  d = diff
+  ds = diff --staged
+
+  # add / commit
+  a = add
+  aa = add -A
+  c = commit
+  ca = commit --amend
+
+  # branch / checkout
+  b = branch
+  co = checkout
+  cob = checkout -b
+
+  # log
+  l = log --oneline --decorate --graph --all
+  last = log -1 --stat
+
+  # stash
+  st = stash
+  sp = stash pop
+
+  # misc
+  who = shortlog -sne

@@ -1,0 +1,23 @@
+# ansible/local.yml.example
+#
+# マシン固有の変数を設定するファイル。
+# このファイルをコピーして ansible/local.yml として保存する（.gitignore済み）。
+#
+#   cp ansible/local.yml.example ansible/local.yml
+#   # 編集後: make git-config
+
+git_name: "Your Name"
+git_email: "you@example.com"
+
+# Keyboard tweaks (defaults: 1 / 10)
+keyboard_keyrepeat: 2
+keyboard_initial_keyrepeat: 15
+
+# Dock apps override example
+dock_apps:
+  - /System/Library/CoreServices/Finder.app
+  - /Applications/Slack.app
+  - /Applications/Notion.app
+  - /Applications/Visual Studio Code.app
+  - /Applications/iTerm.app
+  - /Applications/Google Chrome.app

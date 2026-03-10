@@ -1,0 +1,7 @@
+# Ordered bootstrap phases for the future core installer pipeline.
+preflight
+packages
+links
+plugins
+platform
+verify

@@ -1,0 +1,13 @@
+# Managed Homebrew casks installed by make mac.
+claude
+chatgpt
+google-japanese-ime
+visual-studio-code
+raycast
+cleanshot
+google-chrome
+slack
+notion
+iterm2
+ente-auth
+logi-options+

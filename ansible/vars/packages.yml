@@ -1,0 +1,39 @@
+# Generated from manifests/packages/macos-brew.txt and manifests/packages/macos-cask.txt
+# by bin/render-ansible-package-vars. Keep this file committed for Ansible compatibility.
+
+brew_packages:
+  - git
+  - tmux
+  - fzf
+  - ripgrep
+  - jq
+  - gh
+  - fd
+  - bat
+  - htop
+  - eza
+  - git-delta
+  - shellcheck
+  - starship
+  - zoxide
+  - lazydocker
+  - node
+  - uv
+  - python@3.12
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - dockutil
+
+brew_casks:
+  - claude
+  - chatgpt
+  - google-japanese-ime
+  - visual-studio-code
+  - raycast
+  - cleanshot
+  - google-chrome
+  - slack
+  - notion
+  - iterm2
+  - ente-auth
+  - logi-options+

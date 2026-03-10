@@ -1,0 +1,75 @@
+# ditfiles global gitignore
+# AI agent artifacts and editor state — never commit these
+
+# ── AI agents ────────────────────────────────────────────────────────────────
+# Claude Code
+.claude/
+.claude_files
+.claude_project
+
+# Cursor
+.cursor/
+
+# OpenAI Codex
+.codex/
+
+# Copilot
+.github/copilot-instructions.md
+
+# ── macOS ───────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon$
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Secrets / env ───────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+dist/
+*.egg-info/
+
+# ── Node / JS ───────────────────────────────────────────────────────────────
+node_modules/
+.npm/
+.yarn/
+.pnp.*
+
+# ── Build artifacts ─────────────────────────────────────────────────────────
+target/
+build/
+out/
+*.o
+*.a
+*.so
+*.dylib
+
+# ── Logs & temp ─────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.orig
+
+# ── Editors ─────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -1,0 +1,394 @@
+---
+- name: macOS bootstrap (Homebrew + optional defaults)
+  hosts: local
+  gather_facts: false
+  vars_files:
+    - "{{ playbook_dir }}/vars/packages.yml"
+
+  vars:
+    # Keyboard: "almost fastest" settings
+    keyboard_keyrepeat: 1
+    keyboard_initial_keyrepeat: 10
+
+    # Local machine context (keep gather_facts disabled for faster startup)
+    home_dir: "{{ lookup('env', 'HOME') }}"
+    user_name: "{{ lookup('env', 'USER') | default(lookup('pipe', 'whoami'), true) }}"
+    host_name: "{{ lookup('pipe', 'hostname') }}"
+
+    # git config (#15)
+    git_name: ""
+    git_email: ""
+
+    # Dock アプリ一覧 (#17)
+    dock_apps:
+      - /Applications/Slack.app
+      - /Applications/Notion.app
+      - /Applications/Visual Studio Code.app
+      - /Applications/iTerm.app
+      - /Applications/Google Chrome.app
+      - /System/Applications/System Settings.app
+
+    # Dock reset is destructive, so require explicit confirmation unless overridden.
+    dock_confirm_reset: false
+
+
+  tasks:
+    - name: Show plan
+      ansible.builtin.debug:
+        msg:
+          - "brew packages: {{ brew_packages | join(', ') }}"
+          - "brew casks: {{ brew_casks | join(', ') }}"
+      tags: [brew]
+
+    # --- Homebrew ---
+    - name: Update Homebrew (best effort)
+      community.general.homebrew:
+        update_homebrew: true
+      failed_when: false
+      tags: [brew]
+
+    - name: Install brew packages
+      community.general.homebrew:
+        name: "{{ brew_packages }}"
+        state: present
+      tags: [brew]
+
+    - name: Install brew casks (collect results)
+      community.general.homebrew_cask:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ brew_casks }}"
+      register: cask_result
+      failed_when: false
+      tags: [brew]
+
+    - name: Report failed casks
+      ansible.builtin.debug:
+        msg: >-
+          Failed casks: {{ (cask_result.results | default([]) | selectattr('failed','defined') | selectattr('failed') | map(attribute='item') | list) | join(', ') }}
+      when: (cask_result.results | default([]) | selectattr('failed','defined') | selectattr('failed') | list | length) > 0
+      tags: [brew]
+
+    - name: Report success
+      ansible.builtin.debug:
+        msg: "All casks installed (or already present)."
+      when: (cask_result.results | default([]) | selectattr('failed','defined') | selectattr('failed') | list | length) == 0
+      tags: [brew]
+
+    # --- Keyboard (OPTIONAL) ---
+    - name: Set key repeat speed
+      ansible.builtin.command: "defaults write -g KeyRepeat -int {{ keyboard_keyrepeat }}"
+      changed_when: true
+      tags: [keyboard]
+
+    - name: Set initial key repeat delay
+      ansible.builtin.command: "defaults write -g InitialKeyRepeat -int {{ keyboard_initial_keyrepeat }}"
+      changed_when: true
+      tags: [keyboard]
+
+    - name: Remap CapsLock to LeftControl (apply now)
+      ansible.builtin.command: >-
+        /usr/bin/hidutil property --set '{"UserKeyMapping":[
+          {"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x7000000E0}
+        ]}'
+      changed_when: true
+      failed_when: false
+      tags: [keyboard]
+
+    - name: Note
+      ansible.builtin.debug:
+        msg:
+          - "Done. For keyboard changes, some apps may require restart/logout to reflect repeat settings."
+          - "If any cask failed due to conflicts/prompts, fix it and rerun: make mac"
+      tags: [brew, keyboard]
+
+    # --- macOS defaults (#13) ---
+    # Finder
+    - name: "Finder: show extensions"
+      ansible.builtin.command: defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Finder: show hidden files"
+      ansible.builtin.command: defaults write com.apple.finder AppleShowAllFiles -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Finder: show path bar"
+      ansible.builtin.command: defaults write com.apple.finder ShowPathbar -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Finder: show status bar"
+      ansible.builtin.command: defaults write com.apple.finder ShowStatusBar -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Finder: list view as default"
+      ansible.builtin.command: defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Finder: no trash warning"
+      ansible.builtin.command: defaults write com.apple.finder WarnOnEmptyTrash -bool false
+      changed_when: true
+      tags: [defaults]
+
+    # Dock
+    - name: "Dock: autohide"
+      ansible.builtin.command: defaults write com.apple.dock autohide -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Dock: no recent apps"
+      ansible.builtin.command: defaults write com.apple.dock show-recents -bool false
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Dock: icon size 48"
+      ansible.builtin.command: defaults write com.apple.dock tilesize -int 48
+      changed_when: true
+      tags: [defaults]
+
+    # Screenshots
+    - name: "Screenshots: create save directory"
+      ansible.builtin.file:
+        path: "{{ home_dir }}/Desktop/Screenshots"
+        state: directory
+        mode: "0755"
+      tags: [defaults]
+
+    - name: "Screenshots: save location"
+      ansible.builtin.command: >-
+        defaults write com.apple.screencapture location
+        -string "{{ home_dir }}/Desktop/Screenshots"
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Screenshots: PNG format"
+      ansible.builtin.command: defaults write com.apple.screencapture type -string "png"
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Screenshots: no shadow"
+      ansible.builtin.command: defaults write com.apple.screencapture disable-shadow -bool true
+      changed_when: true
+      tags: [defaults]
+
+    # Trackpad
+    - name: "Trackpad: tap to click (built-in)"
+      ansible.builtin.command: defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Trackpad: tap to click (Bluetooth Magic Trackpad)"
+      ansible.builtin.command: defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Trackpad: tracking speed"
+      ansible.builtin.command: defaults write -g com.apple.trackpad.scaling -float 2.5
+      changed_when: true
+      tags: [defaults]
+
+    # Text
+    - name: "Text: disable auto-capitalization"
+      ansible.builtin.command: defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Text: disable smart dashes"
+      ansible.builtin.command: defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Text: disable smart quotes"
+      ansible.builtin.command: defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Text: disable spell correction"
+      ansible.builtin.command: defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+      changed_when: true
+      tags: [defaults]
+
+    - name: "Defaults: killall Finder"
+      ansible.builtin.command: killall Finder
+      changed_when: true
+      failed_when: false
+      tags: [defaults]
+
+    - name: "Defaults: killall Dock"
+      ansible.builtin.command: killall Dock
+      changed_when: true
+      failed_when: false
+      tags: [defaults]
+
+    # --- SSH key generation (#14) ---
+    - name: "SSH: ensure ~/.ssh exists"
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.ssh"
+        state: directory
+        mode: "0700"
+      tags: [ssh]
+
+    - name: "SSH: check if id_ed25519 exists"
+      ansible.builtin.stat:
+        path: "{{ home_dir }}/.ssh/id_ed25519"
+      register: ssh_key
+      tags: [ssh]
+
+    - name: "SSH: generate ed25519 key"
+      ansible.builtin.command:
+        argv:
+          - ssh-keygen
+          - -t
+          - ed25519
+          - -C
+          - "{{ user_name }}@{{ host_name }}"
+          - -f
+          - "{{ home_dir }}/.ssh/id_ed25519"
+          - -N
+          - ""
+      when: not ssh_key.stat.exists
+      changed_when: true
+      tags: [ssh]
+
+    - name: "SSH: ensure ~/.ssh/config exists"
+      ansible.builtin.file:
+        path: "{{ home_dir }}/.ssh/config"
+        state: touch
+        mode: "0600"
+      tags: [ssh]
+
+    - name: "SSH: add GitHub block to ~/.ssh/config"
+      ansible.builtin.blockinfile:
+        path: "{{ home_dir }}/.ssh/config"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - GitHub"
+        block: |
+          Host github.com
+            AddKeysToAgent yes
+            UseKeychain yes
+            IdentityFile ~/.ssh/id_ed25519
+      tags: [ssh]
+
+    - name: "SSH: display public key (register on GitHub)"
+      ansible.builtin.command:
+        argv:
+          - cat
+          - "{{ home_dir }}/.ssh/id_ed25519.pub"
+      register: pubkey
+      changed_when: false
+      tags: [ssh]
+
+    - name: "SSH: public key"
+      ansible.builtin.debug:
+        msg: "{{ pubkey.stdout }}"
+      tags: [ssh]
+
+    - name: "SSH: register with gh (optional)"
+      ansible.builtin.command:
+        argv:
+          - gh
+          - ssh-key
+          - add
+          - "{{ home_dir }}/.ssh/id_ed25519.pub"
+          - --title
+          - "{{ host_name }}"
+      failed_when: false
+      changed_when: true
+      tags: [ssh]
+
+    # --- git user config (#15) ---
+    - name: "git config: set user.name"
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: "{{ git_name }}"
+      when: git_name != ""
+      tags: [git-config]
+
+    - name: "git config: set user.email"
+      community.general.git_config:
+        name: user.email
+        scope: global
+        value: "{{ git_email }}"
+      when: git_email != ""
+      tags: [git-config]
+
+    # --- Homebrew upgrade (#16) ---
+    - name: "Upgrade: check outdated packages"
+      ansible.builtin.command: brew outdated
+      register: brew_outdated
+      changed_when: false
+      failed_when: false
+      tags: [upgrade]
+
+    - name: "Upgrade: display outdated packages"
+      ansible.builtin.debug:
+        msg: "{{ brew_outdated.stdout_lines }}"
+      tags: [upgrade]
+
+    - name: "Upgrade: managed brew packages"
+      community.general.homebrew:
+        name: "{{ brew_packages }}"
+        state: latest
+      failed_when: false
+      tags: [upgrade]
+
+    - name: "Upgrade: managed brew casks"
+      community.general.homebrew_cask:
+        name: "{{ item }}"
+        state: upgraded
+      loop: "{{ brew_casks }}"
+      failed_when: false
+      tags: [upgrade]
+
+    - name: "Upgrade: brew cleanup"
+      ansible.builtin.command: brew cleanup
+      changed_when: true
+      tags: [upgrade]
+
+    # --- Dock layout (#17) ---
+    - name: "Dock: confirm destructive reset"
+      ansible.builtin.pause:
+        prompt: "Dock の現在の内容を削除して managed layout に置き換えます。続ける場合は yes を入力してください"
+      register: dock_confirm
+      when: not (dock_confirm_reset | bool)
+      tags: [dock]
+
+    - name: "Dock: abort unless confirmed"
+      ansible.builtin.fail:
+        msg: "Cancelled Dock reset."
+      when:
+        - not (dock_confirm_reset | bool)
+        - (dock_confirm.user_input | default('') | lower) != 'yes'
+      tags: [dock]
+
+    - name: "Dock: ensure dockutil is installed"
+      community.general.homebrew:
+        name: dockutil
+        state: present
+      tags: [dock]
+
+    - name: "Dock: remove all items"
+      ansible.builtin.command: dockutil --remove all --no-restart
+      changed_when: true
+      tags: [dock]
+
+    - name: "Dock: add apps"
+      ansible.builtin.command:
+        argv:
+          - dockutil
+          - --add
+          - "{{ item }}"
+          - --no-restart
+      loop: "{{ dock_apps }}"
+      failed_when: false
+      changed_when: true
+      tags: [dock]
+
+    - name: "Dock: restart Dock"
+      ansible.builtin.command: killall Dock
+      changed_when: true
+      tags: [dock]

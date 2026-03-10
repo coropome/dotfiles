@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+need() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+dedupe_lines() {
+  awk '!seen[$0]++'
+}
+
+project_roots=()
+project_max_depth="${DITFILES_PROJECT_MAX_DEPTH:-3}"
+
+if [[ ! "$project_max_depth" =~ ^[0-9]+$ ]]; then
+  echo "DITFILES_PROJECT_MAX_DEPTH must be a non-negative integer" >&2
+  exit 1
+fi
+
+if [[ -n "${DITFILES_PROJECT_ROOTS:-}" ]]; then
+  IFS=: read -r -a project_roots <<< "$DITFILES_PROJECT_ROOTS"
+elif [[ -n "${P_ROOTS:-}" ]]; then
+  IFS=: read -r -a project_roots <<< "$P_ROOTS"
+else
+  project_roots=(
+    "$HOME/src"
+    "$HOME/projects"
+    "$HOME/dotfiles"
+  )
+fi
+
+if ! need tnew; then
+  echo "tnew not found. Run: make install" >&2
+  exit 1
+fi
+
+projects=()
+for root in "${project_roots[@]}"; do
+  [[ -d "$root" ]] || continue
+  while IFS= read -r project; do
+    projects+=("$project")
+  done < <(find "$root" -maxdepth "$project_max_depth" \( -type d -o -type f \) -name .git -prune -exec dirname {} \;)
+done
+
+if [[ ${#projects[@]} -eq 0 ]]; then
+  echo "No projects found under: ${project_roots[*]}" >&2
+  exit 1
+fi
+
+deduped_projects=()
+while IFS= read -r project; do
+  deduped_projects+=("$project")
+done < <(printf "%s\n" "${projects[@]}" | dedupe_lines)
+projects=("${deduped_projects[@]}")
+
+if need fzf; then
+  if ! selected="$(printf "%s\n" "${projects[@]}" | fzf --prompt "Project> " --height 40% --reverse)"; then
+    exit 0
+  fi
+else
+  PS3="Project> "
+  select selected in "${projects[@]}"; do
+    [[ -n "${selected:-}" ]] && break
+  done
+fi
+
+cd "$selected"
+exec tnew
