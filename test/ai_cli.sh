@@ -140,13 +140,24 @@ assert_contains() {
 setup_project
 setup_stubs
 
+help_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" --help)"
+[[ "$help_output" == *"Workflow Shortcuts:"* ]] || fail "ai help did not print workflow shortcuts"
+[[ "$help_output" == *"code"* ]] || fail "ai help did not list code workflow"
+[[ "$help_output" == *"[default agent: implementer]"* ]] || fail "ai help did not include workflow metadata"
+[[ "$help_output" == *".ai-dev-os/workflows.yml"* ]] || fail "ai help did not mention project-local overrides"
+
 agents_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" agents)"
-[[ "$agents_output" == *"claude"* ]] || fail "ai agents did not list claude"
-[[ "$agents_output" == *"reviewer"* ]] || fail "ai agents did not list reviewer"
+[[ "$agents_output" == *"agent | provider | role | command | description"* ]] || fail "ai agents did not print the metadata header"
+[[ "$agents_output" == *"claude | anthropic | coding-agent | claude | Claude Code interactive coding agent"* ]] || fail "ai agents did not list claude metadata"
+[[ "$agents_output" == *"reviewer | openai | reviewer | codex | Reviews code for regressions and risks"* ]] || fail "ai agents did not list reviewer metadata"
 
 workflows_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
-[[ "$workflows_output" == *"code"* ]] || fail "ai workflows did not list code"
-[[ "$workflows_output" == *"improve"* ]] || fail "ai workflows did not list improve"
+[[ "$workflows_output" == *"workflow | default agent | description"* ]] || fail "ai workflows did not print the metadata header"
+[[ "$workflows_output" == *"code | implementer | Launch the primary implementation agent"* ]] || fail "ai workflows did not list code metadata"
+[[ "$workflows_output" == *"improve | researcher | Explore new tools, prompts, and workflow improvements"* ]] || fail "ai workflows did not list improve metadata"
+
+agent_help_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --help)"
+[[ "$agent_help_output" == *"--describe --workflow review"* ]] || fail "ai-agent help did not include workflow describe usage"
 
 eval_list_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-eval" --list)"
 [[ "$eval_list_output" == *"review"* ]] || fail "ai-eval did not list review prompt"
@@ -159,6 +170,10 @@ describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe c
 
 reviewer_describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe reviewer)"
 [[ "$reviewer_describe_output" == *"prompt_file: prompts/reviewer.md"* ]] || fail "reviewer role metadata did not resolve"
+
+workflow_describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe --workflow review)"
+[[ "$workflow_describe_output" == *"workflow: review"* ]] || fail "ai-agent did not describe the resolved workflow"
+[[ "$workflow_describe_output" == *"agents_config: $REPO/ai/agents.yml"* ]] || fail "ai-agent did not report the resolved agent config"
 
 task_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" task)"
 [[ "$task_output" == *"AI Dev OS Backlog"* ]] || fail "ai task did not print the backlog"
@@ -196,6 +211,20 @@ assert_contains "$CLAUDE_LOG" "claude "
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" review >/dev/null
 assert_contains "$CODEX_LOG" "codex "
 
+rm -f "$STUB_BIN/codex"
+review_failure="$(
+  PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai" review 2>&1 >/dev/null || true
+)"
+[[ "$review_failure" == *"missing dependency: codex"* ]] || fail "ai review did not explain the missing backend"
+[[ "$review_failure" == *"resolved workflow: review"* ]] || fail "ai review did not include the resolved workflow"
+[[ "$review_failure" == *"run: make agent"* ]] || fail "ai review did not include remediation"
+cat > "$STUB_BIN/codex" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+printf "codex %s\n" "\$*" >> "$CODEX_LOG"
+EOF
+chmod +x "$STUB_BIN/codex"
+
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" improve --latest-trends >/dev/null
 assert_contains "$CODEX_LOG" "codex --latest-trends"
 
@@ -204,12 +233,16 @@ eval_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" eval review)"
 [[ "$eval_output" == *"hosted_hint: gh models eval --file"* ]] || fail "ai eval did not print the hosted fallback hint"
 
 local_workflows_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
-[[ "$local_workflows_output" == *"native"* ]] || fail "local workflows override did not load"
+[[ "$local_workflows_output" == *"native | local_reviewer | Local project workflow override"* ]] || fail "local workflows override did not load"
+[[ "$local_workflows_output" == *"source: $TEST_REPO/.ai-dev-os/workflows.yml"* ]] || fail "local workflows output did not report the override source"
 
 local_describe_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe local_reviewer)"
 [[ "$local_describe_output" == *"command: gemini"* ]] || fail "local agent override did not describe gemini"
 
 (cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" native --project-scope >/dev/null)
 assert_contains "$GEMINI_LOG" "gemini --project-scope"
+
+unknown_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" nope 2>&1 >/dev/null || true)"
+[[ "$unknown_output" == *"run \`ai workflows\` to see available workflow aliases and descriptions"* ]] || fail "unknown ai command did not include workflow remediation"
 
 echo "ai cli test passed"

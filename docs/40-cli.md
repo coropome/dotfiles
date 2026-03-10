@@ -14,6 +14,27 @@ codex --version
 
 初回はそれぞれログインや API キー設定が必要なことがある。
 
+## まず使うコマンド
+
+AI Dev OS の入口は `ai --help` と `ai start`。
+
+```bash
+ai --help
+ai workflows
+ai agents
+ai-agent --describe --workflow review
+ai start
+```
+
+`ai --help` は main commands に加えて、現在の repo で有効な workflow alias を表示する。
+repo に `.ai-dev-os/workflows.yml` や `.ai-dev-os/agents.yml` があれば、その override も discovery output に反映される。
+
+`ai workflows` は `workflow | default agent | description` の形で表示する。
+`ai agents` は `agent | provider | role | command | description` を表示する。
+
+backend CLI が足りない時は raw な `command not found` ではなく、resolved workflow / agent / config path / remediation を返す。
+まずは `make agent` を見る。
+
 ## AI Dev OS config と vendor config の境界
 
 AI Dev OS は orchestration layer として使い、vendor がすでに持っている機能はなるべく vendor native config に寄せる。
@@ -83,6 +104,7 @@ workflows:
 ```
 
 trust policy template の場所も `ai-agent --describe <role>` で確認できる。
+workflow 起点で確認したい時は `ai-agent --describe --workflow <name>` を使う。
 
 ## ai eval
 
@@ -91,17 +113,19 @@ prompt artifact を repo asset として扱う入口は `ai eval`。
 ```bash
 ai eval --list
 ai eval review
+ai eval --hosted review
 ```
 
 今の `ai eval` は local-first で、`.prompt.yml` の構造確認と test case / evaluator 数の確認を行う。
-hosted eval が必要なら、出力される `gh models eval --file ...` をそのまま使える。
+hosted eval が必要なら `ai eval --hosted <name>` を使う。
+`gh` が使えない時は remediation を返す。
 
 新しい prompt artifact を足す時は:
 
 1. `prompts/<name>.prompt.yml` を作る
 2. `name`, `description`, `messages`, `testData`, `evaluators` を入れる
 3. `ai eval <name>` で local check を通す
-4. 必要なら `gh models eval --file prompts/<name>.prompt.yml` で hosted eval に流す
+4. 必要なら `ai eval --hosted <name>` で hosted eval に流す
 
 ## rg（ripgrep）: 最強の全文検索
 

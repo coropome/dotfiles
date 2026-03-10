@@ -14,30 +14,53 @@ TARGET_REPO="$(ai_target_repo_root "$PWD")"
 WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
 
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 usage: ai <command> [args...]
 
-Commands:
+Main Commands:
   start         launch the AI Dev OS workspace
   stop          stop the AI Dev OS workspace
-  agents        list configured agents
-  workflows     list configured workflows
+  workflows     list configured workflows with descriptions
+  agents        list configured agents with provider and role metadata
   agent         run or inspect a configured agent
   context       build repository context
   task          show the current backlog
-  code          launch the configured code workflow
-  review        launch the configured review workflow
   eval          inspect or validate prompt artifacts
   install       run the OS abstraction install wrapper
   copy          copy stdin through the AI clipboard wrapper
   open          open a path or URL through the AI open wrapper
+
+Workflow Shortcuts:
+$(render_workflow_help)
+
+Resolved workflow config: $WORKFLOWS_FILE
+Resolved agent config: $("$BIN_DIR/ai-agent" --config-path agents)
+
+Project-local overrides:
+  Put .ai-dev-os/workflows.yml or .ai-dev-os/agents.yml in a repo to override
+  workflow aliases, default agents, and routing without editing this dotfiles repo.
 EOF
+}
+
+render_workflow_help() {
+  local workflow_name description default_agent
+
+  while IFS= read -r workflow_name; do
+    [[ -n "$workflow_name" ]] || continue
+    description="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" description)"
+    default_agent="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" default_agent)"
+    printf '  %-12s %s' "$workflow_name" "${description:-No description}"
+    if [[ -n "$default_agent" ]]; then
+      printf ' [default agent: %s]' "$default_agent"
+    fi
+    printf '\n'
+  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
 }
 
 command_name="${1:-}"
 if [[ -z "$command_name" ]]; then
   usage
-  exit 2
+  exit 0
 fi
 shift || true
 
@@ -89,6 +112,8 @@ case "$command_name" in
       exec "$BIN_DIR/ai-agent" --workflow "$command_name" "$@"
     fi
     echo "unknown ai command: $command_name" >&2
+    echo "run \`ai workflows\` to see available workflow aliases and descriptions" >&2
+    echo "repo-local overrides may add commands via .ai-dev-os/workflows.yml" >&2
     usage >&2
     exit 2
     ;;

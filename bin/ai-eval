@@ -14,7 +14,7 @@ TARGET_REPO="$(ai_target_repo_root "$PWD")"
 
 usage() {
   cat <<'EOF'
-usage: ai-eval [--list] [prompt-name]
+usage: ai-eval [--list] [--hosted] [prompt-name]
 EOF
 }
 
@@ -77,9 +77,16 @@ validate_prompt_file() {
   done
 }
 
+hosted_mode=0
+
 if [[ "${1:-}" == "--list" ]]; then
   list_prompts
   exit 0
+fi
+
+if [[ "${1:-}" == "--hosted" ]]; then
+  hosted_mode=1
+  shift || true
 fi
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
@@ -100,6 +107,14 @@ if [[ -z "$prompt_file" ]]; then
 fi
 
 validate_prompt_file "$prompt_file"
+
+if [[ $hosted_mode -eq 1 ]]; then
+  if ! command -v gh >/dev/null 2>&1; then
+    echo "hosted eval requires GitHub CLI with GitHub Models support; run: make agent or install gh" >&2
+    exit 1
+  fi
+  exec gh models eval --file "$prompt_file"
+fi
 
 printf 'prompt: %s\n' "$(field_value "$prompt_file" name)"
 printf 'file: %s\n' "$prompt_file"

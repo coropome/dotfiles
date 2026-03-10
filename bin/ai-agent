@@ -16,58 +16,166 @@ WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
 
 usage() {
   cat <<'EOF'
-usage: ai-agent [--list|--list-workflows] [--describe agent-name] [--workflow name [args...]] [agent-name [args...]]
+usage: ai-agent [options] [agent-name [args...]]
+
+Options:
+  --list                 list configured agents with provider and role metadata
+  --list-workflows       list configured workflows with descriptions
+  --describe             print resolved agent metadata
+  --workflow <name>      resolve and run or describe a workflow
+  --config-path <kind>   print the resolved config path for agents or workflows
+  -h, --help             show this help
+
+Examples:
+  ai-agent --list
+  ai-agent --list-workflows
+  ai-agent --describe reviewer
+  ai-agent --describe --workflow review
+  ai-agent --workflow code
 EOF
 }
 
 list_agents() {
-  ai_section_keys "$AGENTS_FILE" agents
+  local agent_name provider_name role_name command_name description
+
+  printf 'agent | provider | role | command | description\n'
+  while IFS= read -r agent_name; do
+    [[ -n "$agent_name" ]] || continue
+    provider_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" provider)"
+    role_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" role)"
+    command_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" command)"
+    description="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" description)"
+    printf '%s | %s | %s | %s | %s\n' \
+      "$agent_name" \
+      "${provider_name:-unknown}" \
+      "${role_name:-unknown}" \
+      "${command_name:-unknown}" \
+      "${description:-No description}"
+  done < <(ai_section_keys "$AGENTS_FILE" agents)
+
+  printf 'source: %s\n' "$AGENTS_FILE"
 }
 
 list_workflows() {
-  ai_section_keys "$WORKFLOWS_FILE" workflows
+  local workflow_name default_agent description
+
+  printf 'workflow | default agent | description\n'
+  while IFS= read -r workflow_name; do
+    [[ -n "$workflow_name" ]] || continue
+    default_agent="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" default_agent)"
+    description="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" description)"
+    printf '%s | %s | %s\n' \
+      "$workflow_name" \
+      "${default_agent:-unknown}" \
+      "${description:-No description}"
+  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
+
+  printf 'source: %s\n' "$WORKFLOWS_FILE"
 }
 
-if [[ "${1:-}" == "--list" ]]; then
-  list_agents
-  exit 0
-fi
-
-if [[ "${1:-}" == "--list-workflows" ]]; then
-  list_workflows
-  exit 0
-fi
-
-describe_requested=0
-if [[ "${1:-}" == "--describe" ]]; then
-  describe_requested=1
-  shift || true
-fi
-
+config_kind=""
+action="run"
 workflow_name=""
-if [[ "${1:-}" == "--workflow" ]]; then
-  [[ $# -ge 2 ]] || { usage >&2; exit 2; }
-  workflow_name="$2"
-  shift 2
-fi
+agent_name=""
 
-agent_name="${1:-}"
+while [[ $# -gt 0 ]]; do
+  if [[ "$action" == "run" && ( -n "$workflow_name" || -n "$agent_name" ) ]]; then
+    break
+  fi
+
+  case "${1:-}" in
+    --list)
+      action="list"
+      shift
+      ;;
+    --list-workflows)
+      action="list_workflows"
+      shift
+      ;;
+    --describe)
+      action="describe"
+      shift
+      ;;
+    --workflow)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      workflow_name="$2"
+      shift 2
+      ;;
+    --config-path)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      config_kind="$2"
+      action="config_path"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      if [[ "$action" == "run" && ( -n "$workflow_name" || -n "$agent_name" ) ]]; then
+        break
+      fi
+      echo "unknown option: ${1:-}" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      if [[ -z "$agent_name" ]]; then
+        agent_name="$1"
+        shift
+        continue
+      fi
+      break
+      ;;
+  esac
+done
+
+case "$action" in
+  list)
+    list_agents
+    exit 0
+    ;;
+  list_workflows)
+    list_workflows
+    exit 0
+    ;;
+  config_path)
+    case "$config_kind" in
+      agents)
+        printf '%s\n' "$AGENTS_FILE"
+        ;;
+      workflows)
+        printf '%s\n' "$WORKFLOWS_FILE"
+        ;;
+      *)
+        echo "unknown config kind: $config_kind" >&2
+        exit 2
+        ;;
+    esac
+    exit 0
+    ;;
+esac
+
 if [[ -n "$workflow_name" ]]; then
   agent_name="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "default_agent")"
   if [[ -z "$agent_name" ]]; then
     echo "unknown workflow: $workflow_name" >&2
+    echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
     exit 2
   fi
 elif [[ -z "$agent_name" ]]; then
   usage
   exit 2
-else
-  shift || true
 fi
 
 command_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "command")"
 role_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "role")"
 provider_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "provider")"
+description="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "description")"
 docs_url="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "docs_url")"
 user_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "user_config")"
 project_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_config")"
@@ -79,14 +187,16 @@ trust_template="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "trust_t
 
 if [[ -z "$command_name" ]]; then
   echo "unknown agent: $agent_name" >&2
+  echo "run \`ai agents\` to inspect configured agents and their roles" >&2
   exit 2
 fi
 
-if [[ $describe_requested -eq 1 ]]; then
+if [[ "$action" == "describe" ]]; then
   printf 'agent: %s\n' "$agent_name"
   if [[ -n "$workflow_name" ]]; then
     printf 'workflow: %s\n' "$workflow_name"
   fi
+  [[ -n "$description" ]] && printf 'description: %s\n' "$description"
   printf 'command: %s\n' "$command_name"
   printf 'role: %s\n' "${role_name:-unknown}"
   [[ -n "$provider_name" ]] && printf 'provider: %s\n' "$provider_name"
@@ -98,7 +208,35 @@ if [[ $describe_requested -eq 1 ]]; then
   [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
   [[ -n "$prompt_file" ]] && printf 'prompt_file: %s\n' "$prompt_file"
   [[ -n "$trust_template" ]] && printf 'trust_template: %s\n' "$trust_template"
+  printf 'agents_config: %s\n' "$AGENTS_FILE"
+  printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
   exit 0
+fi
+
+if ! command -v "$command_name" >/dev/null 2>&1; then
+  echo "missing dependency: $command_name" >&2
+  if [[ -n "$workflow_name" ]]; then
+    echo "resolved workflow: $workflow_name" >&2
+  fi
+  echo "resolved agent: $agent_name" >&2
+  if [[ -n "$provider_name" ]]; then
+    echo "provider: $provider_name" >&2
+  fi
+  echo "agents config: $AGENTS_FILE" >&2
+  if [[ -n "$workflow_name" ]]; then
+    echo "workflows config: $WORKFLOWS_FILE" >&2
+  fi
+  if [[ -n "$prompt_file" ]]; then
+    echo "prompt file: $prompt_file" >&2
+  fi
+  if [[ -n "$trust_template" ]]; then
+    echo "trust template: $trust_template" >&2
+  fi
+  if [[ -n "$docs_url" ]]; then
+    echo "docs: $docs_url" >&2
+  fi
+  echo "run: make agent" >&2
+  exit 1
 fi
 
 exec "$command_name" "$@"
