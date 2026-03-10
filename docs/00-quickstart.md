@@ -46,5 +46,6 @@ tmux を直接扱いたい時だけ `tnew` を使う。
 ## チュートリアル
 
 - 5〜10分で慣れる: `ttutor`
+- 10分 demo: `docs/05-demo-walkthrough.md`
 - bootstrap の全体像: `docs/02-bootstrap-flow.md`
 - サポート範囲: `docs/31-support-matrix.md`

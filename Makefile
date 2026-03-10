@@ -98,7 +98,7 @@ agent:
 # lint: shellcheck all shell scripts
 lint:
 	@command -v shellcheck >/dev/null 2>&1 || { echo "shellcheck not found (run: make install)"; exit 1; }
-	shellcheck -x install install.sh uninstall.sh doctor.sh bin/_ai_common bin/ai bin/ai-init bin/ai-start bin/ai-agent bin/ai-context bin/ai-task bin/ai-eval bin/ai-install bin/ai-copy bin/ai-open bin/tnew bin/thelp bin/tlist bin/tgo bin/tkill bin/_tpick bin/ttutor bin/p bin/_platform bin/_clipboard_copy bin/_open bin/_tmux_help bin/render-brewfile bin/render-ansible-package-vars ansible/run.sh context/build-context.sh os/mac.sh os/linux.sh os/wsl.sh test/agent_install.sh test/ai_cli.sh test/ai_os_layer.sh test/install_uninstall.sh test/git_config.sh test/p.sh test/ansible_run.sh test/compatibility_helpers.sh test/repository_structure.sh test/package_inventory.sh test/zsh_portability.sh test/doctor_platform.sh
+	shellcheck -x install install.sh uninstall.sh doctor.sh bin/_ai_common bin/ai bin/ai-start bin/ai-agent bin/ai-context bin/ai-task bin/ai-eval bin/ai-init bin/ai-install bin/ai-copy bin/ai-open bin/tnew bin/thelp bin/tlist bin/tgo bin/tkill bin/_tpick bin/ttutor bin/p bin/_platform bin/_clipboard_copy bin/_open bin/_tmux_help bin/render-brewfile bin/render-ansible-package-vars ansible/run.sh context/build-context.sh os/mac.sh os/linux.sh os/wsl.sh test/agent_install.sh test/ai_cli.sh test/ai_os_layer.sh test/demo_assets.sh test/install_uninstall.sh test/git_config.sh test/p.sh test/ansible_run.sh test/compatibility_helpers.sh test/repository_structure.sh test/package_inventory.sh test/zsh_portability.sh test/doctor_platform.sh
 
 # test: run local integration checks in a temporary HOME
 test:
@@ -107,6 +107,7 @@ test:
 	./test/agent_install.sh
 	./test/ai_cli.sh
 	./test/ai_os_layer.sh
+	./test/demo_assets.sh
 	./test/install_uninstall.sh
 	./test/git_config.sh
 	./test/p.sh

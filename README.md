@@ -41,6 +41,7 @@ ai start
 詳細なフェーズ説明: `docs/02-bootstrap-flow.md`
 サポート範囲: `docs/31-support-matrix.md`
 最短の導入ガイド: `docs/00-quickstart.md`
+10分 demo: `docs/05-demo-walkthrough.md`
 
 ### install の挙動（重要）
 
@@ -156,6 +157,7 @@ git layer の構成と include の仕組み、optional signing の考え方は `
 導入:
 
 - `docs/00-quickstart.md`
+- `docs/05-demo-walkthrough.md`
 - `docs/02-bootstrap-flow.md`
 - `docs/31-support-matrix.md`
 

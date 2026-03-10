@@ -170,6 +170,9 @@ verify_layout_scaffold() {
   assert_dir "$REPO/tasks"
   assert_dir "$REPO/.github"
   assert_dir "$REPO/.github/ISSUE_TEMPLATE"
+  assert_dir "$REPO/demo/sample-project"
+  assert_dir "$REPO/demo/sample-project/.ai-dev-os"
+  assert_dir "$REPO/demo/sample-project/prompts"
   assert_dir "$REPO/docs/adr"
   assert_dir "$REPO/lib/bootstrap"
   assert_dir "$REPO/lib/dotfiles"
@@ -189,6 +192,11 @@ verify_layout_scaffold() {
   assert_file "$REPO/prompts/reviewer.md"
   assert_file "$REPO/prompts/researcher.md"
   assert_file "$REPO/prompts/review.prompt.yml"
+  assert_file "$REPO/demo/sample-project/README.md"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/agents.yml"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/workflows.yml"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/README.md"
+  assert_file "$REPO/demo/sample-project/prompts/review.prompt.yml"
   assert_file "$REPO/templates/ai-trust/claude-settings.json"
   assert_file "$REPO/templates/ai-trust/codex-config.toml"
   assert_file "$REPO/templates/ai-trust/gemini-settings.json"
@@ -203,6 +211,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/docs/92-development-workflow.md"
   assert_file "$REPO/docs/adr/README.md"
   assert_file "$REPO/docs/adr/0001-ai-dev-os-delivery-workflow.md"
+  assert_file "$REPO/docs/05-demo-walkthrough.md"
   assert_file "$REPO/docs/41-ai-trust.md"
   assert_file "$REPO/tmux/layout.conf"
 }
@@ -230,6 +239,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/92-development-workflow.md does not mention AGENTS.md"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not enforce issue-first work"
+  grep -Fq "docs/05-demo-walkthrough.md" "$REPO/README.md" \
+    || fail "README.md does not link to the demo walkthrough"
 }
 
 verify_layout_scaffold
