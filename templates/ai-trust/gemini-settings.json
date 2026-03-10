@@ -1,0 +1,15 @@
+{
+  "security": {
+    "filesystemScope": "project-only",
+    "networkAccess": "ask",
+    "blockedPaths": [
+      "~/.ssh",
+      "~/.aws"
+    ]
+  },
+  "allowedCommands": [
+    "git status",
+    "git diff",
+    "rg"
+  ]
+}

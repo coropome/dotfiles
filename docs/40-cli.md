@@ -35,6 +35,7 @@ AI Dev OS は orchestration layer として使い、vendor がすでに持って
 - workflow routing は AI Dev OS 側で持つ
 - MCP / hooks / native agent features は vendor 側で持つ
 - repo ごとの上書きは `.ai-dev-os/` を優先する
+- trust policy の starter template は `templates/ai-trust/` を使う
 
 例:
 
@@ -80,6 +81,8 @@ workflows:
   plan:
     default_agent: local_architect
 ```
+
+trust policy template の場所も `ai-agent --describe <role>` で確認できる。
 
 ## ai eval
 

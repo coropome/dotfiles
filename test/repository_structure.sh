@@ -164,6 +164,7 @@ verify_layout_scaffold() {
   assert_dir "$REPO/manifests/bootstrap"
   assert_dir "$REPO/manifests/packages"
   assert_dir "$REPO/manifests/tmux"
+  assert_dir "$REPO/templates/ai-trust"
   assert_dir "$REPO/zsh/modules"
   assert_dir "$REPO/tmux/conf.d"
   assert_file "$REPO/ai/agents.yml"
@@ -176,6 +177,9 @@ verify_layout_scaffold() {
   assert_file "$REPO/prompts/reviewer.md"
   assert_file "$REPO/prompts/researcher.md"
   assert_file "$REPO/prompts/review.prompt.yml"
+  assert_file "$REPO/templates/ai-trust/claude-settings.json"
+  assert_file "$REPO/templates/ai-trust/codex-config.toml"
+  assert_file "$REPO/templates/ai-trust/gemini-settings.json"
   assert_file "$REPO/.github/ISSUE_TEMPLATE/feature.yml"
   assert_file "$REPO/.github/ISSUE_TEMPLATE/bug.yml"
   assert_file "$REPO/.github/ISSUE_TEMPLATE/config.yml"
@@ -186,6 +190,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/docs/92-development-workflow.md"
   assert_file "$REPO/docs/adr/README.md"
   assert_file "$REPO/docs/adr/0001-ai-dev-os-delivery-workflow.md"
+  assert_file "$REPO/docs/41-ai-trust.md"
   assert_file "$REPO/tmux/layout.conf"
 }
 
@@ -202,6 +207,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai eval"
   grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not explain role metadata"
+  grep -Fq "templates/ai-trust/" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not mention trust templates"
+  grep -Fq "project-only" "$REPO/docs/41-ai-trust.md" \
+    || fail "docs/41-ai-trust.md does not document trust defaults"
 }
 
 verify_layout_scaffold

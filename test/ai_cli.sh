@@ -155,6 +155,7 @@ describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe c
 [[ "$describe_output" == *"project_config: .claude/settings.json"* ]] || fail "ai-agent describe missing project config"
 [[ "$describe_output" == *"mcp_config: .claude/settings.json"* ]] || fail "ai-agent describe missing mcp config"
 [[ "$describe_output" == *"prompt_file: prompts/implementer.md"* ]] || fail "ai-agent describe missing prompt file"
+[[ "$describe_output" == *"trust_template: templates/ai-trust/claude-settings.json"* ]] || fail "ai-agent describe missing trust template"
 
 reviewer_describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe reviewer)"
 [[ "$reviewer_describe_output" == *"prompt_file: prompts/reviewer.md"* ]] || fail "reviewer role metadata did not resolve"

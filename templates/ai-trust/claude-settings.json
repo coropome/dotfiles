@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(./)",
+      "Edit(./)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(rg *)"
+    ],
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(rm -rf /)"
+    ]
+  },
+  "env": {
+    "AI_DEV_OS_TRUST_MODE": "project-scoped"
+  }
+}

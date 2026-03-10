@@ -174,6 +174,7 @@ git / CLI:
 
 - `docs/03-git.md`
 - `docs/40-cli.md`
+- `docs/41-ai-trust.md`
 
 local customization / secrets:
 

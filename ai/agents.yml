@@ -11,6 +11,7 @@ agents:
     project_extensions: .claude/agents/
     mcp_config: .claude/settings.json
     automation_mode: native-subagents-hooks
+    trust_template: templates/ai-trust/claude-settings.json
   gemini:
     provider: google
     command: gemini
@@ -21,6 +22,7 @@ agents:
     user_config: ~/.gemini/settings.json
     mcp_config: ~/.gemini/settings.json
     automation_mode: native-mcp-headless
+    trust_template: templates/ai-trust/gemini-settings.json
   codex:
     provider: openai
     command: codex
@@ -31,6 +33,7 @@ agents:
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
     automation_mode: native-skills-mcp
+    trust_template: templates/ai-trust/codex-config.toml
   architect:
     provider: anthropic
     command: claude
@@ -43,6 +46,7 @@ agents:
     project_extensions: .claude/agents/
     mcp_config: .claude/settings.json
     automation_mode: native-subagents-hooks
+    trust_template: templates/ai-trust/claude-settings.json
   implementer:
     provider: anthropic
     command: claude
@@ -55,6 +59,7 @@ agents:
     project_extensions: .claude/agents/
     mcp_config: .claude/settings.json
     automation_mode: native-subagents-hooks
+    trust_template: templates/ai-trust/claude-settings.json
   reviewer:
     provider: openai
     command: codex
@@ -65,6 +70,7 @@ agents:
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
     automation_mode: native-skills-mcp
+    trust_template: templates/ai-trust/codex-config.toml
   researcher:
     provider: google
     command: codex
@@ -75,3 +81,4 @@ agents:
     user_config: ~/.codex/config.toml
     mcp_config: ~/.codex/config.toml
     automation_mode: native-mcp-evals
+    trust_template: templates/ai-trust/codex-config.toml

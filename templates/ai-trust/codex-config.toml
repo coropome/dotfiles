@@ -1,0 +1,10 @@
+[trust]
+filesystem_scope = "project-only"
+network_access = "ask"
+shell_mode = "allowlisted"
+
+[trust.allowlisted_commands]
+commands = ["git status", "git diff", "rg"]
+
+[trust.blocked_paths]
+paths = ["~/.ssh", "~/.aws"]
