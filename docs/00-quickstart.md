@@ -1,15 +1,19 @@
 # Quickstart
 
+このページは beginner path を優先する。advanced path は後半に分ける。
+
 前提:
 
 - 現在の bootstrap 対象は **macOS**
 - `make install` の前に **Homebrew** が必要
 - 実運用上は **Xcode Command Line Tools** も必要
 
+## Beginner Path
+
 1. iTerm2 をインストール（任意：標準Terminalでも可）
-2. `make install` を実行
-   - Homebrew の core パッケージ導入と dotfiles のリンクをまとめて行う
-3. 必要なら `make mac` と `make agent` を実行
+2. `./install` を実行
+   - bootstrap wrapper。内部では `install.sh` を呼ぶ
+3. `make agent` を実行
 4. 新しいターミナルで `ai start`
 
 別の Git repo を AI Dev OS で使いたい時は:
@@ -22,6 +26,29 @@
 `ai init` は repo root に `.ai-dev-os/` を作り、既存ファイルがあれば skip する。
 
 tmux を直接扱いたい時だけ `tnew` を使う。
+
+agent CLI が足りない時:
+
+- `make agent`
+- `make doctor`
+- `docs/99-troubleshooting.md`
+
+## Optional Setup
+
+- アプリ/CLI: `make mac`
+- Finder / Dock / Screenshot defaults: `make defaults`
+- keyboard tweaks: `make keyboard`
+
+## Advanced Path
+
+advanced user は必要に応じて以下へ分岐してよい。
+
+- `make install`
+- `make mac`
+- `make agent`
+- `tnew`
+- local override
+- vendor-native config (`.claude/`, `.ai-dev-os/`, `~/.codex/`, `~/.gemini/`)
 
 追加で入れるもの:
 

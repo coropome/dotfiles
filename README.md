@@ -1,6 +1,6 @@
-# ditfiles
+# AI Dev OS / ditfiles
 
-Mac + zsh + iTerm2 + tmux を「最初から」使うための dotfiles。
+macOS-first の AI development environment。dotfiles と tmux を内部基盤として使いながら、beginner には `ai start` を入口として見せる。
 
 - beginner 向けの入口は **`ai start`**
 - tmux を直接使う場合の入口は **`tnew`**
@@ -12,24 +12,21 @@ agent instruction: `AGENTS.md`
 
 ---
 
-## Quickstart（30秒）
+## OSS Quickstart
 
 ```bash
 git clone https://github.com/coropome/dotfiles.git
 cd dotfiles
 
-# core setup（brew + dotfiles）
-make install
+# bootstrap
+./install
+make agent
 
-# （任意）アプリ/CLIの導入（Homebrew）
-make mac
-
-# （任意）キーボード調整（挙動が変わるので分離）
-make keyboard
-
-# 新しいターミナルを開いたら
+# workspace
 ai start
 ```
+
+これが beginner path。最初はこの flow だけでよい。
 
 前提:
 
@@ -38,9 +35,29 @@ ai start
 - 実運用上は **Xcode Command Line Tools** も必要
 - Linux / WSL では `make install` / `make mac` はサポート外。runtime 設定の参照先として docs を使う
 
-詳細なフェーズ説明: `docs/02-bootstrap-flow.md`
-サポート範囲: `docs/31-support-matrix.md`
-最短の導入ガイド: `docs/00-quickstart.md`
+次に読む:
+
+- 最短の導入ガイド: `docs/00-quickstart.md`
+- フェーズ説明: `docs/02-bootstrap-flow.md`
+- サポート範囲: `docs/31-support-matrix.md`
+
+## Paths
+
+- Beginner path
+  - `./install`
+  - `make agent`
+  - `ai start`
+- Advanced / manual path
+  - `make install`
+  - `make mac`
+  - `make agent`
+  - `tnew`, `tmux`, local overrides, manual vendor config
+
+## If Agent CLI Is Missing
+
+- `ai start` の前に `make agent` を実行する
+- `make doctor` で `claude` / `gemini` / `codex` の検出状態を見る
+- 詳細な分岐は `docs/99-troubleshooting.md`
 
 ### 別の repo で AI Dev OS を使う
 

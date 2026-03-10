@@ -14,6 +14,12 @@
   - `brew doctor`
   - `brew update`
   - 直らなければ `brew bundle --file ./Brewfile`
+- `ai start` の前に agent CLI が見つからない
+  - `make agent`
+  - `make doctor`
+  - `claude --version`
+  - `gemini --version`
+  - `codex --version`
 - Linux / WSL で `make install` / `make mac` を実行した
   - `docs/31-support-matrix.md`
 - symlink が想定どおり張られない
