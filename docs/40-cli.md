@@ -142,7 +142,8 @@ ai init --repo /path/to/project
 
 - `.ai-dev-os/agents.yml`
 - `.ai-dev-os/workflows.yml`
-- `prompts/review.prompt.yml`
+- `.ai-dev-os/prompts/implementer.md`
+- `.ai-dev-os/prompts/review.prompt.yml`
 - `.ai-dev-os/README.md`
 
 `ai init` は workflow routing と prompt artifact を生成するだけで、vendor-native config は直接上書きしない。
