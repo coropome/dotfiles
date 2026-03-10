@@ -14,6 +14,47 @@ codex --version
 
 初回はそれぞれログインや API キー設定が必要なことがある。
 
+## AI Dev OS config と vendor config の境界
+
+AI Dev OS は orchestration layer として使い、vendor がすでに持っている機能はなるべく vendor native config に寄せる。
+
+- AI Dev OS に書くもの
+  - `.ai-dev-os/workflows.yml`
+  - `.ai-dev-os/agents.yml`
+  - どの workflow がどの agent を呼ぶか
+  - repo 単位でどの CLI を優先するか
+- vendor config に書くもの
+  - `.claude/settings.json`
+  - `.claude/agents/`
+  - `~/.codex/config.toml`
+  - `~/.gemini/settings.json`
+  - MCP, hooks, subagents, headless mode, vendor 固有の権限や runtime 設定
+
+原則:
+
+- workflow routing は AI Dev OS 側で持つ
+- MCP / hooks / native agent features は vendor 側で持つ
+- repo ごとの上書きは `.ai-dev-os/` を優先する
+
+例:
+
+```yaml
+# .ai-dev-os/workflows.yml
+workflows:
+  review:
+    default_agent: local_reviewer
+```
+
+```yaml
+# .ai-dev-os/agents.yml
+agents:
+  local_reviewer:
+    command: gemini
+    role: reviewer
+```
+
+この形なら、AI Dev OS の shell code を編集せずに repo ごとの workflow を差し替えられる。
+
 ## rg（ripgrep）: 最強の全文検索
 
 ```bash

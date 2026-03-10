@@ -193,6 +193,10 @@ verify_ai_dev_os_docs() {
     || fail "README.md does not mention ai start"
   grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
     || fail "docs/00-quickstart.md does not mention ai start"
+  grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
+  grep -Fq ".claude/settings.json" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document vendor-native config boundaries"
 }
 
 verify_layout_scaffold

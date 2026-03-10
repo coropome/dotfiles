@@ -10,6 +10,7 @@ OPEN_LOG="$TMPDIR_ROOT/open.log"
 COPY_LOG="$TMPDIR_ROOT/copy.log"
 CLAUDE_LOG="$TMPDIR_ROOT/claude.log"
 CODEX_LOG="$TMPDIR_ROOT/codex.log"
+GEMINI_LOG="$TMPDIR_ROOT/gemini.log"
 TMUX_STATE="$TMPDIR_ROOT/tmux.state"
 ORIG_PATH="$PATH"
 
@@ -24,8 +25,22 @@ fail() {
 }
 
 setup_project() {
-  mkdir -p "$TEST_REPO/.git" "$STUB_BIN"
+  mkdir -p "$TEST_REPO/.git" "$TEST_REPO/.ai-dev-os" "$STUB_BIN"
   printf "hello\n" > "$TEST_REPO/README.md"
+  cat > "$TEST_REPO/.ai-dev-os/agents.yml" <<'EOF'
+agents:
+  local_reviewer:
+    provider: google
+    command: gemini
+    role: reviewer
+    description: Local project override reviewer
+EOF
+  cat > "$TEST_REPO/.ai-dev-os/workflows.yml" <<'EOF'
+workflows:
+  native:
+    default_agent: local_reviewer
+    description: Local project workflow override
+EOF
 }
 
 setup_stubs() {
@@ -107,7 +122,13 @@ set -euo pipefail
 printf "codex %s\n" "\$*" >> "$CODEX_LOG"
 EOF
 
-  chmod +x "$STUB_BIN/git" "$STUB_BIN/tmux" "$STUB_BIN/open" "$STUB_BIN/pbcopy" "$STUB_BIN/claude" "$STUB_BIN/codex"
+  cat > "$STUB_BIN/gemini" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+printf "gemini %s\n" "\$*" >> "$GEMINI_LOG"
+EOF
+
+  chmod +x "$STUB_BIN/git" "$STUB_BIN/tmux" "$STUB_BIN/open" "$STUB_BIN/pbcopy" "$STUB_BIN/claude" "$STUB_BIN/codex" "$STUB_BIN/gemini"
 }
 
 assert_contains() {
@@ -169,5 +190,14 @@ assert_contains "$CODEX_LOG" "codex "
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" improve --latest-trends >/dev/null
 assert_contains "$CODEX_LOG" "codex --latest-trends"
+
+local_workflows_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
+[[ "$local_workflows_output" == *"native"* ]] || fail "local workflows override did not load"
+
+local_describe_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe local_reviewer)"
+[[ "$local_describe_output" == *"command: gemini"* ]] || fail "local agent override did not describe gemini"
+
+(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" native --project-scope >/dev/null)
+assert_contains "$GEMINI_LOG" "gemini --project-scope"
 
 echo "ai cli test passed"
