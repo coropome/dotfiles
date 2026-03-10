@@ -16,6 +16,7 @@ ai-start
 ai-agent
 ai-context
 ai-task
+ai-eval
 ai-install
 ai-copy
 ai-open

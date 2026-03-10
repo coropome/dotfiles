@@ -27,6 +27,7 @@ Commands:
   task          show the current backlog
   code          launch the configured code workflow
   review        launch the configured review workflow
+  eval          inspect or validate prompt artifacts
   install       run the OS abstraction install wrapper
   copy          copy stdin through the AI clipboard wrapper
   open          open a path or URL through the AI open wrapper
@@ -67,6 +68,9 @@ case "$command_name" in
     ;;
   review)
     exec "$BIN_DIR/ai-agent" --workflow review "$@"
+    ;;
+  eval)
+    exec "$BIN_DIR/ai-eval" "$@"
     ;;
   install)
     exec "$BIN_DIR/ai-install" "$@"

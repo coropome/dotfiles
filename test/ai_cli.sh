@@ -148,6 +148,9 @@ workflows_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
 [[ "$workflows_output" == *"code"* ]] || fail "ai workflows did not list code"
 [[ "$workflows_output" == *"improve"* ]] || fail "ai workflows did not list improve"
 
+eval_list_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-eval" --list)"
+[[ "$eval_list_output" == *"review"* ]] || fail "ai-eval did not list review prompt"
+
 describe_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe claude)"
 [[ "$describe_output" == *"project_config: .claude/settings.json"* ]] || fail "ai-agent describe missing project config"
 [[ "$describe_output" == *"mcp_config: .claude/settings.json"* ]] || fail "ai-agent describe missing mcp config"
@@ -190,6 +193,10 @@ assert_contains "$CODEX_LOG" "codex "
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" improve --latest-trends >/dev/null
 assert_contains "$CODEX_LOG" "codex --latest-trends"
+
+eval_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" eval review)"
+[[ "$eval_output" == *"mode: local-structure-check"* ]] || fail "ai eval did not run the local evaluation flow"
+[[ "$eval_output" == *"hosted_hint: gh models eval --file"* ]] || fail "ai eval did not print the hosted fallback hint"
 
 local_workflows_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
 [[ "$local_workflows_output" == *"native"* ]] || fail "local workflows override did not load"

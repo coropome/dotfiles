@@ -55,6 +55,25 @@ agents:
 
 この形なら、AI Dev OS の shell code を編集せずに repo ごとの workflow を差し替えられる。
 
+## ai eval
+
+prompt artifact を repo asset として扱う入口は `ai eval`。
+
+```bash
+ai eval --list
+ai eval review
+```
+
+今の `ai eval` は local-first で、`.prompt.yml` の構造確認と test case / evaluator 数の確認を行う。
+hosted eval が必要なら、出力される `gh models eval --file ...` をそのまま使える。
+
+新しい prompt artifact を足す時は:
+
+1. `prompts/<name>.prompt.yml` を作る
+2. `name`, `description`, `messages`, `testData`, `evaluators` を入れる
+3. `ai eval <name>` で local check を通す
+4. 必要なら `gh models eval --file prompts/<name>.prompt.yml` で hosted eval に流す
+
 ## rg（ripgrep）: 最強の全文検索
 
 ```bash
