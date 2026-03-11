@@ -248,6 +248,9 @@ list_workflows() {
   done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
 
   printf 'source: %s\n' "$WORKFLOWS_FILE"
+  printf '\nNext Steps:\n'
+  printf '  - inspect a workflow: ai-agent --describe --workflow <name>\n'
+  printf '  - then continue the beginner path: ai start\n'
 }
 
 config_kind=""

@@ -50,7 +50,7 @@ unknown command に当たった時も、`ai` は `ai doctor` を先に、`ai wor
 一時的な wrapper ではなく、長く使う daily tool として surface を整理する。
 trust 設定は beginner surface の常時コマンドというより、`ai doctor` が trust gap を示した時の remediation として使う。
 
-`ai workflows` は `workflow | default agent | description` を基本に、必要なら fallback chain も含めて確認するための一覧。
+`ai workflows` は `workflow | default agent | description` を基本に、必要なら fallback chain も含めて確認するための一覧。一覧を見たあとは、必要なら `ai-agent --describe --workflow <name>` で 1 つの workflow を深掘りし、その次に `ai start` へ進めば beginner path に戻りやすい。
 `ai agents` は `agent | provider | role | command | description` を表示する。
 `ai task` は pending backlog task の短い summary を先に出し、その後に full backlog を表示する。backlog refinement や次 sprint 候補の確認を始める時の入口として使う。
 `ai start` の起動後は、まず `ai doctor` と `ai workflows` を見れば beginner path に戻りやすい。
