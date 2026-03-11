@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #69 `docs: define a PLANS.md closeout contract for turn-scoped sprints`
-- Branch: `docs/69-plans-closeout-contract`
-- Memory Artifact: `tasks/sprint-memory/issue-69.md`
-- Resume Point: closeout completed for this turn-scoped sprint; next work should start from a new issue-backed sprint
+- Active issue: #71 `docs: add a reusable PLANS.md template for turn-scoped and multi-turn sprints`
+- Branch: `docs/71-plans-template`
+- Memory Artifact: `tasks/sprint-memory/issue-71.md`
+- Resume Point: reusable plan template landed; start the next sprint from a new issue-backed branch and refresh `PLANS.md` from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Define a minimal closeout contract for `PLANS.md` so turn-scoped sprints do not leave stale active-plan metadata behind after merge.
+Add a reusable `PLANS.md` template so turn-scoped and intentionally multi-turn sprints start from the canonical shape instead of ad hoc copying.
 
 ## Working Agreement
 
@@ -33,17 +33,18 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - a durable `PLANS.md` closeout contract for turn-scoped sprints
+  - a reusable `PLANS.md` template for turn-scoped and multi-turn sprints
 - concrete surfaces
+  - [`templates/plans/PLANS.md`](./templates/plans/PLANS.md)
   - [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`tasks/sprint-memory/README.md`](./tasks/sprint-memory/README.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - `docs/93-scrum-delivery.md` defines what `active`, `multi-turn`, and `closed` mean for `PLANS.md`
-  - `PLANS.md` shows the closeout shape for a completed sprint
-  - sprint-memory guidance explains when `PLANS.md` should point to a memory artifact versus `not needed`
+  - a reusable plan template exists in the repo
+  - the template covers `turn-scoped` and `multi-turn` use
+  - `docs/93-scrum-delivery.md` points to the template as the recommended starting shape
+  - structure tests guard the template and its canonical fields
 
 ## Squad
 
@@ -57,13 +58,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#69` is the sprint slice for this turn
+  - issue `#71` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 25 was added and converted into issue `#69`
+  - Task 26 was added and converted into issue `#71`
 - Review / Demo
-  - show the new closeout fields, memory handoff wording, and guard coverage
+  - show the reusable template, docs link, and guard coverage
 - Retrospective
-  - keep the closeout contract short enough to avoid heavy archival overhead
+  - keep the template small enough to guide, not to become process bloat
 
 ## Verification
 
@@ -74,14 +75,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - define a canonical `PLANS.md` closeout contract in [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
-  - align [`PLANS.md`](./PLANS.md) to the new `Sprint Status` / `Sprint Scope` / `Memory Artifact` / `Resume Point` shape
-  - clarify memory handoff wording in [`tasks/sprint-memory/README.md`](./tasks/sprint-memory/README.md)
-  - lock the contract with [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - add [`templates/plans/PLANS.md`](./templates/plans/PLANS.md) as the canonical reusable starting shape
+  - connect [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md) to the template for new sprint setup
+  - keep [`PLANS.md`](./PLANS.md) and [`test/repository_structure.sh`](./test/repository_structure.sh) aligned with the template contract
 - Retrospective
-  - keep: the turn-scoped sprint rule lightweight and grep-guarded
-  - change: make plan closeout explicit instead of inferring it from merge state
-  - stop: leaving `PLANS.md` in an active-looking state after the sprint is done
+  - keep: turning recurring sprint behavior into reusable repo assets
+  - change: give the next sprint a canonical starting file instead of expecting hand-copy from the last plan
+  - stop: relying on the previous `PLANS.md` as the only source for a new sprint skeleton
 - System Updates
   - backlog: updated
   - plans: updated
@@ -95,6 +95,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - define closeout fields explicitly instead of relying on implied plan state
+  - make the canonical shape easier to start from, not just easier to verify after the fact
 - stop
-  - leaving merged work behind with a plan that still reads as active
+  - depending on hand-copying the previous sprint plan as the only bootstrap path

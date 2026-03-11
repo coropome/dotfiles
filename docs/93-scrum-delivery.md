@@ -33,6 +33,7 @@ planning の出口は次の状態。
 
 - branch が issue に紐づいている
 - `PLANS.md` が current sprint を説明できる
+- 新しい sprint を始める時は `templates/plans/PLANS.md` を canonical starting shape として使える
 - 誰が product, delivery, review を持つか分かる
 - 最小形なら 3 行程度の sprint note でもよい
 - current turn が 1 sprint か、intentional multi-turn sprint かが明記されている
@@ -152,6 +153,8 @@ ceremony の最小成果物は次でよい。
 
 `PLANS.md` は active sprint の live doc だが、turn-scoped sprint では merge 後に stale な active state を残さない。
 最低限、次の field を持つ。
+
+新しい sprint を始める時は [`templates/plans/PLANS.md`](../templates/plans/PLANS.md) を starting shape とし、issue と branch に合わせて最小限埋めればよい。
 
 - `Sprint Status`
   - `active`
