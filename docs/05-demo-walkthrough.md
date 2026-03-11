@@ -46,9 +46,11 @@ Stage 2: local workflow の見え方を確認する。
 ```bash
 ai workflows
 ai agents
+ai-agent --describe --workflow review
 ```
 
 local-only path を先に固める前提で見る。CI や hosted eval はこの fixture を触ったあとに必要になってから足す。
+ここで fallback chain や prompt metadata の見え方も確認しておく。
 
 ## 5. Start The Workspace
 

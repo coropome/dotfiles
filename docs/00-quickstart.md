@@ -1,6 +1,6 @@
 # Quickstart
 
-このページは beginner path を優先する。advanced path は後半に分ける。
+このページは beginner path を優先する。AI Dev OS はまずわかりやすく入り、そのあと必要なら深く使い込める前提で設計している。advanced path は後半に分ける。
 
 前提:
 
@@ -16,6 +16,8 @@
 3. `make agent` を実行
 4. 新しいターミナルで `ai start`
 
+ここでは tmux や shell の細部を覚えなくてもよい。まず workspace が開き、`ai doctor` で困り方を切り分けられる状態まで進める。
+
 別の Git repo を AI Dev OS で使いたい時は:
 
 1. その repo に移動
@@ -30,11 +32,9 @@ generated README もこの local path を先に出し、trust setup は absolute
 default では GitHub Actions starter も生成する。全部 skip したい時は `ai init --no-github-actions`、hosted eval だけ外したい時は `ai init --no-hosted-eval` を使う。
 starter workflow には `fallback_agents` も書けるので、primary agent の代替候補を repo-local に持てる。
 GitHub Actions starter を使う場合は `.github/workflows/ai-dev-os-pr.yml` と `.github/workflows/ai-dev-os-hosted-eval.yml` も生成する。
-PR 向けの通常運用は `ai-dev-os-pr.yml`、hosted eval は manual dispatch の opt-in で `ai-dev-os-hosted-eval.yml` を使う。
-どちらも target repo と AI Dev OS runtime repo の両方を checkout して動く。
-runtime source は `AI_DEV_OS_RUNTIME_REPOSITORY` と `AI_DEV_OS_RUNTIME_REF` で切り替えられ、fork / branch / tag に pin できる。詳細は `docs/42-github-actions.md`。
-CI failure が local onboarding ではなく runtime checkout / pinning に見える時も `docs/42-github-actions.md` を先に見る。
-local-only / PR CI / hosted eval のどれから入るか迷う時も `docs/42-github-actions.md` の decision guide を使う。
+local path が安定してから、必要なら `ai-dev-os-pr.yml`、さらに必要なら `ai-dev-os-hosted-eval.yml` を足す。
+runtime pinning は最初から触らず、fork / branch / drift control が必要になった時だけ `docs/42-github-actions.md` を見る。
+local-only / PR CI / hosted eval の選び分けも `docs/42-github-actions.md` に寄せている。
 workflow を生成しなかった時の next step は `ai doctor` / `ai workflows` / `ai start` を優先し、CI は必要になってから足す。
 
 tmux を直接扱いたい時だけ `tnew` を使う。
@@ -68,6 +68,8 @@ advanced user は必要に応じて以下へ分岐してよい。
 - `tnew`
 - local override
 - vendor-native config (`.claude/`, `.ai-dev-os/`, `~/.codex/`, `~/.gemini/`)
+
+ここでは AI Dev OS の入口を捨てる必要はなく、必要な層にそのまま降りていけばよい。`ai start` と `tnew`、project-local config と vendor-native config を併用できるのが前提。
 
 追加で入れるもの:
 
