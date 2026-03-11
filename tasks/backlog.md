@@ -347,7 +347,7 @@ Longer-running work becomes easier to continue, audit, and parallelize without d
 ## Task 21
 
 Title: Make retrospectives update the operating system and preserve compressed agent memory
-Tracking: #53
+Tracking: #53 (closed)
 
 Problem:
 The repo now has Scrum cadence, but retrospectives can still become dead-end notes. There is no durable rule for turning retrospective output into backlog, plans, guardrails, or agent-readable memory artifacts, and no standard place to preserve compressed coordination context when model memory is reset.
