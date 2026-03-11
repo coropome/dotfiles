@@ -136,6 +136,8 @@ ai trust init claude --project
 ai start
 ```
 
+`ai start` の current default backend は `tmux`。terminal choice を固定したくない時は `ai start --backend stdio` を使える。
+
 ## Trust Setup
 
 - repo-local starter: `ai trust init claude --project`
@@ -164,6 +166,7 @@ EOF
 
 - local-only first
   - stay on `ai doctor` / `ai workflows` / `ai start`
+  - default backend は `tmux`、lighter path は `ai start --backend stdio`
   - use this when CI is not the current problem
 - PR CI next
   - keep `.github/workflows/ai-dev-os-pr.yml`
@@ -242,6 +245,7 @@ EOF
 - local-only first
   - this run skipped GitHub Actions via `--no-github-actions`
   - stay on `ai doctor` / `ai workflows` / `ai start`
+  - default backend は `tmux`、lighter path は `ai start --backend stdio`
 - PR CI later
   - rerun `ai init` without `--no-github-actions` when pull-request smoke checks become useful
   - use this when you want prompt validation and CLI smoke on pull requests
@@ -374,6 +378,7 @@ printf 'initialized repo: %s\n' "$target_repo"
 printf 'next: ai doctor\n'
 printf 'next: ai workflows\n'
 printf 'next: ai agents\n'
+printf 'note: ai start uses tmux by default; use ai start --backend stdio when terminal choice should stay flexible\n'
 printf 'next: ai trust init claude --project\n'
 printf 'next: ai start\n'
 if [[ $include_github_actions -eq 1 ]]; then

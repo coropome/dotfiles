@@ -58,13 +58,15 @@ init_output="$(cd "$TARGET_REPO/src" && "$REPO/bin/ai" init)"
 [[ "$init_output" == *"initialized repo: $TARGET_REPO"* ]] || fail "ai init did not report the initialized repo"
 [[ "$init_output" == *"next: ai doctor"* ]] || fail "ai init did not print doctor guidance"
 [[ "$init_output" == *"next: ai workflows"* ]] || fail "ai init did not print next workflow guidance"
+[[ "$init_output" == *"note: ai start uses tmux by default; use ai start --backend stdio when terminal choice should stay flexible"* ]] || fail "ai init did not print backend-aware ai start guidance"
 [[ "$init_output" == *"next: ai trust init claude --project"* ]] || fail "ai init did not print trust guidance"
 [[ "$init_output" == *"next: ai start"* ]] || fail "ai init did not print ai start guidance"
 [[ "$init_output" == *"optional: sed -n '1,160p' .github/workflows/ai-dev-os-pr.yml"* ]] || fail "ai init did not print optional GitHub Actions guidance"
 [[ "$init_output" == *"optional: gh workflow run ai-dev-os-hosted-eval.yml"* ]] || fail "ai init did not print optional hosted eval guidance"
 assert_output_order "$init_output" "next: ai doctor" "next: ai workflows"
 assert_output_order "$init_output" "next: ai workflows" "next: ai agents"
-assert_output_order "$init_output" "next: ai agents" "next: ai start"
+assert_output_order "$init_output" "next: ai agents" "note: ai start uses tmux by default; use ai start --backend stdio when terminal choice should stay flexible"
+assert_output_order "$init_output" "note: ai start uses tmux by default; use ai start --backend stdio when terminal choice should stay flexible" "next: ai start"
 
 assert_file "$TARGET_REPO/.ai-dev-os/agents.yml"
 assert_file "$TARGET_REPO/.ai-dev-os/workflows.yml"
@@ -93,6 +95,8 @@ grep -Fq "ai-agent --describe --workflow review" "$TARGET_REPO/.ai-dev-os/README
   || fail "ai init did not document workflow describe guidance"
 grep -Fq "ai trust init claude --project" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document trust init guidance"
+grep -Fq "ai start --backend stdio" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not document the stdio ai-start option"
 grep -Fq "## If Something Fails" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the failure model"
 grep -Fq "local onboarding problem" "$TARGET_REPO/.ai-dev-os/README.md" \
@@ -105,6 +109,8 @@ grep -Fq "## Which Path To Choose" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the adoption guide"
 grep -Fq "local-only first" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the local-first path"
+grep -Fq "default backend は \`tmux\`、lighter path は \`ai start --backend stdio\`" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not document backend-aware local-only guidance"
 grep -Fq "PR CI next" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the PR CI path"
 grep -Fq "## Optional GitHub Actions Commands" "$TARGET_REPO/.ai-dev-os/README.md" \
@@ -167,6 +173,8 @@ grep -Fq "GitHub Actions starter generation was skipped for this run via \`--no-
   || fail "ai init --no-github-actions did not explain skipped GitHub Actions generation"
 grep -Fq "this run skipped GitHub Actions via \`--no-github-actions\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions did not adapt the adoption guide"
+grep -Fq "default backend は \`tmux\`、lighter path は \`ai start --backend stdio\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
+  || fail "ai init --no-github-actions did not keep backend-aware local-only guidance"
 grep -Fq "use this when you want prompt validation and CLI smoke on pull requests" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost PR CI adoption reasoning"
 grep -Fq "use this when hosted backend comparison becomes worth the extra credentials and policy surface" "$NO_GHA_REPO/.ai-dev-os/README.md" \

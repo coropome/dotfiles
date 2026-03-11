@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #89 `docs: align newcomer docs with ai-start backend options`
-- Branch: `docs/89-ai-start-backend-docs`
-- Memory Artifact: `tasks/sprint-memory/issue-89.md`
-- Resume Point: newcomer docs now reflect tmux default plus stdio alternative; next sprint can move to generated starter or richer backend surfaces
+- Active issue: #91 `docs: align ai-init starter guidance with ai-start backend options`
+- Branch: `docs/91-ai-init-backend-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-91.md`
+- Resume Point: generated starter guidance now reflects tmux default plus stdio alternative; next sprint can move to backend-aware doctor or richer starter surfaces
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align newcomer-facing docs with the current `ai start` backend contract so terminal choice stays flexible in practice as well as in code.
+Align generated starter guidance with the current `ai start` backend contract so first-run artifacts tell the same story as the runtime docs.
 
 ## Working Agreement
 
@@ -33,20 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - newcomer/docs alignment for `ai start` backends
+  - backend-aware `ai init` starter guidance
   - concrete surfaces
-  - [`README.md`](./README.md)
-  - [`docs/00-quickstart.md`](./docs/00-quickstart.md)
-  - [`docs/05-demo-walkthrough.md`](./docs/05-demo-walkthrough.md)
-  - [`docs/99-troubleshooting.md`](./docs/99-troubleshooting.md)
+  - [`bin/ai-init`](./bin/ai-init)
+  - [`demo/sample-project/.ai-dev-os/README.md`](./demo/sample-project/.ai-dev-os/README.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
+  - [`test/ai_init.sh`](./test/ai_init.sh)
   - [`test/demo_assets.sh`](./test/demo_assets.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - high-traffic newcomer docs mention `tmux` as the current default and `stdio` as an alternative
-  - troubleshooting points to `stdio` as a valid escape hatch when only the tmux default path is blocked
-  - demo walkthrough stays aligned with the beginner path while exposing the stdio option
+  - generated starter README mentions `tmux` as the current default and `stdio` as an alternative
+  - `ai init` output mentions the backend-aware `ai start` contract
+  - demo starter fixture stays in sync
   - tests guard the new wording
 
 ## Squad
@@ -61,17 +60,18 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#89` is the sprint slice for this turn
+  - issue `#91` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 35 was added and converted into issue `#89`
+  - Task 36 was added and converted into issue `#91`
 - Review / Demo
-  - show tmux as default backend and stdio as the lighter newcomer-facing alternative
+  - show generated starter guidance using tmux default plus stdio alternative
 - Retrospective
-  - keep docs aligned immediately after behavior changes
+  - keep generated surfaces aligned immediately after runtime/docs changes
 
 ## Verification
 
 - `bash test/demo_assets.sh`
+- `bash test/ai_init.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -79,13 +79,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - align README, quickstart, demo walkthrough, and troubleshooting with `tmux` default plus `stdio` alternative
-  - keep the newcomer path order unchanged while exposing the non-tmux escape hatch
-  - lock the wording with structure and demo guards
+  - align `ai init` output and generated starter README with `tmux` default plus `stdio` alternative
+  - keep the local-first onboarding order unchanged
+  - lock the wording with init/demo/structure guards
 - Retrospective
-  - keep: update the highest-traffic docs right after changing a core entrypoint contract
-  - change: treat troubleshooting as part of the beginner-path contract, not as an afterthought
-  - stop: leaving newcomer docs on an older backend story after the code moves ahead
+  - keep: follow top-level docs with generated-surface alignment in the next sprint
+  - change: treat `ai init` output as part of the beginner contract, not just scaffolding noise
+  - stop: leaving generated starter artifacts one backend story behind
 - System Updates
   - backlog: updated
   - plans: updated
@@ -97,8 +97,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping high-traffic docs aligned with code-level backend changes
+  - keeping generated starter surfaces aligned with code-level backend changes
 - change
-  - move the docs follow-through into the very next sprint when an entrypoint contract changes
+  - move generated-surface follow-through into the next sprint after top-level docs land
 - stop
-  - assuming CLI docs alone are enough once README and troubleshooting still say less
+  - assuming runtime docs are enough once starter artifacts still say less
