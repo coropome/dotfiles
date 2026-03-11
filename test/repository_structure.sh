@@ -272,6 +272,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai trust"
   grep -Fq "ai init" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai init"
+  grep -Fq "AI_DEV_OS_PROJECT_ROOTS" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document AI Dev OS project root aliases"
   grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not explain role metadata"
   grep -Fq "templates/ai-trust/" "$REPO/docs/40-cli.md" \
@@ -286,12 +288,34 @@ verify_ai_dev_os_docs() {
     || fail "docs/42-github-actions.md does not have an adoption decision guide"
   grep -Fq "AI_DEV_OS_RUNTIME_REF" "$REPO/docs/42-github-actions.md" \
     || fail "docs/42-github-actions.md does not mention runtime pinning"
+  grep -Fq "current default source" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not describe the current default runtime source"
+  grep -Fq "local-only で始めたい" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not keep the local-only path guidance"
+  grep -Fq "PR で最低限の smoke check を回したい" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not keep the PR CI path guidance"
+  grep -Fq "hosted eval も使いたい" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not keep the hosted eval path guidance"
+  grep -Fq "upstream default branch 追従で困っていない間は不要" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not explain when runtime pinning is unnecessary"
+  grep -Fq "fork を使う時、branch で runtime を試す時、upstream drift を止めたい時" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not explain when runtime pinning is recommended"
+  grep -Fq "generated CI が upstream の変更で急に揺れた" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not cover upstream drift troubleshooting"
+  grep -Fq "fork した runtime を使いたい" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not cover fork runtime troubleshooting"
+  grep -Fq "branch で runtime を試したい" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not cover branch runtime troubleshooting"
+  grep -Fq "fixed tag / fixed branch / commit-ish に pin する" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not cover fixed-ref stability guidance"
   grep -Fq "AGENTS.md" "$REPO/docs/92-development-workflow.md" \
     || fail "docs/92-development-workflow.md does not mention AGENTS.md"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
     || fail "docs/91-state-ownership.md does not describe the AI Dev OS control plane boundary"
+  grep -Fq "AI_DEV_OS_EDITOR" "$REPO/docs/61-local-customization.md" \
+    || fail "docs/61-local-customization.md does not recommend AI Dev OS editor aliases"
   grep -Fq "primary product surface" "$REPO/docs/adr/0002-ai-dev-os-primary-surface.md" \
     || fail "docs/adr/0002-ai-dev-os-primary-surface.md does not record the AI Dev OS product-surface decision"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
@@ -315,6 +339,10 @@ verify_doctor_guidance_consistency() {
     || fail "docs/99-troubleshooting.md does not keep the canonical ai doctor guidance"
   grep -Fq "host bootstrap / symlink / PATH / shell / system state を見る" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not keep the canonical make doctor guidance"
+  grep -Fq "docs/42-github-actions.md" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not point CI/runtime issues to docs/42-github-actions.md"
+  grep -Fq "fork / branch / tag pinning と local onboarding failure を分けて考える" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not preserve CI/runtime vs local onboarding separation"
 }
 
 verify_layout_scaffold

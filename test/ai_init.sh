@@ -17,6 +17,28 @@ fail() {
   exit 1
 }
 
+line_number_in_output() {
+  local needle="$1"
+  local haystack="$2"
+
+  printf '%s\n' "$haystack" | grep -Fnm1 -- "$needle" | cut -d: -f1
+}
+
+assert_output_order() {
+  local haystack="$1"
+  local first="$2"
+  local second="$3"
+  local first_line
+  local second_line
+
+  first_line="$(line_number_in_output "$first" "$haystack")"
+  second_line="$(line_number_in_output "$second" "$haystack")"
+
+  [[ -n "$first_line" ]] || fail "missing output line: $first"
+  [[ -n "$second_line" ]] || fail "missing output line: $second"
+  (( first_line < second_line )) || fail "output does not keep '$first' before '$second'"
+}
+
 assert_file() {
   local path="$1"
   [[ -f "$path" ]] || fail "expected file: $path"
@@ -34,12 +56,15 @@ NO_GHA_REPO="$(cd "$NO_GHA_REPO" && pwd -P)"
 init_output="$(cd "$TARGET_REPO/src" && "$REPO/bin/ai" init)"
 
 [[ "$init_output" == *"initialized repo: $TARGET_REPO"* ]] || fail "ai init did not report the initialized repo"
-[[ "$init_output" == *"next: ai workflows"* ]] || fail "ai init did not print next workflow guidance"
 [[ "$init_output" == *"next: ai doctor"* ]] || fail "ai init did not print doctor guidance"
+[[ "$init_output" == *"next: ai workflows"* ]] || fail "ai init did not print next workflow guidance"
 [[ "$init_output" == *"next: ai trust init claude --project"* ]] || fail "ai init did not print trust guidance"
 [[ "$init_output" == *"next: ai start"* ]] || fail "ai init did not print ai start guidance"
 [[ "$init_output" == *"optional: sed -n '1,160p' .github/workflows/ai-dev-os-pr.yml"* ]] || fail "ai init did not print optional GitHub Actions guidance"
 [[ "$init_output" == *"optional: gh workflow run ai-dev-os-hosted-eval.yml"* ]] || fail "ai init did not print optional hosted eval guidance"
+assert_output_order "$init_output" "next: ai doctor" "next: ai workflows"
+assert_output_order "$init_output" "next: ai workflows" "next: ai agents"
+assert_output_order "$init_output" "next: ai agents" "next: ai start"
 
 assert_file "$TARGET_REPO/.ai-dev-os/agents.yml"
 assert_file "$TARGET_REPO/.ai-dev-os/workflows.yml"
@@ -64,13 +89,15 @@ grep -Fq "fallback_agents: local_backup_reviewer" "$TARGET_REPO/.ai-dev-os/workf
   || fail "ai init did not generate starter workflow fallback"
 grep -Fq "ai doctor" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document ai doctor guidance"
+grep -Fq "ai-agent --describe --workflow review" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not document workflow describe guidance"
 grep -Fq "ai trust init claude --project" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document trust init guidance"
 grep -Fq "## If Something Fails" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the failure model"
 grep -Fq "local onboarding problem" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document local onboarding remediation"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$TARGET_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document CI/runtime remediation"
 grep -Fq "run \`make doctor\` from the AI Dev OS runtime repo" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document bootstrap remediation"
@@ -84,8 +111,10 @@ grep -Fq "## Optional GitHub Actions Commands" "$TARGET_REPO/.ai-dev-os/README.m
   || fail "ai init did not separate optional GitHub Actions commands"
 grep -Fq ".github/workflows/ai-dev-os-pr.yml" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the PR starter workflow"
-grep -Fq "coropome/dotfiles" "$TARGET_REPO/.ai-dev-os/README.md" \
-  || fail "ai init did not document the runtime repository"
+grep -Fq "shared AI Dev OS runtime" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not describe the shared runtime relationship"
+grep -Fq "current default runtime source is \`coropome/dotfiles\` at \`main\`" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not document the current default runtime source"
 grep -Fq "AI_DEV_OS_RUNTIME_REF" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the runtime ref pinning"
 [[ "$(<"$TARGET_REPO/.ai-dev-os/README.md")" != *"$REPO/templates/ai-trust/"* ]] \
@@ -120,7 +149,7 @@ grep -Fq "use this when hosted backend comparison becomes worth the extra creden
   || fail "ai init --no-hosted-eval lost hosted eval adoption reasoning"
 grep -Fq "## If Something Fails" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost the failure model"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost CI/runtime remediation"
 grep -Fq ".github/workflows/ai-dev-os-pr.yml" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval did not keep PR workflow in README"
@@ -146,7 +175,7 @@ grep -Fq "## If Something Fails" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost the failure model"
 grep -Fq "use \`ai doctor\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost local remediation"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost CI/runtime remediation"
 grep -Fq "run \`make doctor\` from the AI Dev OS runtime repo" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost bootstrap remediation"

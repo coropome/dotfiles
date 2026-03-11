@@ -103,8 +103,33 @@ verify_extract_tar_zst_fallback() {
   assert_equals "$(cat "$TAR_LOG")" "xf -"
 }
 
+verify_ai_dev_os_editor_aliases() {
+  local output
+
+  output="$(
+    PATH="$STUB_BIN:$ORIG_PATH" zsh -c '
+      has_cmd() { command -v "$1" >/dev/null 2>&1; }
+      export AI_DEV_OS_EDITOR="nvim"
+      source "'"$REPO"'/zsh/modules/50-editor.zsh"
+      print -r -- "${EDITOR:-unset}:${VISUAL:-unset}"
+    '
+  )"
+  assert_equals "$output" "nvim:nvim"
+
+  output="$(
+    PATH="$STUB_BIN:$ORIG_PATH" zsh -c '
+      has_cmd() { command -v "$1" >/dev/null 2>&1; }
+      export DITFILES_EDITOR="vim"
+      source "'"$REPO"'/zsh/modules/50-editor.zsh"
+      print -r -- "${EDITOR:-unset}:${VISUAL:-unset}"
+    '
+  )"
+  assert_equals "$output" "vim:vim"
+}
+
 setup_stubs
 verify_fzf_packaged_script_fallback
 verify_extract_tar_zst_fallback
+verify_ai_dev_os_editor_aliases
 
 echo "zsh portability test passed"
