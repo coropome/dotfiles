@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #107 `chore: refactor ai-init starter readme helpers`
-- Branch: `chore/107-ai-init-readme-helpers`
-- Memory Artifact: `tasks/sprint-memory/issue-107.md`
-- Resume Point: ai-init now builds the starter README through section helpers; next sprint can keep tightening shell internals or move into expansion work
+- Active issue: #109 `chore: refactor top-level ai dispatch helpers`
+- Branch: `chore/109-ai-dispatch-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-109.md`
+- Resume Point: top-level ai dispatch now routes through direct-command, workflow-alias, and unknown-command helpers; next sprint can keep tightening shell internals or move into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Refactor `ai-init` starter README generation so the code stays easy to read and extend without changing the current generated output contract.
+Refactor the top-level `ai` entrypoint so the code stays easy to read and extend without changing the current command behavior contract.
 
 ## Working Agreement
 
@@ -33,16 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - cleaner `ai-init` starter README generation
+  - cleaner top-level `ai` dispatch flow
   - concrete surfaces
-  - [`bin/ai-init`](./bin/ai-init)
+  - [`bin/ai`](./bin/ai)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_init.sh`](./test/ai_init.sh)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - acceptance slice
-  - `ai-init` keeps current starter README output unchanged across current flag variants
-  - repeated README section generation moves into clearer helpers
-  - tests lock the refactor with an explicit section-duplication assertion
+  - top-level `ai` keeps current direct command and workflow alias behavior unchanged
+  - direct dispatch, workflow alias dispatch, and unknown-command recovery move into clearer helpers
+  - tests lock the refactor with an explicit unknown-command assertion
 
 ## Squad
 
@@ -56,30 +56,30 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#107` is the sprint slice for this turn
+  - issue `#109` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 44 was added and converted into issue `#107`
+  - Task 45 was added and converted into issue `#109`
 - Review / Demo
-  - show `bin/ai-init` reading as helper-based README assembly while keeping the same generated starter output
+  - show `bin/ai` reading as helper-based command resolution while keeping the same direct commands and unknown-command behavior
 - Retrospective
   - keep shell cleanup moving once user-facing contracts settle
 
 ## Verification
 
-- `bash test/ai_init.sh`
+- `bash test/ai_cli.sh`
 - `make lint`
 - `make test`
 
 ## Closeout
 
 - Review / Demo
-  - refactor `ai-init` starter README generation into helpers without changing generated output
-  - keep the no-hosted and no-github-actions variants stable
-  - lock the refactor with ai-init tests, including section-duplication coverage
+  - refactor top-level `ai` dispatch into helpers without changing direct-command or workflow-alias behavior
+  - keep unknown-command recovery stable
+  - lock the refactor with CLI tests, including explicit unknown-command coverage
 - Retrospective
   - keep: use small refactors once product wording has stabilized
-  - change: add one explicit duplication guard whenever a long generated document is restructured
-  - stop: letting generated README variants keep duplicating section blocks inline
+  - change: add one explicit recovery-path assertion whenever entrypoint dispatch is rearranged
+  - stop: letting top-level command routing keep growing inline
 - System Updates
   - backlog: updated
   - plans: updated
@@ -91,8 +91,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - cleaning shell-generated document assembly once outward behavior is stable
+  - cleaning shell entrypoints once outward behavior is stable
 - change
-  - lock refactors with a targeted duplication assertion instead of relying only on broad coverage
+  - lock refactors with a targeted recovery assertion instead of relying only on broad coverage
 - stop
-  - allowing generated README section logic to keep spreading across repeated blocks
+  - allowing top-level command dispatch to keep spreading across one case block

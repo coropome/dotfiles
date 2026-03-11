@@ -69,6 +69,91 @@ render_workflow_help() {
   done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
 }
 
+run_direct_command() {
+  local command_name="$1"
+  shift || true
+
+  case "$command_name" in
+    start)
+      exec "$BIN_DIR/ai-start" "$@"
+      ;;
+    stop)
+      exec "$BIN_DIR/ai-start" --stop "$@"
+      ;;
+    init)
+      exec "$BIN_DIR/ai-init" "$@"
+      ;;
+    agents)
+      exec "$BIN_DIR/ai-agent" --list "$@"
+      ;;
+    workflows)
+      exec "$BIN_DIR/ai-agent" --list-workflows "$@"
+      ;;
+    agent)
+      exec "$BIN_DIR/ai-agent" "$@"
+      ;;
+    context)
+      exec "$BIN_DIR/ai-context" "$@"
+      ;;
+    doctor)
+      exec "$BIN_DIR/ai-doctor" "$@"
+      ;;
+    task)
+      exec "$BIN_DIR/ai-task" "$@"
+      ;;
+    code)
+      exec "$BIN_DIR/ai-agent" --workflow code "$@"
+      ;;
+    review)
+      exec "$BIN_DIR/ai-agent" --workflow review "$@"
+      ;;
+    eval)
+      exec "$BIN_DIR/ai-eval" "$@"
+      ;;
+    trust)
+      exec "$BIN_DIR/ai-trust" "$@"
+      ;;
+    install)
+      exec "$BIN_DIR/ai-install" "$@"
+      ;;
+    copy)
+      exec "$BIN_DIR/ai-copy" "$@"
+      ;;
+    open)
+      exec "$BIN_DIR/ai-open" "$@"
+      ;;
+    -h|--help|help)
+      usage
+      exit 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+run_workflow_alias() {
+  local workflow_name="$1"
+  shift || true
+
+  if [[ -f "$WORKFLOWS_FILE" ]] && ai_has_named_key "$WORKFLOWS_FILE" workflows "$workflow_name"; then
+    exec "$BIN_DIR/ai-agent" --workflow "$workflow_name" "$@"
+  fi
+
+  return 1
+}
+
+print_unknown_command() {
+  local command_name="$1"
+
+  echo "unknown ai command: $command_name" >&2
+  echo "run \`ai doctor\` to diagnose repo/runtime readiness first" >&2
+  echo "run \`ai workflows\` to see available workflow aliases and descriptions" >&2
+  echo "repo-local overrides may add commands via .ai-dev-os/workflows.yml" >&2
+  usage >&2
+  exit 2
+}
+
 command_name="${1:-}"
 if [[ -z "$command_name" ]]; then
   usage
@@ -76,67 +161,6 @@ if [[ -z "$command_name" ]]; then
 fi
 shift || true
 
-case "$command_name" in
-  start)
-    exec "$BIN_DIR/ai-start" "$@"
-    ;;
-  stop)
-    exec "$BIN_DIR/ai-start" --stop "$@"
-    ;;
-  init)
-    exec "$BIN_DIR/ai-init" "$@"
-    ;;
-  agents)
-    exec "$BIN_DIR/ai-agent" --list "$@"
-    ;;
-  workflows)
-    exec "$BIN_DIR/ai-agent" --list-workflows "$@"
-    ;;
-  agent)
-    exec "$BIN_DIR/ai-agent" "$@"
-    ;;
-  context)
-    exec "$BIN_DIR/ai-context" "$@"
-    ;;
-  doctor)
-    exec "$BIN_DIR/ai-doctor" "$@"
-    ;;
-  task)
-    exec "$BIN_DIR/ai-task" "$@"
-    ;;
-  code)
-    exec "$BIN_DIR/ai-agent" --workflow code "$@"
-    ;;
-  review)
-    exec "$BIN_DIR/ai-agent" --workflow review "$@"
-    ;;
-  eval)
-    exec "$BIN_DIR/ai-eval" "$@"
-    ;;
-  trust)
-    exec "$BIN_DIR/ai-trust" "$@"
-    ;;
-  install)
-    exec "$BIN_DIR/ai-install" "$@"
-    ;;
-  copy)
-    exec "$BIN_DIR/ai-copy" "$@"
-    ;;
-  open)
-    exec "$BIN_DIR/ai-open" "$@"
-    ;;
-  -h|--help|help)
-    usage
-    ;;
-  *)
-    if [[ -f "$WORKFLOWS_FILE" ]] && ai_has_named_key "$WORKFLOWS_FILE" workflows "$command_name"; then
-      exec "$BIN_DIR/ai-agent" --workflow "$command_name" "$@"
-    fi
-    echo "unknown ai command: $command_name" >&2
-    echo "run \`ai doctor\` to diagnose repo/runtime readiness first" >&2
-    echo "run \`ai workflows\` to see available workflow aliases and descriptions" >&2
-    echo "repo-local overrides may add commands via .ai-dev-os/workflows.yml" >&2
-    usage >&2
-    exit 2
-    ;;
-esac
+run_direct_command "$command_name" "$@" || true
+run_workflow_alias "$command_name" "$@" || true
+print_unknown_command "$command_name"

@@ -751,3 +751,20 @@ Refactor `bin/ai-init` around helper functions for repeated README sections and 
 
 Expected Impact:
 Starter README generation stays behaviorally stable while becoming easier to maintain when onboarding wording evolves.
+
+## Task 45
+
+Title: Refactor top-level `ai` command dispatch into helpers
+Tracking: #109 (closed)
+
+Problem:
+The top-level `ai` wrapper now mixes help rendering, workflow shortcut rendering, direct command dispatch, workflow alias dispatch, and unknown-command recovery in one linear case block. The behavior is still stable, but the control flow is harder to scan than it needs to be.
+
+Improvement Idea:
+Keep the current `ai` behavior exactly the same, but extract direct dispatch and unknown-command recovery into small helpers so the top-level flow reads as command resolution instead of a long monolithic case.
+
+Implementation Hint:
+Refactor `bin/ai` around helper functions for direct command execution, workflow alias execution, and unknown-command recovery. Extend `test/ai_cli.sh` with a targeted assertion for the unknown-command path so the refactor keeps stderr guidance and exit status stable.
+
+Expected Impact:
+The `ai` entrypoint remains behaviorally stable while becoming easier to maintain as the command surface grows.
