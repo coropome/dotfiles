@@ -717,3 +717,20 @@ Refactor `bin/ai-start` around helper functions for backend validation, stop han
 
 Expected Impact:
 `ai-start` stays behaviorally stable while becoming easier to read, test, and extend if more backends or launch nuances appear later.
+
+## Task 43
+
+Title: Refactor `ai-doctor` runtime status reporting into helpers
+Tracking: #105 (closed)
+
+Problem:
+`ai-doctor` reports project config, user config, MCP config, and project extensions with repeated status-printing blocks. The behavior is consistent today, but the implementation duplicates path resolution and WARN/OK formatting across several cases.
+
+Improvement Idea:
+Keep the current doctor output exactly the same, but move repeated runtime-path reporting into small helpers so agent diagnostics read as a sequence of checks instead of a long set of nearly identical blocks.
+
+Implementation Hint:
+Refactor `bin/ai-doctor` around helpers for file-backed runtime status and directory-backed runtime status. Extend `test/ai_doctor.sh` with at least one extra assertion that protects the filtered or path-specific output during the refactor.
+
+Expected Impact:
+`ai-doctor` becomes easier to maintain and extend without changing the beginner-facing diagnostics or next-step contract.
