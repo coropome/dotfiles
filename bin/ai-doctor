@@ -221,6 +221,8 @@ report_workflow() {
     overall_exit=1
   elif [[ "$selected_agent" != "${candidates[0]}" ]]; then
     workflow_status="WARN fallback to $selected_agent"
+    any_warn=1
+    [[ -z "$warned_workflow" ]] && warned_workflow="$workflow_name"
   fi
 
   printf '  status: %s\n' "$workflow_status"
@@ -333,7 +335,29 @@ report_agent() {
 
   [[ -n "$docs_url" ]] && printf '  docs: %s\n' "$docs_url"
   printf '  status: %s\n' "$agent_status"
+  [[ "$agent_status" == "WARN" ]] && any_warn=1
   printf '\n'
+}
+
+print_next_steps() {
+  printf 'Next Steps\n'
+
+  if [[ "$overall_exit" -ne 0 ]]; then
+    printf '  - fix the reported gaps above\n'
+    printf '  - rerun: ai doctor\n'
+    printf '  - inspect available workflows: ai workflows\n'
+    return
+  fi
+
+  printf '  - next: ai workflows\n'
+  if [[ -n "$warned_workflow" ]]; then
+    printf '  - optional deeper check: ai-agent --describe --workflow %s\n' "$warned_workflow"
+  fi
+  if [[ "$any_warn" -eq 1 ]]; then
+    printf '  - if the warnings look acceptable, next: ai start\n'
+  else
+    printf '  - next: ai start\n'
+  fi
 }
 
 target_path="$PWD"
@@ -376,6 +400,8 @@ context_checked="0"
 context_ready="0"
 context_error=""
 overall_exit=0
+any_warn=0
+warned_workflow=""
 
 if [[ -n "$workflow_filter" ]] && ! ai_has_named_key "$WORKFLOWS_FILE" workflows "$workflow_filter"; then
   echo "unknown workflow: $workflow_filter" >&2
@@ -412,5 +438,7 @@ else
     report_agent "$listed_agent"
   done < <(ai_section_keys "$AGENTS_FILE" agents)
 fi
+
+print_next_steps
 
 exit "$overall_exit"

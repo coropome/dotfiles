@@ -496,3 +496,20 @@ Add a small `First Steps` section to `bin/ai`, update CLI docs wording, and lock
 
 Expected Impact:
 The most common CLI discovery surface tells the same story as the rest of the repo, which reduces onboarding drift and makes the daily entrypoint more trustworthy.
+
+## Task 30
+
+Title: Add beginner-first next-step guidance to `ai doctor`
+Tracking: #79 (closed)
+
+Problem:
+`ai doctor` is now the canonical first response for starter-repo troubleshooting, but its output still stops at diagnosis. That makes the most important recovery surface weaker than the rest of the beginner path, which already teaches clear next steps.
+
+Improvement Idea:
+Keep the existing diagnostics intact, but end `ai doctor` with a short outcome-based next-step block so healthy, warn, and fail cases tell users what to do next.
+
+Implementation Hint:
+Add a compact footer to `bin/ai-doctor`, update CLI docs wording, and cover healthy, warn, and fail cases in tests without blurring `ai doctor` and `make doctor`.
+
+Expected Impact:
+Users who run `ai doctor` can move from diagnosis to the right next action faster, which makes beginner recovery more consistent and less guessy.

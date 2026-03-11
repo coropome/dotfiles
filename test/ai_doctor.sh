@@ -178,6 +178,35 @@ doctor_output="$(
 [[ "$doctor_output" == *"agent: claude_native"* ]] || fail "ai doctor did not report claude native diagnostics"
 [[ "$doctor_output" == *"mcp_config: WARN $TEST_REPO/.claude/settings.json (run: ai trust init claude --project --repo $TEST_REPO)"* ]] || fail "ai doctor did not report project-scoped MCP config"
 [[ "$doctor_output" == *"project_extensions: WARN $TEST_REPO/.claude/agents/ (create the directory and add vendor-native project extensions if needed)"* ]] || fail "ai doctor did not report missing project extensions"
+[[ "$doctor_output" == *"Next Steps"* ]] || fail "ai doctor did not print next steps for the fail case"
+[[ "$doctor_output" == *"fix the reported gaps above"* ]] || fail "ai doctor did not explain the fail-case remediation"
+[[ "$doctor_output" == *"rerun: ai doctor"* ]] || fail "ai doctor did not explain the fail-case rerun step"
+[[ "$doctor_output" == *"inspect available workflows: ai workflows"* ]] || fail "ai doctor did not explain the fail-case workflow inspection step"
+[[ "$doctor_output" != *"next: ai start"* ]] || fail "ai doctor should not suggest ai start in the fail case"
+[[ "$(printf '%s\n' "$doctor_output" | tail -n 1)" == "  - inspect available workflows: ai workflows" ]] || fail "ai doctor did not keep fail-case next steps at the end of the output"
+
+warn_output="$(
+  cd "$TEST_REPO" && HOME="$TEST_HOME" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-doctor" --workflow broken_fallback --agent local_reviewer
+)"
+[[ "$warn_output" == *"status: WARN fallback to local_reviewer"* ]] || fail "warn ai-doctor output did not include fallback status"
+[[ "$warn_output" == *"Next Steps"* ]] || fail "warn ai-doctor output did not print next steps"
+[[ "$warn_output" == *"next: ai workflows"* ]] || fail "warn ai-doctor output did not point to ai workflows first"
+[[ "$warn_output" == *"optional deeper check: ai-agent --describe --workflow broken_fallback"* ]] || fail "warn ai-doctor output did not include deeper workflow inspection"
+[[ "$warn_output" == *"if the warnings look acceptable, next: ai start"* ]] || fail "warn ai-doctor output did not keep ai start behind the warning check"
+[[ "$(printf '%s\n' "$warn_output" | tail -n 1)" == "  - if the warnings look acceptable, next: ai start" ]] || fail "warn ai-doctor output did not keep next steps at the end of the output"
+
+mkdir -p "$TEST_REPO/.gemini" "$TEST_HOME/.gemini"
+touch "$TEST_REPO/.gemini/settings.json" "$TEST_HOME/.gemini/settings.json"
+
+healthy_output="$(
+  cd "$TEST_REPO" && HOME="$TEST_HOME" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-doctor" --workflow native --agent local_reviewer
+)"
+[[ "$healthy_output" == *"status: OK"* ]] || fail "healthy ai-doctor output did not report OK status"
+[[ "$healthy_output" == *"Next Steps"* ]] || fail "healthy ai-doctor output did not print next steps"
+[[ "$healthy_output" == *"next: ai workflows"* ]] || fail "healthy ai-doctor output did not point to ai workflows first"
+[[ "$healthy_output" == *"next: ai start"* ]] || fail "healthy ai-doctor output did not point to ai start second"
+[[ "$healthy_output" != *"if the warnings look acceptable"* ]] || fail "healthy ai-doctor output should not print warning-specific guidance"
+[[ "$(printf '%s\n' "$healthy_output" | tail -n 1)" == "  - next: ai start" ]] || fail "healthy ai-doctor output did not keep next steps at the end of the output"
 
 filtered_output="$(
   cd "$TEST_REPO" && HOME="$TEST_HOME" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-doctor" --workflow native --agent local_reviewer

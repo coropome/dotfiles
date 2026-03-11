@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #77 `docs: teach ai --help to show the beginner path before deeper commands`
-- Branch: `docs/77-ai-help-beginner-path`
-- Memory Artifact: `tasks/sprint-memory/issue-77.md`
-- Resume Point: ai help guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
+- Active issue: #79 `docs: add beginner-first next-step guidance to ai doctor`
+- Branch: `docs/79-ai-doctor-next-steps`
+- Memory Artifact: `tasks/sprint-memory/issue-79.md`
+- Resume Point: ai-doctor next-step guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Make `ai --help` a beginner-first discovery surface by showing the recommended next-step path before deeper commands.
+Make `ai doctor` a better recovery surface by ending with beginner-first next-step guidance for healthy, warn, and fail outcomes.
 
 ## Working Agreement
 
@@ -33,19 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - beginner-first `ai --help` guidance
+  - beginner-first `ai doctor` next-step guidance
 - concrete surfaces
-  - [`bin/ai`](./bin/ai)
+  - [`bin/ai-doctor`](./bin/ai-doctor)
   - [`docs/40-cli.md`](./docs/40-cli.md)
-  - [`PLANS.md`](./PLANS.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`PLANS.md`](./PLANS.md)
+  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - `ai --help` includes a short beginner-first path
-  - starter-repo guidance puts `ai doctor` / `ai workflows` ahead of deeper commands
-  - deeper commands remain visible after the first-steps section
-  - tests lock the help ordering
+  - `ai doctor` prints a compact next-step block at the end
+  - healthy output points to `ai workflows` before `ai start`
+  - warn output keeps beginner-first ordering and can point to deeper inspection after `ai workflows`
+  - fail output tells users to fix gaps and rerun `ai doctor` before `ai start`
 
 ## Squad
 
@@ -59,13 +59,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#77` is the sprint slice for this turn
+  - issue `#79` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 29 was added and converted into issue `#77`
+  - Task 30 was added and converted into issue `#79`
 - Review / Demo
-  - show the new `First Steps` section in `ai --help` and its ordering
+  - show the new `ai doctor` next-step block for healthy, warn, and fail cases
 - Retrospective
-  - keep `ai --help` compact while making the next step obvious
+  - keep `ai doctor` terminal-short and explicit about what to do next
 
 ## Verification
 
@@ -76,13 +76,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - add a `First Steps` block to [`bin/ai`](./bin/ai) with runtime repo, starter repo, and deeper-use paths
-  - align [`docs/40-cli.md`](./docs/40-cli.md) and [`README.md`](./README.md) with the new beginner-first role of `ai --help`
-  - lock the line ordering in [`test/ai_cli.sh`](./test/ai_cli.sh) and the docs wording in [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - add an outcome-based `Next Steps` footer to [`bin/ai-doctor`](./bin/ai-doctor)
+  - keep healthy output on `ai workflows -> ai start`, warn output on `ai workflows -> optional ai-agent --describe --workflow <name> -> ai start`, and fail output on `fix -> rerun ai doctor -> ai workflows`
+  - align [`docs/40-cli.md`](./docs/40-cli.md) and lock the footer ordering in [`test/ai_doctor.sh`](./test/ai_doctor.sh)
 - Retrospective
-  - keep: upgrade the most common entry surfaces before adding new ones
-  - change: treat docs/help shape as a tested contract, not just a copy edit
-  - stop: leaving `ai --help` as a flat command catalog after the rest of the repo moved to guided next steps
+  - keep: extend beginner-first guidance to recovery surfaces after discovery and startup surfaces are aligned
+  - change: treat the exact last lines of diagnostic output as part of the contract when the task is specifically about next steps
+  - stop: ending the canonical recovery command with no clear next action
 - System Updates
   - backlog: updated
   - plans: updated
@@ -96,6 +96,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - align top-level CLI discovery with the same beginner path used in runtime messages
+  - align the recovery surface with the same beginner path used in discovery and startup messages
 - stop
-  - treating `ai --help` as a flat catalog after the rest of the repo moved to guided next steps
+  - leaving `ai doctor` as a raw diagnostic dump after the rest of the repo moved to guided next steps
