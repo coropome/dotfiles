@@ -305,6 +305,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai workflows next-step guidance"
   grep -Fq "workspace launch は today は tmux-backed session を default に使う" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document the current tmux-backed ai-start implementation"
+  grep -Fq "default の tmux path が missing dependency で止まった時も" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document the ai-start tmux-failure stdio guidance"
   grep -Fq "ai start --backend stdio" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document the stdio backend override"
   grep -Fq "healthy path では \`ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
