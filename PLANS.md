@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #81 `docs: align unknown-command recovery in ai with the beginner path`
-- Branch: `docs/81-ai-unknown-command-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-81.md`
-- Resume Point: unknown-command recovery is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
+- Active issue: #83 `docs: add beginner-first next-step guidance to ai workflows`
+- Branch: `docs/83-ai-workflows-next-steps`
+- Memory Artifact: `tasks/sprint-memory/issue-83.md`
+- Resume Point: `ai workflows` next-step guidance landed; start the next sprint from a fresh issue-backed branch
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align the generic unknown-command recovery path in `ai` with the same beginner-first order used by help, start, and doctor.
+Make `ai workflows` act like a real beginner-path bridge instead of a flat metadata dump.
 
 ## Working Agreement
 
@@ -32,19 +32,20 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 
 ## Sprint Slice
 
-- primary deliverable
-  - beginner-first unknown-command recovery guidance
-- concrete surfaces
-  - [`bin/ai`](./bin/ai)
+  - primary deliverable
+  - beginner-first next-step guidance for `ai workflows`
+  - concrete surfaces
+  - [`bin/ai-agent`](./bin/ai-agent)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
   - [`test/ai_cli.sh`](./test/ai_cli.sh)
-- acceptance slice
-  - unknown-command output points to `ai doctor` before `ai workflows`
-  - workflow-alias discovery remains visible in the fallback output
-  - tests lock the fallback ordering
-  - any touched docs keep the same recovery order
+  - [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - acceptance slice
+  - `ai workflows` ends with a compact next-step footer
+  - the footer points to `ai-agent --describe --workflow <name>` before `ai start`
+  - tests lock the footer wording and order
+  - docs explain the new guidance without blurring `ai doctor` and `ai workflows`
 
 ## Squad
 
@@ -58,16 +59,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#81` is the sprint slice for this turn
+  - issue `#83` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 31 was added and converted into issue `#81`
+  - Task 32 was added and converted into issue `#83`
 - Review / Demo
-  - show the unknown-command recovery order and keep workflow discovery visible
+  - show the `ai workflows` footer order: inspect one workflow, then continue with `ai start`
 - Retrospective
-  - keep the unknown-command path short and terminal-friendly
+  - keep discovery surfaces short and ordered
 
 ## Verification
 
+- `bash test/ai_cli.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -75,13 +77,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - update [`bin/ai`](./bin/ai) so unknown-command fallback points to `ai doctor` before `ai workflows`
-  - keep workflow-alias discovery visible after the doctor-first remediation
-  - align [`docs/40-cli.md`](./docs/40-cli.md) and lock the fallback order in [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - update [`bin/ai-agent`](./bin/ai-agent) so `ai workflows` ends with compact next-step guidance
+  - keep workflow inspection ahead of workspace launch in both CLI output and docs
+  - lock the footer wording and order in [`test/ai_cli.sh`](./test/ai_cli.sh)
 - Retrospective
-  - keep: close the broadest fallback paths after the stronger happy-path surfaces are aligned
-  - change: add a narrow docs guard when a recovery phrase becomes part of the canonical CLI story
-  - stop: letting generic fallback surfaces lag behind the guided beginner path
+  - keep: close beginner-path gaps in the order users actually hit the surfaces
+  - change: add a small next-step contract once a discovery command becomes part of the canonical path
+  - stop: treating `ai workflows` like a raw metadata dump after it became a guided beginner-step
 - System Updates
   - backlog: updated
   - plans: updated
@@ -93,8 +95,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - treating workflow rules as repo artifacts, not just chat habits
+  - treating workflow discovery surfaces as part of the guided beginner path
 - change
-  - align generic fallback paths with the same beginner path used in the stronger entry surfaces
+  - align the middle of the beginner path after the top-level entry surfaces are consistent
 - stop
-  - leaving one broad fallback path on an older, thinner recovery story
+  - leaving `ai workflows` as a raw catalog when the repo now treats it as a core next step

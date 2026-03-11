@@ -530,3 +530,20 @@ Adjust the unknown-command stderr in `bin/ai`, update any lightweight CLI wordin
 
 Expected Impact:
 Even when users type the wrong command, the top-level CLI still pushes them toward the same beginner-first recovery flow as the other entry surfaces.
+
+## Task 32
+
+Title: Add beginner-first next-step guidance to `ai workflows`
+Tracking: #83 (closed)
+
+Problem:
+`ai workflows` is now part of the canonical beginner path, but the command still behaves like a flat workflow catalog with no explicit next-step guidance. That leaves the middle of the newcomer flow thinner than the surrounding CLI surfaces.
+
+Improvement Idea:
+Keep the workflow table intact, but append a compact next-step footer that points to workflow inspection first and workspace launch second.
+
+Implementation Hint:
+Update `bin/ai-agent --list-workflows`, document the guidance in `docs/40-cli.md`, and add ordering checks in CLI tests so `ai-agent --describe --workflow <name>` stays ahead of `ai start`.
+
+Expected Impact:
+Users can move from workflow discovery to the right next action without dropping out of the guided beginner path.

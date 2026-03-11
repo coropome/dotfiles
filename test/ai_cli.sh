@@ -267,6 +267,15 @@ workflows_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/
 [[ "$workflows_output" == *"workflow | candidates | description"* ]] || fail "ai workflows did not print the metadata header"
 [[ "$workflows_output" == *"code | implementer -> codex -> gemini | Launch the primary implementation agent"* ]] || fail "ai workflows did not list code candidate metadata"
 [[ "$workflows_output" == *"improve | researcher -> codex -> claude | Explore new tools, prompts, and workflow improvements"* ]] || fail "ai workflows did not list improve candidate metadata"
+[[ "$workflows_output" == *"Next Steps:"* ]] || fail "ai workflows did not print next-step guidance"
+[[ "$workflows_output" == *"inspect a workflow: ai-agent --describe --workflow <name>"* ]] || fail "ai workflows did not explain workflow inspection"
+[[ "$workflows_output" == *"then continue the beginner path: ai start"* ]] || fail "ai workflows did not point back to ai start"
+workflows_source_line="$(printf '%s\n' "$workflows_output" | rg '^source:' -n)"
+workflows_inspect_line="$(printf '%s\n' "$workflows_output" | rg '^  - inspect a workflow:' -n)"
+workflows_start_line="$(printf '%s\n' "$workflows_output" | rg '^  - then continue the beginner path:' -n)"
+[[ -n "$workflows_source_line" && -n "$workflows_inspect_line" && -n "$workflows_start_line" ]] || fail "ai workflows did not print ordered next-step guidance"
+[[ "${workflows_source_line%%:*}" -lt "${workflows_inspect_line%%:*}" ]] || fail "ai workflows did not print next-step guidance after the table"
+[[ "${workflows_inspect_line%%:*}" -lt "${workflows_start_line%%:*}" ]] || fail "ai workflows did not keep inspection before ai start"
 
 agent_help_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --help)"
 [[ "$agent_help_output" == *"--describe --workflow review"* ]] || fail "ai-agent help did not include workflow describe usage"
@@ -418,6 +427,7 @@ hosted_failure="$(
 local_workflows_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" workflows)"
 [[ "$local_workflows_output" == *"native | local_reviewer | Local project workflow override"* ]] || fail "local workflows override did not load"
 [[ "$local_workflows_output" == *"source: $TEST_REPO/.ai-dev-os/workflows.yml"* ]] || fail "local workflows output did not report the override source"
+[[ "$local_workflows_output" == *"inspect a workflow: ai-agent --describe --workflow <name>"* ]] || fail "local workflows output did not keep next-step guidance"
 
 local_describe_output="$(cd "$TEST_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe local_reviewer)"
 [[ "$local_describe_output" == *"command: gemini"* ]] || fail "local agent override did not describe gemini"
