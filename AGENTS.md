@@ -17,6 +17,7 @@ Keep this file short. Put durable detail in normal repository docs and link to t
 Before planning or editing, read:
 
 - [`docs/92-development-workflow.md`](./docs/92-development-workflow.md)
+- [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
 - [`docs/40-cli.md`](./docs/40-cli.md)
 - [`docs/41-ai-trust.md`](./docs/41-ai-trust.md)
 - [`tasks/backlog.md`](./tasks/backlog.md)
@@ -70,6 +71,7 @@ If the task changes architecture or long-term operating rules, also read:
 When the task is large, ambiguous, or expected to take multiple meaningful steps, create or update a plan document before major edits.
 
 - Put plans in `PLANS.md` or `docs/adr/` when appropriate.
+- Run the work using the Scrum cadence in [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md).
 - A good plan is self-contained, outcome-focused, and kept up to date as work progresses.
 - If a task is too large for one pass, leave the plan in a restartable state for the next agent.
 
@@ -87,6 +89,7 @@ Before marking work done:
 ## Pointers
 
 - Workflow rules: [`docs/92-development-workflow.md`](./docs/92-development-workflow.md)
+- Scrum cadence: [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
 - CLI and config boundaries: [`docs/40-cli.md`](./docs/40-cli.md)
 - Trust defaults: [`docs/41-ai-trust.md`](./docs/41-ai-trust.md)
 - ADR rules: [`docs/adr/README.md`](./docs/adr/README.md)

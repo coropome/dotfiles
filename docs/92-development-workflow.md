@@ -34,6 +34,10 @@ agent-specific compatibility file がある場合も、基本方針は `AGENTS.m
 - behavior change がある場合は docs を更新する
 - merge 前に `make test` と `make lint` を通す
 
+大きめの仕事や複数ステップの active work は、free-form に進めず [`docs/93-scrum-delivery.md`](./93-scrum-delivery.md) の cadence に従う。
+つまり backlog refinement, sprint commitment, review/demo, retrospective を repo ルールとして回す。
+一方で single-step の小さな変更まで ceremony を肥大化させる必要はなく、issue-first と test/lint を満たした最小運用でよい。
+
 ## Recommended Labels
 
 - `type:feature`
@@ -59,6 +63,24 @@ agent-specific compatibility file がある場合も、基本方針は `AGENTS.m
 5. 実装、テスト、docs 更新を行う
 6. PR を作って `Closes #<issue>` を付ける
 7. review 後に merge する
+
+## Scrum Cadence For Multi-Step Work
+
+issue-first workflow を守りつつ、multi-step work は軽量な Scrum cadence で回す。
+
+- Sprint Planning
+  - 今回の sprint で close する issue と acceptance slice を決める
+- Backlog Refinement
+  - 次の候補を `tasks/backlog.md` で整え、Problem / Improvement / Impact を粗く揃える
+- Execution
+  - `PLANS.md` を restartable に保ち、必要なら multi-agent lane を明示する
+- Review / Demo
+  - diff, tests, docs 更新で何を達成したかを示す
+- Retrospective
+  - 次に keep / change / stop することを短く残す
+
+詳細な squad roles, Definition of Ready, Definition of Done は [`docs/93-scrum-delivery.md`](./93-scrum-delivery.md) を参照。
+small sprint では 1 人が複数 role を兼務してよい。
 
 ## Branch Naming
 
@@ -111,3 +133,5 @@ bug issue には少なくとも次を書く。
 - 必要なら linked ADR がある
 - tests / lint の結果がある
 - rollout risk が書かれている
+
+Scrum cadence で進めた work では、PR summary から sprint commitment と review/demo evidence が辿れる状態を保つ。
