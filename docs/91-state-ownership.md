@@ -42,6 +42,9 @@
 - `docs/41-ai-trust.md`
 - `docs/42-github-actions.md`
 
+AI Dev OS control plane は「どの agent / workflow / trust / context を使うか」を管理する。
+workspace をどの backend で開くかは別レイヤーとし、tmux は current backend だが control plane 自体ではない。
+
 ## Ansible が管理するもの
 
 - Homebrew formula / cask 導入
@@ -63,6 +66,10 @@
 - git の一般設定
 - helper command
 - host bootstrap docs / tests
+- current workspace backend 実装
+
+terminal-native integration はここからさらに外側の frontend lane として扱う。
+Ghostty, WezTerm, iTerm2 のような terminal UI / automation は control plane の source of truth にはしない。
 
 ## plugin manager / 外部ツールに依存するもの
 

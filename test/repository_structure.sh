@@ -229,6 +229,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md"
   assert_file "$REPO/docs/adr/0004-ai-dev-os-retro-memory-loop.md"
   assert_file "$REPO/docs/adr/0005-turn-scoped-sprint-cadence.md"
+  assert_file "$REPO/docs/adr/0006-terminal-orchestration-modes.md"
   assert_file "$REPO/docs/05-demo-walkthrough.md"
   assert_file "$REPO/docs/41-ai-trust.md"
   assert_file "$REPO/docs/42-github-actions.md"
@@ -290,6 +291,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document unknown-command recovery guidance"
   grep -Fq "一覧を見たあとは、必要なら \`ai-agent --describe --workflow <name>\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai workflows next-step guidance"
+  grep -Fq "workspace launch は today は tmux-backed session を使う" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document the current tmux-backed ai-start implementation"
   grep -Fq "healthy path では \`ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document healthy ai doctor next steps"
   grep -Fq "warn path では \`ai workflows -> optional ai-agent --describe --workflow <name> -> ai start\`" "$REPO/docs/40-cli.md" \
@@ -422,8 +425,12 @@ verify_ai_dev_os_docs() {
     || fail "templates/plans/PLANS.md does not cover multi-turn sprints"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
+  grep -Fq "tmux は current workspace backend" "$REPO/docs/90-philosophy.md" \
+    || fail "docs/90-philosophy.md does not distinguish tmux backend from the AI Dev OS core"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
     || fail "docs/91-state-ownership.md does not describe the AI Dev OS control plane boundary"
+  grep -Fq "workspace をどの backend で開くかは別レイヤー" "$REPO/docs/91-state-ownership.md" \
+    || fail "docs/91-state-ownership.md does not separate workspace backend from the AI control plane"
   grep -Fq "AI_DEV_OS_EDITOR" "$REPO/docs/61-local-customization.md" \
     || fail "docs/61-local-customization.md does not recommend AI Dev OS editor aliases"
   grep -Fq "primary product surface" "$REPO/docs/adr/0002-ai-dev-os-primary-surface.md" \
@@ -436,6 +443,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/adr/0004-ai-dev-os-retro-memory-loop.md does not record the compressed sprint memory decision"
   grep -Fq "one user/assistant round-trip as one sprint" "$REPO/docs/adr/0005-turn-scoped-sprint-cadence.md" \
     || fail "docs/adr/0005-turn-scoped-sprint-cadence.md does not record the turn-scoped sprint decision"
+  grep -Fq "current default workspace backend" "$REPO/docs/adr/0006-terminal-orchestration-modes.md" \
+    || fail "docs/adr/0006-terminal-orchestration-modes.md does not define tmux as the current backend"
+  grep -Fq "terminal-native frontend integration" "$REPO/docs/adr/0006-terminal-orchestration-modes.md" \
+    || fail "docs/adr/0006-terminal-orchestration-modes.md does not define terminal-native integrations"
   grep -Fq "Compressed Memory" "$REPO/tasks/sprint-memory/README.md" \
     || fail "tasks/sprint-memory/README.md does not define compressed memory"
   grep -Fq "System Updates" "$REPO/tasks/sprint-memory/README.md" \
@@ -489,6 +500,8 @@ verify_doctor_guidance_consistency() {
     || fail "docs/00-quickstart.md does not keep the canonical make doctor guidance"
   grep -Fq "workflow / prompt / trust / fallback / runtime config を見る時は \`make doctor\` ではなく \`ai doctor\`" "$REPO/docs/31-support-matrix.md" \
     || fail "docs/31-support-matrix.md does not keep the canonical ai doctor guidance"
+  grep -Fq "multiplexer: **tmux** (\`ai start\` の current backend)" "$REPO/docs/31-support-matrix.md" \
+    || fail "docs/31-support-matrix.md does not describe tmux as the current ai-start backend"
   grep -Fq "workflow / prompt / trust / fallback / runtime config を診断する" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not keep the canonical ai doctor guidance"
   grep -Fq "host bootstrap / symlink / PATH / shell / system state を見る" "$REPO/docs/99-troubleshooting.md" \

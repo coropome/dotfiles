@@ -3,12 +3,14 @@
 AI Dev OS は、初心者にはわかりやすく、手慣れた人には深く速く使い込めて、1年後も日常的に使い続けられる OS レベルの AI workspace platform を目指す。
 
 shell / tmux / git / bootstrap は重要だが、あくまで AI workflow を支える host substrate として扱う。
+tmux は current workspace backend として重要だが、AI Dev OS の本体そのものではない。
 
 ## 1) 迷ったら AI workflow の入口に戻れる
 
 - beginner の primary entrypoint は `ai start`
 - starter repo では `ai init -> ai doctor -> ai workflows -> ai start` を最短導線にする
 - tmux helper や bootstrap 手順は必要な時だけ見せる
+- `ai start` は today は tmux-backed だが、その backend choice を north-star にしない
 
 ## 2) host substrate は薄く、でも逃げ道は消さない
 
@@ -27,6 +29,7 @@ shell / tmux / git / bootstrap は重要だが、あくまで AI workflow を支
 - shell / tmux / git / clipboard / open helper は日常作業の基盤として扱う
 - ただし user-facing surface は AI workflow の入口を優先し、内部実装を前に出しすぎない
 - 慣れた利用者が標準ツールにそのまま降りられる構成を保つ
+- Ghostty や WezTerm のような terminal-native surface は frontend integration として歓迎するが、control plane と混ぜない
 
 ## 5) 壊れにくさを runtime と host の両方で優先する
 
