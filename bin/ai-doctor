@@ -43,6 +43,19 @@ join_with() {
   printf '%s\n' "$output"
 }
 
+mark_failure() {
+  overall_exit=1
+}
+
+mark_warning() {
+  any_warn=1
+}
+
+remember_warned_workflow() {
+  local workflow_name="$1"
+  [[ -z "$warned_workflow" ]] && warned_workflow="$workflow_name"
+}
+
 resolve_scope_path() {
   local scope="$1"
   local raw_path="$2"
@@ -205,6 +218,62 @@ runtime_status_directory() {
   return 1
 }
 
+validate_named_filter() {
+  local config_file="$1"
+  local section="$2"
+  local filter_name="$3"
+  local label="$4"
+
+  [[ -z "$filter_name" ]] && return 0
+  if ai_has_named_key "$config_file" "$section" "$filter_name"; then
+    return 0
+  fi
+
+  echo "unknown $label: $filter_name" >&2
+  exit 2
+}
+
+print_doctor_header() {
+  printf 'AI Dev OS doctor\n'
+  printf 'repo: %s\n' "$TARGET_REPO"
+  printf 'agents_config: %s\n' "$AGENTS_FILE"
+  printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
+  printf '\n'
+}
+
+print_section_header() {
+  local title="$1"
+  printf '%s\n' "$title"
+}
+
+report_requested_workflows() {
+  local workflow_name
+
+  if [[ -n "$workflow_filter" ]]; then
+    report_workflow "$workflow_filter"
+    return
+  fi
+
+  while IFS= read -r workflow_name; do
+    [[ -n "$workflow_name" ]] || continue
+    report_workflow "$workflow_name"
+  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
+}
+
+report_requested_agents() {
+  local listed_agent
+
+  if [[ -n "$agent_filter" ]]; then
+    report_agent "$agent_filter"
+    return
+  fi
+
+  while IFS= read -r listed_agent; do
+    [[ -n "$listed_agent" ]] || continue
+    report_agent "$listed_agent"
+  done < <(ai_section_keys "$AGENTS_FILE" agents)
+}
+
 report_workflow() {
   local workflow_name="$1"
   local default_agent fallback_agents selected_agent="" candidate_name candidate_reason
@@ -255,11 +324,11 @@ report_workflow() {
 
   if [[ -z "$selected_agent" ]]; then
     workflow_status="FAIL no available candidates"
-    overall_exit=1
+    mark_failure
   elif [[ "$selected_agent" != "${candidates[0]}" ]]; then
     workflow_status="WARN fallback to $selected_agent"
-    any_warn=1
-    [[ -z "$warned_workflow" ]] && warned_workflow="$workflow_name"
+    mark_warning
+    remember_warned_workflow "$workflow_name"
   fi
 
   printf '  status: %s\n' "$workflow_status"
@@ -287,7 +356,7 @@ report_agent() {
   else
     printf '  dependency: FAIL missing dependency: %s\n' "${command_name:-unknown}"
     agent_status="FAIL"
-    overall_exit=1
+    mark_failure
   fi
 
   if [[ -n "$prompt_file" ]]; then
@@ -296,7 +365,7 @@ report_agent() {
     elif [[ -n "$prompt_handoff" && "$prompt_handoff" != "none" ]]; then
       printf '  prompt_file: FAIL %s\n' "${candidate_prompt_file:-$prompt_file}"
       agent_status="FAIL"
-      overall_exit=1
+      mark_failure
     else
       printf '  prompt_file: INFO %s (handoff disabled)\n' "${candidate_prompt_file:-$prompt_file}"
     fi
@@ -308,7 +377,7 @@ report_agent() {
     else
       printf '  context_summary: FAIL %s\n' "$context_error"
       agent_status="FAIL"
-      overall_exit=1
+      mark_failure
     fi
   fi
 
@@ -319,7 +388,7 @@ report_agent() {
     else
       printf '  trust_template: FAIL %s\n' "$trust_template_path"
       agent_status="FAIL"
-      overall_exit=1
+      mark_failure
     fi
   fi
 
@@ -353,7 +422,7 @@ report_agent() {
 
   [[ -n "$docs_url" ]] && printf '  docs: %s\n' "$docs_url"
   printf '  status: %s\n' "$agent_status"
-  [[ "$agent_status" == "WARN" ]] && any_warn=1
+  [[ "$agent_status" == "WARN" ]] && mark_warning
   printf '\n'
 }
 
@@ -423,41 +492,14 @@ overall_exit=0
 any_warn=0
 warned_workflow=""
 
-if [[ -n "$workflow_filter" ]] && ! ai_has_named_key "$WORKFLOWS_FILE" workflows "$workflow_filter"; then
-  echo "unknown workflow: $workflow_filter" >&2
-  exit 2
-fi
+validate_named_filter "$WORKFLOWS_FILE" "workflows" "$workflow_filter" "workflow"
+validate_named_filter "$AGENTS_FILE" "agents" "$agent_filter" "agent"
 
-if [[ -n "$agent_filter" ]] && ! ai_has_named_key "$AGENTS_FILE" agents "$agent_filter"; then
-  echo "unknown agent: $agent_filter" >&2
-  exit 2
-fi
-
-printf 'AI Dev OS doctor\n'
-printf 'repo: %s\n' "$TARGET_REPO"
-printf 'agents_config: %s\n' "$AGENTS_FILE"
-printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
-printf '\n'
-
-printf 'Workflow Resolution\n'
-if [[ -n "$workflow_filter" ]]; then
-  report_workflow "$workflow_filter"
-else
-  while IFS= read -r workflow_name; do
-    [[ -n "$workflow_name" ]] || continue
-    report_workflow "$workflow_name"
-  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
-fi
-
-printf 'Agent Diagnostics\n'
-if [[ -n "$agent_filter" ]]; then
-  report_agent "$agent_filter"
-else
-  while IFS= read -r listed_agent; do
-    [[ -n "$listed_agent" ]] || continue
-    report_agent "$listed_agent"
-  done < <(ai_section_keys "$AGENTS_FILE" agents)
-fi
+print_doctor_header
+print_section_header "Workflow Resolution"
+report_requested_workflows
+print_section_header "Agent Diagnostics"
+report_requested_agents
 
 print_next_steps
 
