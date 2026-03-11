@@ -513,3 +513,20 @@ Add a compact footer to `bin/ai-doctor`, update CLI docs wording, and cover heal
 
 Expected Impact:
 Users who run `ai doctor` can move from diagnosis to the right next action faster, which makes beginner recovery more consistent and less guessy.
+
+## Task 31
+
+Title: Align unknown-command recovery in `ai` with the beginner path
+Tracking: #81 (closed)
+
+Problem:
+The repo's main entry surfaces now guide users through `ai doctor`, `ai workflows`, and `ai start`, but the generic unknown-command fallback in `ai` still behaves like an older thin error path. That leaves one broad recovery surface out of sync with the current beginner path.
+
+Improvement Idea:
+Keep the unknown-command path short, but make it point users to `ai doctor` and `ai workflows` before deeper commands so the fallback story matches the rest of the CLI.
+
+Implementation Hint:
+Adjust the unknown-command stderr in `bin/ai`, update any lightweight CLI wording if needed, and lock the ordering down in tests.
+
+Expected Impact:
+Even when users type the wrong command, the top-level CLI still pushes them toward the same beginner-first recovery flow as the other entry surfaces.

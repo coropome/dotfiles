@@ -286,6 +286,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not keep the starter repo first-steps guidance"
   grep -Fq "\`deeper use\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not preserve deeper-use guidance after first steps"
+  grep -Fq "unknown command に当たった時も" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document unknown-command recovery guidance"
   grep -Fq "healthy path では \`ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document healthy ai doctor next steps"
   grep -Fq "warn path では \`ai workflows -> optional ai-agent --describe --workflow <name> -> ai start\`" "$REPO/docs/40-cli.md" \
