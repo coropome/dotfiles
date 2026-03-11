@@ -387,6 +387,14 @@ verify_ai_dev_os_docs() {
     || fail "tasks/sprint-memory/README.md does not define system updates"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not enforce issue-first work"
+  grep -Fq "Likely System Updates" "$REPO/.github/ISSUE_TEMPLATE/feature.yml" \
+    || fail ".github/ISSUE_TEMPLATE/feature.yml does not prompt for likely system updates"
+  grep -Fq "Sprint Shape / Lanes" "$REPO/.github/ISSUE_TEMPLATE/feature.yml" \
+    || fail ".github/ISSUE_TEMPLATE/feature.yml does not prompt for sprint shape"
+  grep -Fq "Likely Fix Surfaces" "$REPO/.github/ISSUE_TEMPLATE/bug.yml" \
+    || fail ".github/ISSUE_TEMPLATE/bug.yml does not prompt for likely fix surfaces"
+  grep -Fq "Sprint Shape / Scope" "$REPO/.github/ISSUE_TEMPLATE/bug.yml" \
+    || fail ".github/ISSUE_TEMPLATE/bug.yml does not prompt for sprint scope"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/AGENTS.md" \
     || fail "AGENTS.md does not point to docs/93-scrum-delivery.md"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/.github/copilot-instructions.md" \
