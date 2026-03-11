@@ -394,3 +394,20 @@ Add a small section to the feature and bug issue templates for expected docs/tes
 
 Expected Impact:
 Issue creation better matches the repo's delivery model, and later planning or handoff has fewer hidden assumptions.
+
+## Task 24
+
+Title: Default each user turn to one sprint with agent-run Scrum inside it
+Tracking: #65
+
+Problem:
+The repo now has Scrum rules, but the cadence is still repo-level and can be interpreted loosely. For this collaboration style, there is still no durable rule that one user/assistant turn should default to one sprint, with planning, execution, review/demo, and retrospective handled by agents inside that turn.
+
+Improvement Idea:
+Define a turn-scoped Scrum rule where each user round-trip is normally treated as one sprint slice, unless an issue explicitly spans multiple turns.
+
+Implementation Hint:
+Extend the Scrum delivery doc, agent instructions, and ADR set so turn-scoped sprint behavior is explicit, lightweight exceptions are documented, and tests keep the wording from drifting.
+
+Expected Impact:
+Collaboration becomes more predictable: each turn has a clear sprint boundary, agents know when to plan and retro, and users get a visible cadence without extra coordination overhead.

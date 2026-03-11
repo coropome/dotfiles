@@ -226,6 +226,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/docs/adr/0002-ai-dev-os-primary-surface.md"
   assert_file "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md"
   assert_file "$REPO/docs/adr/0004-ai-dev-os-retro-memory-loop.md"
+  assert_file "$REPO/docs/adr/0005-turn-scoped-sprint-cadence.md"
   assert_file "$REPO/docs/05-demo-walkthrough.md"
   assert_file "$REPO/docs/41-ai-trust.md"
   assert_file "$REPO/docs/42-github-actions.md"
@@ -323,6 +324,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/92-development-workflow.md does not mention compressed sprint memory"
   grep -Fq "Sprint Planning" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not have a Sprint Planning section"
+  grep -Fq "1 往復 = 1 sprint" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the turn-scoped sprint default"
+  grep -Fq "intentionally turn をまたぐ" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the multi-turn exception"
   grep -Fq "Backlog Refinement" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not have a Backlog Refinement section"
   grep -Fq "Review / Demo" "$REPO/docs/93-scrum-delivery.md" \
@@ -381,6 +386,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/adr/0003-ai-dev-os-scrum-cadence.md does not keep the small-change escape hatch"
   grep -Fq "compressed sprint memory" "$REPO/docs/adr/0004-ai-dev-os-retro-memory-loop.md" \
     || fail "docs/adr/0004-ai-dev-os-retro-memory-loop.md does not record the compressed sprint memory decision"
+  grep -Fq "one user/assistant round-trip as one sprint" "$REPO/docs/adr/0005-turn-scoped-sprint-cadence.md" \
+    || fail "docs/adr/0005-turn-scoped-sprint-cadence.md does not record the turn-scoped sprint decision"
   grep -Fq "Compressed Memory" "$REPO/tasks/sprint-memory/README.md" \
     || fail "tasks/sprint-memory/README.md does not define compressed memory"
   grep -Fq "System Updates" "$REPO/tasks/sprint-memory/README.md" \
@@ -401,8 +408,12 @@ verify_ai_dev_os_docs() {
     || fail ".github/copilot-instructions.md does not point to docs/93-scrum-delivery.md"
   grep -Fq "tasks/sprint-memory/" "$REPO/AGENTS.md" \
     || fail "AGENTS.md does not point to tasks/sprint-memory/"
+  grep -Fq "one user/assistant round-trip as one sprint" "$REPO/AGENTS.md" \
+    || fail "AGENTS.md does not define the turn-scoped sprint default"
   grep -Fq "tasks/sprint-memory/" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not point to tasks/sprint-memory/"
+  grep -Fq "one user/assistant round-trip as one sprint" "$REPO/.github/copilot-instructions.md" \
+    || fail ".github/copilot-instructions.md does not define the turn-scoped sprint default"
   grep -Fq "Sprint Memory" "$REPO/.github/pull_request_template.md" \
     || fail ".github/pull_request_template.md does not prompt for sprint memory"
   grep -Fq "Review / Demo" "$REPO/.github/pull_request_template.md" \

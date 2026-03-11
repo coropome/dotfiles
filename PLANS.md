@@ -1,9 +1,9 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #53 `docs: make retrospectives update the system and preserve agent memory`
-- Branch: `docs/53-retro-memory-loop`
-- Memory Artifact: [`tasks/sprint-memory/issue-53.md`](./tasks/sprint-memory/issue-53.md)
+- Active issue: #65 `docs: default each user turn to one sprint with agent-run Scrum`
+- Branch: `docs/65-turn-scoped-sprint-rule`
+- Memory Artifact: `not needed in this turn-scoped sprint; fallback location is tasks/sprint-memory/`
 
 ## North Star
 
@@ -16,56 +16,50 @@
 
 ## Current Goal
 
-Make retrospectives improve the operating system instead of ending as dead-end notes, and preserve compressed sprint memory so multi-agent work can survive context loss and handoff.
+Make the collaboration cadence explicit: one user/assistant round-trip defaults to one sprint, and agents are responsible for running planning, execution, review/demo, and retrospective inside that turn unless the issue intentionally spans multiple turns.
 
 ## Working Agreement
 
 Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md).
 
 - start from `tasks/backlog.md`, then commit to an issue-backed sprint slice
-- keep `PLANS.md` restartable throughout the sprint
-- keep compressed handoff context in [`tasks/sprint-memory/`](./tasks/sprint-memory/)
-- end the sprint with review/demo evidence, retrospective output, and explicit system updates
+- default to 1 user turn = 1 sprint
+- only span multiple turns when the issue explicitly justifies it
+- end the turn with review/demo evidence and a retrospective outcome
 
 ## Sprint Slice
 
 - primary deliverable
-  - a durable retrospective feedback loop and sprint-memory contract
+  - a durable turn-scoped sprint rule for this collaboration style
 - concrete surfaces
   - [`docs/92-development-workflow.md`](./docs/92-development-workflow.md)
   - [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
   - [`AGENTS.md`](./AGENTS.md)
   - [`.github/copilot-instructions.md`](./.github/copilot-instructions.md)
-  - [`tasks/sprint-memory/README.md`](./tasks/sprint-memory/README.md)
-  - [`tasks/sprint-memory/issue-53.md`](./tasks/sprint-memory/issue-53.md)
+  - [`docs/adr/0005-turn-scoped-sprint-cadence.md`](./docs/adr/0005-turn-scoped-sprint-cadence.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - retrospectives map to backlog / plans / docs / tests / instructions / ADR or explicit no-op
-  - the repo defines a standard compressed sprint memory location and format
-  - active planning surfaces point to sprint memory artifacts
+  - turn-scoped sprint default is explicit
+  - exceptions for intentional multi-turn work are explicit
+  - agent-facing instructions reflect the rule
 
 ## Squad
 
 - Product / Backlog: Codex
-  - owns issue shape, acceptance criteria, and backlog refinement
 - Delivery / Scrum: Codex
-  - owns sprint commitment, plan hygiene, and ceremony completion
-- Explorer / Design: Gibbs
-  - scans memory artifact shape and handoff clarity
-- Explorer / Guardrails: Hypatia
-  - scans regression guards and wording drift
+- Reviewer / QA: Codex
 
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#53`, branch `docs/53-retro-memory-loop`, and memory artifact path are fixed
+  - issue `#65` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 21 was added and converted into issue `#53`
+  - Task 24 was added and converted into issue `#65`
 - Review / Demo
-  - leave proof in docs, tests, and the sprint-memory artifact
+  - leave proof in docs and structure tests
 - Retrospective
-  - capture keep / change / stop and which system surfaces were updated
+  - keep the turn-scoped rule lightweight and exception-driven
 
 ## Verification
 
@@ -76,8 +70,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - using the current sprint itself as the first real memory-artifact trial
+  - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - standardize one artifact path before more branches invent alternatives
+  - make the turn boundary explicit earlier so cadence expectations are visible
 - stop
-  - leaving handoff context only in ephemeral agent state
+  - relying on implicit conversation rhythm as the only sprint definition

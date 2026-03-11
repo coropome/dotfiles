@@ -13,6 +13,15 @@ AI Dev OS の delivery は ad hoc な issue hopping に戻さず、backlog refin
 - ただし single-step の小さな変更は、issue-first と verification を満たす最小 ceremony でよい
 - retrospective は dead-end note にせず、次の system update と sprint memory まで残す
 
+この collaboration mode では、default として「ユーザーとの 1 往復 = 1 sprint」とみなす。
+つまり 1 turn の中で planning, execution, review/demo, retrospective まで agents が回す。
+
+例外:
+
+- issue の slice が 1 turn で完了しないと明確に分かっている
+- 外部待ち、長時間検証、段階的 rollout で intentionally turn をまたぐ
+- small change なので full sprint ではなく最小 ceremony で済む
+
 ## Sprint Planning
 
 - 1 sprint で close したい issue を決める
@@ -26,6 +35,7 @@ planning の出口は次の状態。
 - `PLANS.md` が current sprint を説明できる
 - 誰が product, delivery, review を持つか分かる
 - 最小形なら 3 行程度の sprint note でもよい
+- current turn が 1 sprint か、intentional multi-turn sprint かが明記されている
 
 ## Backlog Refinement
 
@@ -183,3 +193,4 @@ memory artifact の最小項目:
 - retrospective note for the sprint exists in issue, PR, or plan closeout
 - retrospective output is mapped to backlog, plans, docs, tests, instructions, ADR, or explicit no-op
 - multi-agent or handoff-heavy work leaves `tasks/sprint-memory/issue-<id>.md` or explicitly records why one was not needed
+- default turn-scoped sprint なら、その user turn の中で sprint closeout まで終える

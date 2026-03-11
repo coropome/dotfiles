@@ -73,6 +73,7 @@ If the task changes architecture or long-term operating rules, also read:
 When the task is large, ambiguous, or expected to take multiple meaningful steps, create or update a plan document before major edits.
 
 - Put plans in `PLANS.md` or `docs/adr/` when appropriate.
+- Default to treating one user/assistant round-trip as one sprint unless the issue explicitly spans multiple turns.
 - Run the work using the Scrum cadence in [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md).
 - For multi-agent or handoff-heavy work, leave a compressed memory artifact under [`tasks/sprint-memory/`](./tasks/sprint-memory/).
 - A good plan is self-contained, outcome-focused, and kept up to date as work progresses.
