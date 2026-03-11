@@ -193,7 +193,8 @@ warn_output="$(
 [[ "$warn_output" == *"next: ai workflows"* ]] || fail "warn ai-doctor output did not point to ai workflows first"
 [[ "$warn_output" == *"optional deeper check: ai-agent --describe --workflow broken_fallback"* ]] || fail "warn ai-doctor output did not include deeper workflow inspection"
 [[ "$warn_output" == *"if the warnings look acceptable, next: ai start"* ]] || fail "warn ai-doctor output did not keep ai start behind the warning check"
-[[ "$(printf '%s\n' "$warn_output" | tail -n 1)" == "  - if the warnings look acceptable, next: ai start" ]] || fail "warn ai-doctor output did not keep next steps at the end of the output"
+[[ "$warn_output" == *"if you want a non-tmux path, use: ai start --backend stdio"* ]] || fail "warn ai-doctor output did not include the stdio alternative"
+[[ "$(printf '%s\n' "$warn_output" | tail -n 1)" == "  - if you want a non-tmux path, use: ai start --backend stdio" ]] || fail "warn ai-doctor output did not keep backend-aware next steps at the end of the output"
 
 mkdir -p "$TEST_REPO/.gemini" "$TEST_HOME/.gemini"
 touch "$TEST_REPO/.gemini/settings.json" "$TEST_HOME/.gemini/settings.json"
@@ -205,8 +206,9 @@ healthy_output="$(
 [[ "$healthy_output" == *"Next Steps"* ]] || fail "healthy ai-doctor output did not print next steps"
 [[ "$healthy_output" == *"next: ai workflows"* ]] || fail "healthy ai-doctor output did not point to ai workflows first"
 [[ "$healthy_output" == *"next: ai start"* ]] || fail "healthy ai-doctor output did not point to ai start second"
+[[ "$healthy_output" == *"optional non-tmux path: ai start --backend stdio"* ]] || fail "healthy ai-doctor output did not include the stdio alternative"
 [[ "$healthy_output" != *"if the warnings look acceptable"* ]] || fail "healthy ai-doctor output should not print warning-specific guidance"
-[[ "$(printf '%s\n' "$healthy_output" | tail -n 1)" == "  - next: ai start" ]] || fail "healthy ai-doctor output did not keep next steps at the end of the output"
+[[ "$(printf '%s\n' "$healthy_output" | tail -n 1)" == "  - optional non-tmux path: ai start --backend stdio" ]] || fail "healthy ai-doctor output did not keep backend-aware next steps at the end of the output"
 
 filtered_output="$(
   cd "$TEST_REPO" && HOME="$TEST_HOME" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-doctor" --workflow native --agent local_reviewer

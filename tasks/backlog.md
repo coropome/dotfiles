@@ -615,3 +615,20 @@ Update `bin/ai-init`, keep the demo starter fixture in sync, and extend `test/ai
 
 Expected Impact:
 The first generated artifact a new adopter reads tells the same backend story as the runtime docs and CLI surface.
+
+## Task 37
+
+Title: Make `ai doctor` next steps backend-aware
+Tracking: #93 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but `ai doctor` still ends with next-step guidance that treats `ai start` as a single undifferentiated path.
+
+Improvement Idea:
+Keep the healthy / warn / fail structure, but mention the stdio alternative in healthy and warn cases without weakening the fail-case remediation.
+
+Implementation Hint:
+Update `bin/ai-doctor`, sync `docs/40-cli.md`, and extend `test/ai_doctor.sh` plus structure guards so the backend-aware guidance stays durable.
+
+Expected Impact:
+Users can move from diagnosis to the right `ai start` path faster, without reading tmux-only intent into the doctor output.
