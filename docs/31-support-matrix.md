@@ -5,7 +5,7 @@
 - OS: **macOS**
 - パッケージ管理: **Homebrew**
 - shell: **zsh**
-- multiplexer: **tmux** (`ai start` の current backend)
+- multiplexer: **tmux** (`ai start` の current default backend)
 
 ## best-effort / 将来対応の余地
 
@@ -25,7 +25,8 @@
 - bash
 - zsh
 - git
-- tmux (`ai start` は today これを要求する)
+- tmux (`ai start` default backend は today これを要求する)
+- stdio (`ai start --backend stdio` は tmux なしで動く)
 
 ## Linux / WSL で今使えるもの
 
