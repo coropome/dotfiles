@@ -1,0 +1,74 @@
+name: AI Dev OS PR
+
+on:
+  pull_request:
+    paths:
+      - '.ai-dev-os/**'
+      - '.github/workflows/ai-dev-os-*.yml'
+      - '**/*.prompt.yml'
+
+permissions:
+  contents: read
+
+env:
+  AI_DEV_OS_RUNTIME_REPOSITORY: coropome/dotfiles
+  AI_DEV_OS_RUNTIME_REF: main
+
+jobs:
+  prompt-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout AI Dev OS runtime
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.AI_DEV_OS_RUNTIME_REPOSITORY }}
+          ref: ${{ env.AI_DEV_OS_RUNTIME_REF }}
+          path: ai-dev-os
+
+      - name: Validate prompt artifacts
+        shell: bash
+        working-directory: repo
+        run: |
+          set -euo pipefail
+          prompt_names="$("$GITHUB_WORKSPACE/ai-dev-os/bin/ai-eval" --list)"
+          if [[ -z "$prompt_names" ]]; then
+            echo "No prompt artifacts found."
+            exit 0
+          fi
+
+          while IFS= read -r prompt_name; do
+            [[ -n "$prompt_name" ]] || continue
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai-eval" "$prompt_name"
+          done <<< "$prompt_names"
+
+  starter-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout AI Dev OS runtime
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.AI_DEV_OS_RUNTIME_REPOSITORY }}
+          ref: ${{ env.AI_DEV_OS_RUNTIME_REF }}
+          path: ai-dev-os
+
+      - name: Smoke the starter scaffold
+        shell: bash
+        run: |
+          set -euo pipefail
+          smoke_repo="$RUNNER_TEMP/ai-dev-os-smoke"
+          mkdir -p "$smoke_repo"
+          git init --quiet "$smoke_repo"
+
+          "$GITHUB_WORKSPACE/ai-dev-os/bin/ai-init" --repo "$smoke_repo"
+          (
+            cd "$smoke_repo"
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai" workflows
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai" agents
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai-agent" --describe --workflow review
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai-eval" review
+          )

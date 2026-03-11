@@ -25,8 +25,10 @@ Main Commands:
   agents        list configured agents with provider and role metadata
   agent         run or inspect a configured agent
   context       build repository context
+  doctor        inspect workflow resolution and agent readiness
   task          show the current backlog
   eval          inspect or validate prompt artifacts
+  trust         generate or apply vendor-native trust config
   install       run the OS abstraction install wrapper
   copy          copy stdin through the AI clipboard wrapper
   open          open a path or URL through the AI open wrapper
@@ -44,14 +46,17 @@ EOF
 }
 
 render_workflow_help() {
-  local workflow_name description default_agent
+  local workflow_name description default_agent candidate_chain
 
   while IFS= read -r workflow_name; do
     [[ -n "$workflow_name" ]] || continue
     description="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" description)"
     default_agent="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" default_agent)"
+    candidate_chain="$(ai_workflow_candidate_chain "$WORKFLOWS_FILE" "$workflow_name")"
     printf '  %-12s %s' "$workflow_name" "${description:-No description}"
-    if [[ -n "$default_agent" ]]; then
+    if [[ -n "$candidate_chain" ]]; then
+      printf ' [candidates: %s]' "$candidate_chain"
+    elif [[ -n "$default_agent" ]]; then
       printf ' [default agent: %s]' "$default_agent"
     fi
     printf '\n'
@@ -87,6 +92,9 @@ case "$command_name" in
   context)
     exec "$BIN_DIR/ai-context" "$@"
     ;;
+  doctor)
+    exec "$BIN_DIR/ai-doctor" "$@"
+    ;;
   task)
     exec "$BIN_DIR/ai-task" "$@"
     ;;
@@ -98,6 +106,9 @@ case "$command_name" in
     ;;
   eval)
     exec "$BIN_DIR/ai-eval" "$@"
+    ;;
+  trust)
+    exec "$BIN_DIR/ai-trust" "$@"
     ;;
   install)
     exec "$BIN_DIR/ai-install" "$@"

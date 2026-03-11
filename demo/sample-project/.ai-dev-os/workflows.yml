@@ -4,4 +4,5 @@ workflows:
     description: Project-local implementation workflow
   review:
     default_agent: local_reviewer
+    fallback_agents: local_backup_reviewer
     description: Project-local review workflow

@@ -5,6 +5,8 @@ agents:
     role: coding-agent
     description: Claude Code interactive coding agent
     prompt_file: prompts/implementer.md
+    prompt_handoff: append-system-prompt
+    context_handoff: prompt
     docs_url: https://code.claude.com/docs/en/settings
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -18,8 +20,11 @@ agents:
     role: coding-agent
     description: Gemini CLI terminal agent with MCP and headless workflows
     prompt_file: prompts/researcher.md
+    prompt_handoff: prompt
+    context_handoff: prompt
     docs_url: https://github.com/google-gemini/gemini-cli
     user_config: ~/.gemini/settings.json
+    project_config: .gemini/settings.json
     mcp_config: ~/.gemini/settings.json
     automation_mode: native-mcp-headless
     trust_template: templates/ai-trust/gemini-settings.json
@@ -29,8 +34,11 @@ agents:
     role: coding-agent
     description: OpenAI Codex CLI for repository work
     prompt_file: prompts/reviewer.md
+    prompt_handoff: prompt
+    context_handoff: prompt
     docs_url: https://developers.openai.com/codex/cloud
     user_config: ~/.codex/config.toml
+    project_config: .codex/config.toml
     mcp_config: ~/.codex/config.toml
     automation_mode: native-skills-mcp
     trust_template: templates/ai-trust/codex-config.toml
@@ -40,6 +48,8 @@ agents:
     role: architect
     description: Drafts plans and high-level system changes
     prompt_file: prompts/architect.md
+    prompt_handoff: append-system-prompt
+    context_handoff: prompt
     docs_url: https://code.claude.com/docs/en/sub-agents
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -53,6 +63,8 @@ agents:
     role: implementer
     description: Applies changes for the current task
     prompt_file: prompts/implementer.md
+    prompt_handoff: append-system-prompt
+    context_handoff: prompt
     docs_url: https://code.claude.com/docs/en/sub-agents
     user_config: ~/.claude/settings.json
     project_config: .claude/settings.json
@@ -66,19 +78,25 @@ agents:
     role: reviewer
     description: Reviews code for regressions and risks
     prompt_file: prompts/reviewer.md
+    prompt_handoff: prompt
+    context_handoff: prompt
     docs_url: https://developers.openai.com/codex/cloud
     user_config: ~/.codex/config.toml
+    project_config: .codex/config.toml
     mcp_config: ~/.codex/config.toml
     automation_mode: native-skills-mcp
     trust_template: templates/ai-trust/codex-config.toml
   researcher:
     provider: google
-    command: codex
+    command: gemini
     role: researcher
     description: Investigates tooling and workflow ideas
     prompt_file: prompts/researcher.md
-    docs_url: https://docs.github.com/en/github-models/about-github-models
-    user_config: ~/.codex/config.toml
-    mcp_config: ~/.codex/config.toml
-    automation_mode: native-mcp-evals
-    trust_template: templates/ai-trust/codex-config.toml
+    prompt_handoff: prompt
+    context_handoff: prompt
+    docs_url: https://github.com/google-gemini/gemini-cli
+    user_config: ~/.gemini/settings.json
+    project_config: .gemini/settings.json
+    mcp_config: ~/.gemini/settings.json
+    automation_mode: native-mcp-headless
+    trust_template: templates/ai-trust/gemini-settings.json

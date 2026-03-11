@@ -1,0 +1,68 @@
+name: AI Dev OS Hosted Eval
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: Prompt artifact name or all
+        required: true
+        default: review
+
+permissions:
+  contents: read
+
+env:
+  AI_DEV_OS_RUNTIME_REPOSITORY: coropome/dotfiles
+  AI_DEV_OS_RUNTIME_REF: main
+
+jobs:
+  hosted-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout AI Dev OS runtime
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.AI_DEV_OS_RUNTIME_REPOSITORY }}
+          ref: ${{ env.AI_DEV_OS_RUNTIME_REF }}
+          path: ai-dev-os
+
+      - name: Require hosted eval credentials
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ -n "${GH_TOKEN:-}" ]] || {
+            echo "Set repository secret GH_TOKEN with GitHub Models access."
+            exit 1
+          }
+
+      - name: Run hosted eval
+        shell: bash
+        working-directory: repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+          prompt_input="${{ inputs.prompt }}"
+
+          if [[ "$prompt_input" == "all" ]]; then
+            prompt_names="$("$GITHUB_WORKSPACE/ai-dev-os/bin/ai-eval" --list)"
+          else
+            prompt_names="$prompt_input"
+          fi
+
+          if [[ -z "$prompt_names" ]]; then
+            echo "No prompt artifacts found."
+            exit 1
+          fi
+
+          while IFS= read -r prompt_name; do
+            [[ -n "$prompt_name" ]] || continue
+            "$GITHUB_WORKSPACE/ai-dev-os/bin/ai-eval" --hosted "$prompt_name"
+          done <<< "$prompt_names"
