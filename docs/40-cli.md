@@ -22,6 +22,7 @@ AI Dev OS の入口は `ai --help` と `ai start`。starter repo で最初に困
 ai --help
 ai init
 ai doctor
+ai task
 ai workflows
 ai agents
 ai-agent --describe --workflow review
@@ -51,6 +52,7 @@ trust 設定は beginner surface の常時コマンドというより、`ai doct
 
 `ai workflows` は `workflow | default agent | description` を基本に、必要なら fallback chain も含めて確認するための一覧。
 `ai agents` は `agent | provider | role | command | description` を表示する。
+`ai task` は pending backlog task の短い summary を先に出し、その後に full backlog を表示する。backlog refinement や次 sprint 候補の確認を始める時の入口として使う。
 project-local scaffold を作りたい時は `ai init` を使う。
 `ai doctor` は workflow resolution、missing binary、missing prompt/config、fallback path、vendor-native runtime path (`project_config`, `user_config`, `mcp_config`, `project_extensions`) を human-readable に返す。
 `ai code` / `ai review` / `ai improve` は agent metadata にある `prompt_file` と `.context/summary.md` を使って vendor CLI に自然な形で handoff する。

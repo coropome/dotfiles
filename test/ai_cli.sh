@@ -7,6 +7,8 @@ TEST_REPO="$TMPDIR_ROOT/project"
 GLOBAL_REPO="$TMPDIR_ROOT/global-project"
 INIT_REPO="$TMPDIR_ROOT/init-project"
 STUB_BIN="$TMPDIR_ROOT/bin"
+PENDING_BACKLOG="$TMPDIR_ROOT/pending-backlog.md"
+NO_PENDING_BACKLOG="$TMPDIR_ROOT/no-pending-backlog.md"
 TMUX_LOG="$TMPDIR_ROOT/tmux.log"
 OPEN_LOG="$TMPDIR_ROOT/open.log"
 COPY_LOG="$TMPDIR_ROOT/copy.log"
@@ -79,6 +81,55 @@ workflows:
     default_agent: broken_native
     fallback_agents: missing_native
     description: No viable workflow candidates
+EOF
+
+  cat > "$PENDING_BACKLOG" <<'EOF'
+# AI Dev OS Backlog
+
+Tracking note:
+- `Tracking: #<issue> (closed)` means the task landed in `main` and stays here as historical context.
+- `Tracking: pending` means the task has not been turned into a GitHub Issue yet.
+
+## Task 99
+
+Title: Example pending task
+Tracking: pending
+
+Problem:
+Pending example.
+
+Expected Impact:
+Pending example.
+
+## Task 100
+
+Title: Example closed task
+Tracking: #100 (closed)
+
+Problem:
+Closed example.
+
+Expected Impact:
+Closed example.
+EOF
+
+  cat > "$NO_PENDING_BACKLOG" <<'EOF'
+# AI Dev OS Backlog
+
+Tracking note:
+- `Tracking: #<issue> (closed)` means the task landed in `main` and stays here as historical context.
+- `Tracking: pending` means the task has not been turned into a GitHub Issue yet.
+
+## Task 101
+
+Title: Example closed task
+Tracking: #101 (closed)
+
+Problem:
+Closed example.
+
+Expected Impact:
+Closed example.
 EOF
 }
 
@@ -191,6 +242,7 @@ help_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" -
 [[ "$help_output" == *"[candidates: implementer -> codex -> gemini]"* ]] || fail "ai help did not include workflow candidate metadata"
 [[ "$help_output" == *".ai-dev-os/workflows.yml"* ]] || fail "ai help did not mention project-local overrides"
 [[ "$help_output" == *"doctor        inspect workflow resolution and agent readiness"* ]] || fail "ai help did not list the doctor command"
+[[ "$help_output" == *"task          summarize pending backlog work for refinement and print the backlog"* ]] || fail "ai help did not list the updated task command"
 [[ "$help_output" == *"trust         generate or apply vendor-native trust config"* ]] || fail "ai help did not list the trust command"
 
 agents_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" agents)"
@@ -246,8 +298,24 @@ workflow_describe_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$R
 [[ "$workflow_describe_output" == *"resolution_candidates: reviewer, claude, gemini"* ]] || fail "ai-agent describe missing resolution candidates"
 [[ "$workflow_describe_output" == *"agents_config: $REPO/ai/agents.yml"* ]] || fail "ai-agent did not report the resolved agent config"
 
-task_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" task)"
-[[ "$task_output" == *"AI Dev OS Backlog"* ]] || fail "ai task did not print the backlog"
+task_output="$(cd "$GLOBAL_REPO" && AI_TASK_BACKLOG_FILE="$PENDING_BACKLOG" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" task)"
+[[ "$task_output" == *"AI Dev OS Pending Tasks"* ]] || fail "ai task did not print the pending summary header"
+[[ "$task_output" == *"Pending count: 1"* ]] || fail "ai task did not print the pending task count"
+[[ "$task_output" == *"- Task 99: Example pending task"* ]] || fail "ai task did not summarize pending tasks"
+[[ "$task_output" == *"AI Dev OS Backlog"* ]] || fail "ai task did not print the backlog body"
+task_summary="${task_output%%# AI Dev OS Backlog*}"
+[[ "$task_summary" == *"- Task 99: Example pending task"* ]] || fail "ai task summary did not include the pending task before the backlog body"
+[[ "$task_summary" != *"Example closed task"* ]] || fail "ai task summary included a closed task"
+[[ "$task_output" == *"Title: Example closed task"* ]] || fail "ai task did not preserve the closed task in the backlog body"
+[[ "$task_output" == *"Tracking: #100 (closed)"* ]] || fail "ai task did not preserve closed-task tracking in the backlog body"
+
+no_pending_task_output="$(AI_TASK_BACKLOG_FILE="$NO_PENDING_BACKLOG" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-task")"
+[[ "$no_pending_task_output" == *"AI Dev OS Pending Tasks"* ]] || fail "ai-task did not print the no-pending summary header"
+[[ "$no_pending_task_output" == *"Pending count: 0"* ]] || fail "ai-task did not print the zero pending count"
+[[ "$no_pending_task_output" == *"- none"* ]] || fail "ai-task did not explain the no-pending case"
+[[ "$no_pending_task_output" == *"AI Dev OS Backlog"* ]] || fail "ai-task did not preserve the backlog output in the no-pending case"
+no_pending_summary="${no_pending_task_output%%# AI Dev OS Backlog*}"
+[[ "$no_pending_summary" == *"- none"* ]] || fail "ai-task did not keep the no-pending marker before the backlog body"
 
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-context" --repo "$TEST_REPO" >/dev/null
 [[ -f "$TEST_REPO/.context/summary.md" ]] || fail "ai-context did not create summary.md"

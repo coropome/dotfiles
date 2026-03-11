@@ -445,3 +445,20 @@ Add a template file under a durable docs or tasks location, document when to use
 
 Expected Impact:
 Starting a sprint becomes faster and more consistent, and the `PLANS.md` contract is easier to follow without drifting.
+
+## Task 27
+
+Title: Teach `ai task` to summarize pending backlog work before printing the backlog
+Tracking: #73 (closed)
+
+Problem:
+`ai task` currently dumps `tasks/backlog.md` verbatim. That preserves the raw source of truth, but it makes backlog refinement and next-sprint selection slower because pending work is buried inside the full file.
+
+Improvement Idea:
+Keep `ai task` simple, but prepend a short pending-task summary before the full backlog so the command is useful as a daily backlog-refinement entrypoint.
+
+Implementation Hint:
+Parse task titles and `Tracking:` state from `tasks/backlog.md`, print a compact pending summary first, then print the unchanged backlog body. Update CLI wording and tests to reflect the new behavior.
+
+Expected Impact:
+Operators can use `ai task` to spot next candidates quickly without losing access to the full backlog context.

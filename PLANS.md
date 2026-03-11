@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #71 `docs: add a reusable PLANS.md template for turn-scoped and multi-turn sprints`
-- Branch: `docs/71-plans-template`
-- Memory Artifact: `tasks/sprint-memory/issue-71.md`
-- Resume Point: reusable plan template landed; start the next sprint from a new issue-backed branch and refresh `PLANS.md` from the template
+- Active issue: #73 `feat: teach ai task to summarize pending backlog work before printing the backlog`
+- Branch: `feat/73-ai-task-pending-summary`
+- Memory Artifact: `tasks/sprint-memory/issue-73.md`
+- Resume Point: ai-task summary upgrade landed; next sprint should start from a new issue-backed branch and refresh this plan from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Add a reusable `PLANS.md` template so turn-scoped and intentionally multi-turn sprints start from the canonical shape instead of ad hoc copying.
+Make `ai task` a better backlog-refinement entrypoint by showing pending work first without losing the full backlog output.
 
 ## Working Agreement
 
@@ -33,18 +33,20 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - a reusable `PLANS.md` template for turn-scoped and multi-turn sprints
+  - a pending-summary upgrade for `ai task`
 - concrete surfaces
-  - [`templates/plans/PLANS.md`](./templates/plans/PLANS.md)
-  - [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
+  - [`bin/ai-task`](./bin/ai-task)
+  - [`bin/ai`](./bin/ai)
+  - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`PLANS.md`](./PLANS.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - a reusable plan template exists in the repo
-  - the template covers `turn-scoped` and `multi-turn` use
-  - `docs/93-scrum-delivery.md` points to the template as the recommended starting shape
-  - structure tests guard the template and its canonical fields
+  - `ai task` prints a pending summary before the full backlog
+  - the summary includes task number and title for pending tasks
+  - `ai task` says when there are no pending tasks
+  - help/docs wording reflects summary-plus-backlog behavior
 
 ## Squad
 
@@ -58,13 +60,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#71` is the sprint slice for this turn
+  - issue `#73` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 26 was added and converted into issue `#71`
+  - Task 27 was added and converted into issue `#73`
 - Review / Demo
-  - show the reusable template, docs link, and guard coverage
+  - show the pending summary, no-pending fallback, and full backlog preservation
 - Retrospective
-  - keep the template small enough to guide, not to become process bloat
+  - keep `ai task` lightweight and text-only; do not turn it into an interactive task manager
 
 ## Verification
 
@@ -75,13 +77,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - add [`templates/plans/PLANS.md`](./templates/plans/PLANS.md) as the canonical reusable starting shape
-  - connect [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md) to the template for new sprint setup
-  - keep [`PLANS.md`](./PLANS.md) and [`test/repository_structure.sh`](./test/repository_structure.sh) aligned with the template contract
+  - prepend pending-task summary output in [`bin/ai-task`](./bin/ai-task) while preserving the full backlog body
+  - update [`bin/ai`](./bin/ai) and [`docs/40-cli.md`](./docs/40-cli.md) so `ai task` reads as a backlog-refinement entrypoint
+  - cover pending and no-pending cases, plus summary/body ordering, in [`test/ai_cli.sh`](./test/ai_cli.sh)
 - Retrospective
-  - keep: turning recurring sprint behavior into reusable repo assets
-  - change: give the next sprint a canonical starting file instead of expecting hand-copy from the last plan
-  - stop: relying on the previous `PLANS.md` as the only source for a new sprint skeleton
+  - keep: improving operator entrypoints without adding a new command surface
+  - change: test behavior against fixed backlog fixtures instead of the live repo backlog state
+  - stop: relying on raw file dumps for daily backlog refinement
 - System Updates
   - backlog: updated
   - plans: updated
@@ -95,6 +97,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - make the canonical shape easier to start from, not just easier to verify after the fact
+  - improve operator entrypoints after the planning substrate is stable
 - stop
-  - depending on hand-copying the previous sprint plan as the only bootstrap path
+  - treating `ai task` as a raw file dump when backlog refinement is now part of the operating model
