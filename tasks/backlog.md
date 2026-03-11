@@ -785,3 +785,20 @@ Refactor `bin/ai-agent` around helpers for config-path output, candidate dedupli
 
 Expected Impact:
 `ai-agent` remains behaviorally stable while becoming easier to maintain, review, and extend as workflow routing grows.
+
+## Task 47
+
+Title: Refactor `ai-doctor` control flow and state updates into helpers
+Tracking: pending
+
+Problem:
+`ai-doctor` still mixes filter validation, header/section printing, and warn/fail state mutation directly into the main flow and report functions. Runtime status reporting is already cleaner, but the overall control path still leans on scattered global updates.
+
+Improvement Idea:
+Keep current `ai-doctor` behavior exactly the same, but move filter validation, section rendering, and warn/fail state transitions into small helpers so the script reads as staged reporting instead of interleaved output and state mutation.
+
+Implementation Hint:
+Refactor `bin/ai-doctor` around helpers for validation, section printing, and warning/failure bookkeeping. Extend `test/ai_doctor.sh` with at least one explicit unknown-filter assertion so recovery behavior stays pinned during the refactor.
+
+Expected Impact:
+`ai-doctor` remains behaviorally stable while becoming easier to reason about and extend, especially when new diagnostics are added later.

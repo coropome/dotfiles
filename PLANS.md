@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #111 `chore: refactor ai-agent resolution helpers`
-- Branch: `chore/111-ai-agent-resolution-helpers`
-- Memory Artifact: `tasks/sprint-memory/issue-111.md`
-- Resume Point: ai-agent now routes config-path output, candidate resolution, and describe/recovery paths through helpers; next sprint can keep tightening shell internals or move into expansion work
+- Active issue: #113 `chore: refactor ai-doctor control flow helpers`
+- Branch: `chore/113-ai-doctor-control-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-113.md`
+- Resume Point: ai-doctor now routes filter validation, section printing, and warn/fail bookkeeping through helpers; next sprint can keep tightening shell internals or move into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Refactor `ai-agent` resolution and describe flows so the code stays easy to read and extend without changing the current workflow routing and recovery contracts.
+Refactor `ai-doctor` control flow so the code stays easy to read and extend without changing the current reporting and next-step contracts.
 
 ## Working Agreement
 
@@ -33,16 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - cleaner `ai-agent` resolution and describe flow
+  - cleaner `ai-doctor` reporting control flow
   - concrete surfaces
-  - [`bin/ai-agent`](./bin/ai-agent)
+  - [`bin/ai-doctor`](./bin/ai-doctor)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
   - acceptance slice
-  - `ai-agent` keeps current list, describe, workflow resolution, and launch behavior unchanged
-  - config-path output, candidate resolution, and describe/recovery logic move into clearer helpers
-  - tests lock the refactor with an explicit unknown-workflow recovery assertion
+  - `ai-doctor` keeps current reporting and next-step behavior unchanged
+  - filter validation, section printing, and warn/fail bookkeeping move into clearer helpers
+  - tests lock the refactor with an explicit unknown-workflow assertion
 
 ## Squad
 
@@ -56,30 +56,31 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#111` is the sprint slice for this turn
+  - issue `#113` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 46 was added and converted into issue `#111`
+  - Task 47 was added and converted into issue `#113`
 - Review / Demo
-  - show `bin/ai-agent` reading as helper-based resolution while keeping the same describe and recovery behavior
+  - show `bin/ai-doctor` reading as helper-based reporting flow while keeping the same diagnostics and next steps
 - Retrospective
   - keep shell cleanup moving once user-facing contracts settle
 
 ## Verification
 
 - `bash test/ai_cli.sh`
+- `bash test/ai_doctor.sh`
 - `make lint`
 - `make test`
 
 ## Closeout
 
 - Review / Demo
-  - refactor `ai-agent` resolution and describe flows into helpers without changing routing behavior
-  - keep unknown-workflow and unknown-agent recovery stable
-  - lock the refactor with CLI tests, including explicit unknown-workflow coverage
+  - refactor `ai-doctor` control flow into helpers without changing reporting behavior
+  - keep unknown-filter recovery and next-step guidance stable
+  - lock the refactor with doctor tests, including explicit unknown-workflow coverage
 - Retrospective
   - keep: use small refactors once product wording has stabilized
-  - change: add one explicit recovery-path assertion whenever resolution logic is rearranged
-  - stop: letting `ai-agent` keep accumulating one long staged control path
+  - change: add one explicit recovery-path assertion whenever report control flow is rearranged
+  - stop: letting ai-doctor keep mixing printing and global-state mutation inline
 - System Updates
   - backlog: updated
   - plans: updated
@@ -91,8 +92,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - cleaning heavy shell resolution surfaces once outward behavior is stable
+  - cleaning heavy shell reporting surfaces once outward behavior is stable
 - change
   - lock refactors with a targeted recovery assertion instead of relying only on broad coverage
 - stop
-  - allowing ai-agent resolution, describe, and recovery logic to keep spreading across one control path
+  - allowing ai-doctor validation, section printing, and state updates to keep spreading across one control path

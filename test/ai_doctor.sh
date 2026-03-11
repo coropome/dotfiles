@@ -218,6 +218,11 @@ filtered_output="$(
 [[ "$filtered_output" != *"workflow: unusable"* ]] || fail "filtered ai-doctor output included unrelated workflows"
 [[ "$filtered_output" != *"agent: claude_native"* ]] || fail "filtered ai-doctor output included unrelated agents"
 
+unknown_workflow_output="$(
+  cd "$TEST_REPO" && HOME="$TEST_HOME" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-doctor" --workflow missing 2>&1 >/dev/null || true
+)"
+[[ "$unknown_workflow_output" == *"unknown workflow: missing"* ]] || fail "ai-doctor did not keep the unknown-workflow error"
+
 doctor_failure="$(
   cd "$TEST_REPO"
   set +e
