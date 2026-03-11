@@ -37,6 +37,7 @@ agent-specific compatibility file がある場合も、基本方針は `AGENTS.m
 大きめの仕事や複数ステップの active work は、free-form に進めず [`docs/93-scrum-delivery.md`](./93-scrum-delivery.md) の cadence に従う。
 つまり backlog refinement, sprint commitment, review/demo, retrospective を repo ルールとして回す。
 一方で single-step の小さな変更まで ceremony を肥大化させる必要はなく、issue-first と test/lint を満たした最小運用でよい。
+retrospective の出力は note で終わらせず、必要なら backlog, plans, docs, tests, instructions, ADR へ反映し、圧縮した handoff は `tasks/sprint-memory/issue-<id>.md` に残す。
 
 ## Recommended Labels
 
@@ -77,10 +78,11 @@ issue-first workflow を守りつつ、multi-step work は軽量な Scrum cadenc
 - Review / Demo
   - diff, tests, docs 更新で何を達成したかを示す
 - Retrospective
-  - 次に keep / change / stop することを短く残す
+  - 次に keep / change / stop することを短く残し、必要なら backlog / docs / tests / agent instructions / ADR に反映する
 
 詳細な squad roles, Definition of Ready, Definition of Done は [`docs/93-scrum-delivery.md`](./93-scrum-delivery.md) を参照。
 small sprint では 1 人が複数 role を兼務してよい。
+context loss や handoff が起こる work では、compressed sprint memory artifact を `tasks/sprint-memory/issue-<id>.md` に残す。
 
 ## Branch Naming
 

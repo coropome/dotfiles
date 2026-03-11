@@ -11,6 +11,7 @@ AI Dev OS の delivery は ad hoc な issue hopping に戻さず、backlog refin
 - sprint 中も backlog refinement を止めず、次の候補を粗く整えておく
 - review/demo と retrospective を省略して次の sprint に飛ばない
 - ただし single-step の小さな変更は、issue-first と verification を満たす最小 ceremony でよい
+- retrospective は dead-end note にせず、次の system update と sprint memory まで残す
 
 ## Sprint Planning
 
@@ -47,6 +48,7 @@ Definition of Ready:
 - 実装前に必要な docs と tests の更新箇所を見積もる
 - multi-agent で進める時は write scope を分ける
 - sprint 中の判断は `PLANS.md` と issue に戻せる形にする
+- context loss や handoff に備えて、lane ごとの要点は `tasks/sprint-memory/` に圧縮して残せる形で集める
 
 ## Review / Demo
 
@@ -54,6 +56,7 @@ Definition of Ready:
 - tests / lint の結果を残す
 - newcomer-facing change なら docs surface の一貫性も確認する
 - demo が必要な change では、実行順や利用者の見え方を説明できる状態にする
+- multi-agent sprint では、review/demo までに compressed memory に decisions, lane outcomes, rerun commands を揃える
 
 ## Retrospective
 
@@ -66,6 +69,27 @@ Definition of Ready:
 
 retrospective は長文でなくてよいが、次 sprint の backlog refinement や staffing に効く形で残す。
 最小形なら keep / change / stop を 1 行ずつ残せばよい。
+
+## Retrospective Feedback Loop
+
+retrospective の出口は「感想」ではなく、どこを更新するかが決まっている状態にする。
+
+- backlog
+  - 次 sprint で切る改善候補を `tasks/backlog.md` に足す
+- plans
+  - `PLANS.md` の squad, risk, memory artifact, resume point を更新する
+- docs
+  - operating docs や newcomer docs を更新する
+- tests
+  - durable wording や operating rule を test で固定する
+- instructions
+  - `AGENTS.md` や compatibility instructions を更新する
+- ADR
+  - 長期運用判断として記録が必要かを判断する
+- no-op
+  - 変えるものがなければ、それも retrospective の結果として残す
+
+少なくとも 1 つは「どこに反映したか」を示すか、明示的に no-op を残す。
 
 ## Squad Roles
 
@@ -110,7 +134,41 @@ ceremony の最小成果物は次でよい。
 - Review / Demo
   - tests と diff summary を残す
 - Retrospective
-  - keep / change / stop を短く残す
+  - keep / change / stop を短く残し、反映先か no-op を書く
+
+## Sprint Memory
+
+compressed sprint memory artifact は `tasks/sprint-memory/` に置く。
+`PLANS.md` は live な active-work doc とし、長く残す handoff / memory compression は別 artifact に逃がす。
+
+標準は compressed memory で、full raw chat transcript は標準 artifact にしない。
+raw coordination log は次の時だけ optional で残す。
+
+- 意思決定の根拠が要約だけでは落ちる
+- 複数 lane の非同期判断を監査したい
+- 外部 review 向けに coordination evidence が必要
+
+標準ファイル名:
+
+- compressed memory
+  - `tasks/sprint-memory/issue-<id>.md`
+- optional raw coordination log
+  - `tasks/sprint-memory/raw/issue-<id>.md`
+
+memory artifact の最小項目:
+
+- Sprint
+  - issue, branch, date, lanes
+- Compressed Memory
+  - goal, decisions, constraints, current state, next likely moves, open questions
+- Lane Notes
+  - Product / Delivery / Review などの短い要約
+- Retrospective Output
+  - keep, change, stop, follow-ups
+- System Updates
+  - backlog / plans / docs / tests / instructions / ADR が `updated / not needed / follow-up issue` のどれか
+- Handoff
+  - next agent が最初に読むもの、rerun commands、known risks
 
 ## Definition of Done
 
@@ -122,3 +180,5 @@ ceremony の最小成果物は次でよい。
 - `PLANS.md` is restartable or intentionally closed out
 - review/demo evidence exists
 - retrospective note for the sprint exists in issue, PR, or plan closeout
+- retrospective output is mapped to backlog, plans, docs, tests, instructions, ADR, or explicit no-op
+- multi-agent or handoff-heavy work leaves `tasks/sprint-memory/issue-<id>.md` or explicitly records why one was not needed

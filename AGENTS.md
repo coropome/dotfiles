@@ -22,6 +22,8 @@ Before planning or editing, read:
 - [`docs/41-ai-trust.md`](./docs/41-ai-trust.md)
 - [`tasks/backlog.md`](./tasks/backlog.md)
 
+If you are resuming or handing off multi-step work, also read the latest relevant artifact under [`tasks/sprint-memory/`](./tasks/sprint-memory/).
+
 If the task changes architecture or long-term operating rules, also read:
 
 - [`docs/adr/README.md`](./docs/adr/README.md)
@@ -72,6 +74,7 @@ When the task is large, ambiguous, or expected to take multiple meaningful steps
 
 - Put plans in `PLANS.md` or `docs/adr/` when appropriate.
 - Run the work using the Scrum cadence in [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md).
+- For multi-agent or handoff-heavy work, leave a compressed memory artifact under [`tasks/sprint-memory/`](./tasks/sprint-memory/).
 - A good plan is self-contained, outcome-focused, and kept up to date as work progresses.
 - If a task is too large for one pass, leave the plan in a restartable state for the next agent.
 
@@ -90,6 +93,7 @@ Before marking work done:
 
 - Workflow rules: [`docs/92-development-workflow.md`](./docs/92-development-workflow.md)
 - Scrum cadence: [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
+- Sprint memory: [`tasks/sprint-memory/`](./tasks/sprint-memory/)
 - CLI and config boundaries: [`docs/40-cli.md`](./docs/40-cli.md)
 - Trust defaults: [`docs/41-ai-trust.md`](./docs/41-ai-trust.md)
 - ADR rules: [`docs/adr/README.md`](./docs/adr/README.md)
