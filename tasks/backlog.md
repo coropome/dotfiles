@@ -288,3 +288,20 @@ Start with the smallest safe surface: `bin/p`, editor override handling, and the
 
 Expected Impact:
 New user guidance and shell overrides align with AI Dev OS framing, while existing local configs continue to work unchanged.
+
+## Task 18
+
+Title: Make the demo sample-project README follow the staged AI Dev OS adoption flow
+Tracking: #42
+
+Problem:
+`demo/sample-project/README.md` is still a tiny command list, so the walkthrough and generated starter README are richer than the demo repo's own top-level entrypoint.
+
+Improvement Idea:
+Refactor the demo repo README so it mirrors the local-first AI Dev OS adoption model: inspect starter guidance, run `ai doctor`, inspect workflows, then start the workspace, with CI/runtime guidance clearly secondary.
+
+Implementation Hint:
+Update `demo/sample-project/README.md` together with `docs/05-demo-walkthrough.md` and the demo asset tests so the fixture's top-level README stays aligned with the walkthrough and generated starter semantics.
+
+Expected Impact:
+The demo repo becomes a stronger first-run exemplar of AI Dev OS adoption instead of just a minimal fixture listing commands.

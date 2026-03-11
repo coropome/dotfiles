@@ -25,6 +25,9 @@
 
 ## AI Dev OS Starter Repos
 
+判断に迷った時は、まず local path を `ai doctor -> ai workflows -> ai start` で安定させる。
+generated CI, hosted eval, runtime pinning は local onboarding が通ったあとに切り分ける。
+
 - `ai init` した repo で最初に何を見るか分からない
   - `ai doctor`
   - `ai workflows`

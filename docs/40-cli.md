@@ -16,12 +16,11 @@ codex --version
 
 ## まず使うコマンド
 
-AI Dev OS の入口は `ai --help` と `ai start`。
+AI Dev OS の入口は `ai --help` と `ai start`。starter repo で最初に困り方を切り分ける command は `ai doctor`。
 
 ```bash
 ai --help
 ai init
-ai trust init claude --project
 ai doctor
 ai workflows
 ai agents
@@ -32,6 +31,23 @@ ai start
 `ai --help` は main commands に加えて、現在の repo で有効な workflow alias を表示する。
 workflow に fallback chain がある場合は、`ai --help` がその discovery の入口になる。
 repo に `.ai-dev-os/workflows.yml` や `.ai-dev-os/agents.yml` があれば、その override も discovery output に反映される。
+
+## beginner surface と deeper surface
+
+- beginner surface
+  - `ai start`
+  - `ai init`
+  - `ai doctor`
+  - まず workspace を開き、困り方を切り分けるところまでを担当する
+- deeper surface
+  - `ai workflows`
+  - `ai agents`
+  - `ai-agent --describe --workflow <name>`
+  - fallback chain, prompt metadata, provider/runtime config の見え方を掘る時に使う
+
+この分け方は「初心者には入口を明快にし、慣れた利用者には深く降りられるようにする」ためのもの。
+一時的な wrapper ではなく、長く使う daily tool として surface を整理する。
+trust 設定は beginner surface の常時コマンドというより、`ai doctor` が trust gap を示した時の remediation として使う。
 
 `ai workflows` は `workflow | default agent | description` を基本に、必要なら fallback chain も含めて確認するための一覧。
 `ai agents` は `agent | provider | role | command | description` を表示する。
