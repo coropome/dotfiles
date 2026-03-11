@@ -6,6 +6,7 @@ Required rules:
 
 - do not implement without a GitHub Issue
 - follow [`docs/92-development-workflow.md`](../docs/92-development-workflow.md)
+- for multi-step work, follow [`docs/93-scrum-delivery.md`](../docs/93-scrum-delivery.md)
 - prefer config-driven behavior over vendor-specific shell branching
 - update docs and tests with behavior changes
 - run `make test` and `make lint` before considering work complete

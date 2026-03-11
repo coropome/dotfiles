@@ -313,7 +313,7 @@ The demo repo becomes a stronger first-run exemplar of AI Dev OS adoption instea
 ## Task 19
 
 Title: Tighten README granularity around beginner path vs deeper surfaces
-Tracking: #46
+Tracking: #46 (closed)
 
 Problem:
 The top-level `README.md` now tells the right AI Dev OS story, but its granularity is still uneven. The beginner path, host substrate details, optional CI/runtime lanes, and deeper operator surfaces all live in one document at similar visual weight, which makes the README feel denser than the intended newcomer-first entrypoint.
@@ -326,3 +326,20 @@ Refactor `README.md` so the must-know flow stays visible while more detailed CI/
 
 Expected Impact:
 The README becomes easier to scan for newcomers without losing the advanced-path framing or the durable daily-tool positioning.
+
+## Task 20
+
+Title: Establish a Scrum operating cadence for backlog, delivery, and retrospectives
+Tracking: #49
+
+Problem:
+The repo now has a stronger issue-first workflow and clearer product north star, but ongoing work still depends too much on ad hoc execution. There is no durable repo-level agreement for sprint planning, backlog refinement, review, retrospective cadence, or which skill sets should be staffed for multi-step delivery.
+
+Improvement Idea:
+Define a lightweight Scrum-style operating model for AI Dev OS work so active delivery follows a repeatable cadence with clear roles, explicit refinement, and restartable plans.
+
+Implementation Hint:
+Add a durable doc for Scrum cadence and team lanes, link it from development workflow guidance and plans, and spell out how backlog refinement, sprint commitment, review, and retrospective should be run in this repo.
+
+Expected Impact:
+Longer-running work becomes easier to continue, audit, and parallelize without drifting back into unstructured issue hopping.
