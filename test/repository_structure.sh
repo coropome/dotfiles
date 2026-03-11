@@ -366,12 +366,28 @@ verify_ai_dev_os_docs() {
     || fail "docs/93-scrum-delivery.md does not define system updates"
   grep -Fq "PLANS.md" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not connect Scrum cadence to PLANS.md"
+  grep -Fq "PLANS Closeout Contract" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the PLANS closeout contract"
+  grep -Fq "Sprint Status" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define sprint status in PLANS.md"
+  grep -Fq "## Closeout" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the PLANS closeout section"
+  grep -Fq "not needed in this sprint" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the no-artifact closeout wording"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/PLANS.md" \
     || fail "PLANS.md does not point to docs/93-scrum-delivery.md"
+  grep -Fq "Sprint Status" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not define a sprint status field"
+  grep -Fq "Sprint Scope" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not define a sprint scope field"
   grep -Fq "Memory Artifact" "$REPO/PLANS.md" \
     || fail "PLANS.md does not define a memory artifact field"
+  grep -Fq "Resume Point" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not define a resume point field"
   grep -Fq "tasks/sprint-memory/" "$REPO/PLANS.md" \
     || fail "PLANS.md does not point to tasks/sprint-memory/"
+  grep -Fq "## Closeout" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not define a closeout section"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
@@ -392,6 +408,10 @@ verify_ai_dev_os_docs() {
     || fail "tasks/sprint-memory/README.md does not define compressed memory"
   grep -Fq "System Updates" "$REPO/tasks/sprint-memory/README.md" \
     || fail "tasks/sprint-memory/README.md does not define system updates"
+  grep -Fq "Memory Artifact: tasks/sprint-memory/issue-<id>.md" "$REPO/tasks/sprint-memory/README.md" \
+    || fail "tasks/sprint-memory/README.md does not define the canonical memory artifact handoff"
+  grep -Fq "Memory Artifact: not needed in this sprint" "$REPO/tasks/sprint-memory/README.md" \
+    || fail "tasks/sprint-memory/README.md does not define the no-artifact handoff wording"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not enforce issue-first work"
   grep -Fq "Likely System Updates" "$REPO/.github/ISSUE_TEMPLATE/feature.yml" \

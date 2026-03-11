@@ -12,6 +12,15 @@
 
 single-step の小さな変更では不要なこともある。
 
+`PLANS.md` 側では `Memory Artifact` を必ず明示する。
+
+- artifact を残す
+  - `Memory Artifact: tasks/sprint-memory/issue-<id>.md`
+- artifact が不要
+  - `Memory Artifact: not needed in this sprint`
+
+空欄のまま closeout しない。
+
 ## File Naming
 
 - compressed memory

@@ -411,3 +411,20 @@ Extend the Scrum delivery doc, agent instructions, and ADR set so turn-scoped sp
 
 Expected Impact:
 Collaboration becomes more predictable: each turn has a clear sprint boundary, agents know when to plan and retro, and users get a visible cadence without extra coordination overhead.
+
+## Task 25
+
+Title: Define a PLANS.md closeout contract for turn-scoped sprints
+Tracking: #69 (closed)
+
+Problem:
+The repo now treats one user turn as one sprint by default, but `PLANS.md` still relies on convention to indicate whether a sprint is active, intentionally spanning multiple turns, or fully closed out. That makes stale active-plan state too easy to leave behind after merge.
+
+Improvement Idea:
+Define a small, durable closeout contract for `PLANS.md` so turn-scoped sprints clearly record whether they are active, intentionally multi-turn, or closed, and how they hand off to `tasks/sprint-memory/` when needed.
+
+Implementation Hint:
+Update the Scrum delivery doc, `PLANS.md`, and sprint-memory guidance with a canonical closeout shape, then lock the wording down with narrow structure tests.
+
+Expected Impact:
+The repo keeps a restartable plan surface during active work without leaving misleading active sprint metadata behind after work lands.

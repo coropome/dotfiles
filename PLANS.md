@@ -1,9 +1,12 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #65 `docs: default each user turn to one sprint with agent-run Scrum`
-- Branch: `docs/65-turn-scoped-sprint-rule`
-- Memory Artifact: `not needed in this turn-scoped sprint; fallback location is tasks/sprint-memory/`
+- Sprint Status: `closed`
+- Sprint Scope: `turn-scoped`
+- Active issue: #69 `docs: define a PLANS.md closeout contract for turn-scoped sprints`
+- Branch: `docs/69-plans-closeout-contract`
+- Memory Artifact: `tasks/sprint-memory/issue-69.md`
+- Resume Point: closeout completed for this turn-scoped sprint; next work should start from a new issue-backed sprint
 
 ## North Star
 
@@ -16,7 +19,7 @@
 
 ## Current Goal
 
-Make the collaboration cadence explicit: one user/assistant round-trip defaults to one sprint, and agents are responsible for running planning, execution, review/demo, and retrospective inside that turn unless the issue intentionally spans multiple turns.
+Define a minimal closeout contract for `PLANS.md` so turn-scoped sprints do not leave stale active-plan metadata behind after merge.
 
 ## Working Agreement
 
@@ -30,36 +33,37 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - a durable turn-scoped sprint rule for this collaboration style
+  - a durable `PLANS.md` closeout contract for turn-scoped sprints
 - concrete surfaces
-  - [`docs/92-development-workflow.md`](./docs/92-development-workflow.md)
   - [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
-  - [`AGENTS.md`](./AGENTS.md)
-  - [`.github/copilot-instructions.md`](./.github/copilot-instructions.md)
-  - [`docs/adr/0005-turn-scoped-sprint-cadence.md`](./docs/adr/0005-turn-scoped-sprint-cadence.md)
+  - [`PLANS.md`](./PLANS.md)
+  - [`tasks/sprint-memory/README.md`](./tasks/sprint-memory/README.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - turn-scoped sprint default is explicit
-  - exceptions for intentional multi-turn work are explicit
-  - agent-facing instructions reflect the rule
+  - `docs/93-scrum-delivery.md` defines what `active`, `multi-turn`, and `closed` mean for `PLANS.md`
+  - `PLANS.md` shows the closeout shape for a completed sprint
+  - sprint-memory guidance explains when `PLANS.md` should point to a memory artifact versus `not needed`
 
 ## Squad
 
 - Product / Backlog: Codex
 - Delivery / Scrum: Codex
+- Implementer: Codex
 - Reviewer / QA: Codex
+- Docs / Onboarding specialist: Avicenna
+- Reviewer / QA specialist: Mendel
 
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#65` is the sprint slice for this turn
+  - issue `#69` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 24 was added and converted into issue `#65`
+  - Task 25 was added and converted into issue `#69`
 - Review / Demo
-  - leave proof in docs and structure tests
+  - show the new closeout fields, memory handoff wording, and guard coverage
 - Retrospective
-  - keep the turn-scoped rule lightweight and exception-driven
+  - keep the closeout contract short enough to avoid heavy archival overhead
 
 ## Verification
 
@@ -67,11 +71,30 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - `make lint`
 - `make test`
 
+## Closeout
+
+- Review / Demo
+  - define a canonical `PLANS.md` closeout contract in [`docs/93-scrum-delivery.md`](./docs/93-scrum-delivery.md)
+  - align [`PLANS.md`](./PLANS.md) to the new `Sprint Status` / `Sprint Scope` / `Memory Artifact` / `Resume Point` shape
+  - clarify memory handoff wording in [`tasks/sprint-memory/README.md`](./tasks/sprint-memory/README.md)
+  - lock the contract with [`test/repository_structure.sh`](./test/repository_structure.sh)
+- Retrospective
+  - keep: the turn-scoped sprint rule lightweight and grep-guarded
+  - change: make plan closeout explicit instead of inferring it from merge state
+  - stop: leaving `PLANS.md` in an active-looking state after the sprint is done
+- System Updates
+  - backlog: updated
+  - plans: updated
+  - docs: updated
+  - tests: updated
+  - instructions: not needed
+  - ADR: not needed
+
 ## Retrospective
 
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - make the turn boundary explicit earlier so cadence expectations are visible
+  - define closeout fields explicitly instead of relying on implied plan state
 - stop
-  - relying on implicit conversation rhythm as the only sprint definition
+  - leaving merged work behind with a plan that still reads as active

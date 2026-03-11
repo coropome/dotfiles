@@ -36,6 +36,7 @@ planning の出口は次の状態。
 - 誰が product, delivery, review を持つか分かる
 - 最小形なら 3 行程度の sprint note でもよい
 - current turn が 1 sprint か、intentional multi-turn sprint かが明記されている
+- `PLANS.md` の `Sprint Status` が `active`, `multi-turn`, `closed` のどれかで分かる
 
 ## Backlog Refinement
 
@@ -147,6 +148,37 @@ ceremony の最小成果物は次でよい。
 - Retrospective
   - keep / change / stop を短く残し、反映先か no-op を書く
 
+## PLANS Closeout Contract
+
+`PLANS.md` は active sprint の live doc だが、turn-scoped sprint では merge 後に stale な active state を残さない。
+最低限、次の field を持つ。
+
+- `Sprint Status`
+  - `active`
+    - この turn で進行中の sprint
+  - `multi-turn`
+    - issue が intentionally 次 turn へ続く sprint
+  - `closed`
+    - この turn の sprint が closeout まで終わった状態
+- `Sprint Scope`
+  - `turn-scoped` か `multi-turn`
+- `Memory Artifact`
+  - `tasks/sprint-memory/issue-<id>.md`
+  - または `not needed in this sprint`
+- `Resume Point`
+  - `active` と `multi-turn` では次に何を再開するか
+  - `closed` では closeout 済みであることを短く示す
+
+`Sprint Status: closed` の時は、`PLANS.md` に少なくとも次を残す。
+
+- `## Closeout`
+  - `Review / Demo`
+  - `Retrospective`
+  - `System Updates`
+
+turn-scoped sprint では default として、この closeout shape までその user turn の中で埋める。
+intentionally multi-turn にする時だけ、`Sprint Status: multi-turn` と `Resume Point` を残して次 turn に渡す。
+
 ## Sprint Memory
 
 compressed sprint memory artifact は `tasks/sprint-memory/` に置く。
@@ -158,6 +190,15 @@ raw coordination log は次の時だけ optional で残す。
 - 意思決定の根拠が要約だけでは落ちる
 - 複数 lane の非同期判断を監査したい
 - 外部 review 向けに coordination evidence が必要
+
+`PLANS.md` から sprint memory への handoff は explicit にする。
+
+- multi-agent または handoff-heavy work
+  - `Memory Artifact: tasks/sprint-memory/issue-<id>.md`
+- small sprint で artifact が不要
+  - `Memory Artifact: not needed in this sprint`
+
+どちらでも `Memory Artifact` を空欄にしない。
 
 標準ファイル名:
 
