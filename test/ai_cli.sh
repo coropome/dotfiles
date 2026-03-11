@@ -392,6 +392,12 @@ stdio_output="$(PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TES
 [[ "$(cat "$TMUX_LOG")" == "$tmux_log_before_stdio" ]] || fail "ai-start stdio backend unexpectedly touched tmux"
 PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" --backend stdio --stop >/dev/null
 
+unknown_backend_failure="$(
+  PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-start" --repo "$TEST_REPO" --backend invalid 2>&1 >/dev/null || true
+)"
+[[ "$unknown_backend_failure" == *"unknown workspace backend: invalid"* ]] || fail "ai-start did not keep the unknown-backend error"
+[[ "$unknown_backend_failure" == *"usage: ai-start [--repo PATH] [--backend <tmux|stdio>] [--stop]"* ]] || fail "ai-start did not keep usage in the unknown-backend error"
+
 start_failure="$(
   PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" 2>&1 >/dev/null || true
 )"

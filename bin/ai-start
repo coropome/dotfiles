@@ -29,6 +29,18 @@ Hints:
 EOF
 }
 
+is_supported_backend() {
+  local candidate="${1:-}"
+  case "$candidate" in
+    tmux|stdio)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 platform_remediation() {
   case "$(uname -s)" in
     Darwin)
@@ -54,6 +66,84 @@ require_command() {
     echo "$alternative" >&2
   fi
   exit 1
+}
+
+validate_backend() {
+  local candidate="$1"
+
+  if is_supported_backend "$candidate"; then
+    return 0
+  fi
+
+  echo "unknown workspace backend: $candidate" >&2
+  usage >&2
+  exit 2
+}
+
+stop_workspace_backend() {
+  local backend="$1"
+  local session="$2"
+
+  case "$backend" in
+    tmux)
+      require_command tmux "$(platform_remediation)"
+      if tmux has-session -t "$session" >/dev/null 2>&1; then
+        tmux kill-session -t "$session"
+      fi
+      ;;
+    stdio)
+      ;;
+  esac
+}
+
+launch_tmux_workspace() {
+  local session="$1"
+  local window="$2"
+  local repo="$3"
+  local context_cmd="$4"
+
+  require_command tmux "$(platform_remediation)" "if you only need a non-tmux path: ai start --backend stdio"
+  if ! tmux has-session -t "$session" >/dev/null 2>&1; then
+    tmux new-session -d -s "$session" -n "$window" -c "$repo"
+    tmux split-window -v -t "$session:$window.1" -c "$repo"
+    tmux send-keys -t "$session:$window.2" "$context_cmd" C-m
+    tmux select-layout -t "$session:$window" "${AI_TMUX_LAYOUT_PRESET:-tiled}"
+    tmux select-pane -t "$session:$window.1"
+  fi
+
+  printf '%s\n' "$session"
+}
+
+launch_workspace_backend() {
+  local backend="$1"
+  local session="$2"
+  local window="$3"
+  local repo="$4"
+  local context_cmd="$5"
+
+  case "$backend" in
+    tmux)
+      launch_tmux_workspace "$session" "$window" "$repo" "$context_cmd"
+      ;;
+    stdio)
+      printf 'stdio\n'
+      ;;
+  esac
+}
+
+attach_workspace_backend() {
+  local backend="$1"
+  local session="$2"
+
+  case "$backend" in
+    tmux)
+      if [[ -t 1 && -z "${TMUX:-}" ]]; then
+        exec tmux attach-session -t "$session"
+      fi
+      ;;
+    stdio)
+      ;;
+  esac
 }
 
 repo_path=""
@@ -87,15 +177,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-case "$backend_name" in
-  tmux|stdio)
-    ;;
-  *)
-    echo "unknown workspace backend: $backend_name" >&2
-    usage >&2
-    exit 2
-    ;;
-esac
+validate_backend "$backend_name"
 
 target_repo="$(ai_target_repo_root "${repo_path:-$PWD}")"
 window_name="${AI_TMUX_WINDOW_NAME:-workspace}"
@@ -104,16 +186,7 @@ session_name="$(ai_session_name "$target_repo" "$TMUX_LAYOUT")"
 context_command="$REPO_ROOT/bin/ai-context --repo $target_repo --show"
 
 if [[ $stop_requested -eq 1 ]]; then
-  case "$backend_name" in
-    tmux)
-      require_command tmux "$(platform_remediation)"
-      if tmux has-session -t "$session_name" >/dev/null 2>&1; then
-        tmux kill-session -t "$session_name"
-      fi
-      ;;
-    stdio)
-      ;;
-  esac
+  stop_workspace_backend "$backend_name" "$session_name"
   exit 0
 fi
 
@@ -122,22 +195,7 @@ if ! "$REPO_ROOT/bin/ai-context" --repo "$target_repo" >/dev/null; then
   exit 1
 fi
 
-case "$backend_name" in
-  tmux)
-    require_command tmux "$(platform_remediation)" "if you only need a non-tmux path: ai start --backend stdio"
-    if ! tmux has-session -t "$session_name" >/dev/null 2>&1; then
-      tmux new-session -d -s "$session_name" -n "$window_name" -c "$target_repo"
-      tmux split-window -v -t "$session_name:$window_name.1" -c "$target_repo"
-      tmux send-keys -t "$session_name:$window_name.2" "$context_command" C-m
-      tmux select-layout -t "$session_name:$window_name" "${AI_TMUX_LAYOUT_PRESET:-tiled}"
-      tmux select-pane -t "$session_name:$window_name.1"
-    fi
-    workspace_label="$session_name"
-    ;;
-  stdio)
-    workspace_label="stdio"
-    ;;
-esac
+workspace_label="$(launch_workspace_backend "$backend_name" "$session_name" "$window_name" "$target_repo" "$context_command")"
 
 printf 'AI Dev OS workspace ready: %s\n' "$workspace_label"
 printf 'Workspace: %s\n' "$target_repo"
@@ -145,6 +203,4 @@ printf 'Backend: %s\n' "$backend_name"
 printf 'Next: ai doctor | ai workflows\n'
 printf 'Then: ai code | ai review | ai task | ai agents\n'
 
-if [[ "$backend_name" == "tmux" && -t 1 && -z "${TMUX:-}" ]]; then
-  exec tmux attach-session -t "$session_name"
-fi
+attach_workspace_backend "$backend_name" "$session_name"
