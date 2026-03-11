@@ -44,6 +44,16 @@ assert_file() {
   [[ -f "$path" ]] || fail "expected file: $path"
 }
 
+assert_occurrence_count() {
+  local file="$1"
+  local needle="$2"
+  local expected_count="$3"
+  local actual_count
+
+  actual_count="$(grep -Fc -- "$needle" "$file")"
+  [[ "$actual_count" == "$expected_count" ]] || fail "$file expected $expected_count occurrences of '$needle' but found $actual_count"
+}
+
 git init -q "$TARGET_REPO"
 git init -q "$NO_HOSTED_REPO"
 git init -q "$NO_GHA_REPO"
@@ -99,6 +109,7 @@ grep -Fq "ai start --backend stdio" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the stdio ai-start option"
 grep -Fq "## If Something Fails" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the failure model"
+assert_occurrence_count "$TARGET_REPO/.ai-dev-os/README.md" "## If Something Fails" "1"
 grep -Fq "local onboarding problem" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document local onboarding remediation"
 grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$TARGET_REPO/.ai-dev-os/README.md" \
@@ -155,6 +166,7 @@ grep -Fq "use this when hosted backend comparison becomes worth the extra creden
   || fail "ai init --no-hosted-eval lost hosted eval adoption reasoning"
 grep -Fq "## If Something Fails" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost the failure model"
+assert_occurrence_count "$NO_HOSTED_REPO/.ai-dev-os/README.md" "## If Something Fails" "1"
 grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost CI/runtime remediation"
 grep -Fq ".github/workflows/ai-dev-os-pr.yml" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
@@ -181,6 +193,7 @@ grep -Fq "use this when hosted backend comparison becomes worth the extra creden
   || fail "ai init --no-github-actions lost hosted eval adoption reasoning"
 grep -Fq "## If Something Fails" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost the failure model"
+assert_occurrence_count "$NO_GHA_REPO/.ai-dev-os/README.md" "## If Something Fails" "1"
 grep -Fq "use \`ai doctor\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost local remediation"
 grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \

@@ -734,3 +734,20 @@ Refactor `bin/ai-doctor` around helpers for file-backed runtime status and direc
 
 Expected Impact:
 `ai-doctor` becomes easier to maintain and extend without changing the beginner-facing diagnostics or next-step contract.
+
+## Task 44
+
+Title: Refactor `ai-init` starter README generation into section helpers
+Tracking: #107 (closed)
+
+Problem:
+`ai-init` builds the starter README with large conditional blocks that repeat the failure model and adoption guidance across the GitHub Actions variants. The output is correct, but the implementation makes wording drift more likely over time.
+
+Improvement Idea:
+Keep the generated README exactly the same, but break the content generation into small reusable section helpers so the variant-specific differences are isolated.
+
+Implementation Hint:
+Refactor `bin/ai-init` around helper functions for repeated README sections and add a targeted test assertion that protects against accidentally duplicating a major section during the refactor.
+
+Expected Impact:
+Starter README generation stays behaviorally stable while becoming easier to maintain when onboarding wording evolves.
