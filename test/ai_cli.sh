@@ -428,6 +428,14 @@ review_fallback_output="$(
 assert_contains "$CLAUDE_LOG" "claude --append-system-prompt Workflow prompt"
 assert_contains "$CLAUDE_LOG" "--fallback-check"
 assert_contains "$CLAUDE_LOG" "source: $REPO/prompts/implementer.md"
+
+unknown_ai_output="$(
+  PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" not-a-command 2>&1 >/dev/null || true
+)"
+[[ "$unknown_ai_output" == *"unknown ai command: not-a-command"* ]] || fail "ai did not keep the unknown-command error"
+[[ "$unknown_ai_output" == *"run \`ai doctor\` to diagnose repo/runtime readiness first"* ]] || fail "ai did not keep doctor-first unknown-command guidance"
+[[ "$unknown_ai_output" == *"run \`ai workflows\` to see available workflow aliases and descriptions"* ]] || fail "ai did not keep workflow discovery guidance on unknown command"
+[[ "$unknown_ai_output" == *"usage: ai <command> [args...]"* ]] || fail "ai did not keep usage in the unknown-command output"
 cat > "$STUB_BIN/codex" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
