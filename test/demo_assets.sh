@@ -34,6 +34,19 @@ assert_same_file "$GENERATED/.ai-dev-os/prompts/review.prompt.yml" "$DEMO/.ai-de
 assert_same_file "$GENERATED/.github/workflows/ai-dev-os-pr.yml" "$DEMO/.github/workflows/ai-dev-os-pr.yml"
 assert_same_file "$GENERATED/.github/workflows/ai-dev-os-hosted-eval.yml" "$DEMO/.github/workflows/ai-dev-os-hosted-eval.yml"
 
+grep -Fq "Stage 1: inspect the local starter first" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing stage 1 guidance"
+grep -Fq "ai doctor" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing ai doctor"
+grep -Fq "ai workflows" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing ai workflows"
+grep -Fq "ai start --repo demo/sample-project" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing ai start"
+grep -Fq "docs/42-github-actions.md" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing CI/runtime guidance"
+grep -Fq "make doctor" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing bootstrap guidance"
+
 grep -Fq "ai start" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai start"
 grep -Fq "ai review" "$REPO/docs/05-demo-walkthrough.md" \
@@ -42,6 +55,8 @@ grep -Fq "ai eval review" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai eval review"
 grep -Fq "ai doctor" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai doctor"
+grep -Fq "sed -n '1,200p' README.md" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing demo README inspection"
 grep -Fq "sed -n '1,200p' .ai-dev-os/README.md" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing starter README inspection"
 grep -Fq "Stage 1: local onboarding" "$REPO/docs/05-demo-walkthrough.md" \

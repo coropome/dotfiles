@@ -1,8 +1,8 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #40 `refactor: add AI Dev OS env aliases for user-facing overrides`
-- Branch: `feat/40-ai-dev-os-env-aliases`
+- Active issue: #42 `docs: make demo sample-project README follow staged AI Dev OS adoption`
+- Branch: `docs/42-demo-readme-staged-adoption`
 
 ## MVP
 
@@ -17,14 +17,14 @@ Current newcomer MVP:
 
 ## Current Goal
 
-Add AI Dev OS env aliases for user-facing override variables while keeping `DITFILES_*` as backward-compatible fallbacks.
+Make the demo sample-project README a top-level staged AI Dev OS adoption entrypoint aligned with the walkthrough and generated starter semantics.
 
 ## Acceptance Slice
 
-- `bin/p` prefers `AI_DEV_OS_PROJECT_ROOTS` and `AI_DEV_OS_PROJECT_MAX_DEPTH` while keeping fallback support
-- editor override logic accepts `AI_DEV_OS_EDITOR` and `AI_DEV_OS_FORCE_VIM`
-- newcomer docs recommend `AI_DEV_OS_*` names for new configs and note backward compatibility
-- tests cover alias precedence and compatibility behavior
+- `demo/sample-project/README.md` explains the local-first staged adoption flow
+- the demo README points to `ai doctor`, `ai workflows`, and `ai start` in order
+- CI/runtime guidance remains secondary and points back to the runtime repo doc split
+- walkthrough and demo tests stay aligned with the new README
 
 ## Scout Lanes
 
