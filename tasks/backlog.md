@@ -683,3 +683,20 @@ Update `bin/ai-start`, sync `docs/40-cli.md`, and extend `test/ai_cli.sh` plus s
 
 Expected Impact:
 Users can discover the right launch mode directly from `ai-start --help` instead of inferring it from broader docs or trial and error.
+
+## Task 41
+
+Title: Make the demo sample-project README backend-aware
+Tracking: #101 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but `demo/sample-project/README.md` still describes Stage 3 as if the demo workspace is tmux-only.
+
+Improvement Idea:
+Keep the staged demo flow intact, but make Stage 3 say that `tmux` is the current default backend and `ai start --backend stdio` is the lighter non-tmux alternative.
+
+Implementation Hint:
+Update `demo/sample-project/README.md`, extend `test/demo_assets.sh`, and add a narrow repository-structure guard so the sample entrypoint stays aligned with the backend contract.
+
+Expected Impact:
+The demo fixture tells the same backend story as the starter README, walkthrough, and CLI surfaces, so the sample no longer reads like tmux is mandatory.

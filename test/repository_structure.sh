@@ -277,6 +277,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/99-troubleshooting.md does not mention ai trust remediation"
   grep -Fq "ai start --backend stdio" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not mention the stdio ai-start escape hatch"
+  grep -Fq "current default backend is \`tmux\`" "$REPO/demo/sample-project/README.md" \
+    || fail "demo sample-project README does not describe tmux as the current default backend"
+  grep -Fq "ai start --repo demo/sample-project --backend stdio" "$REPO/demo/sample-project/README.md" \
+    || fail "demo sample-project README does not mention the stdio ai-start alternative"
   grep -Fq "ai start --backend stdio" "$REPO/demo/sample-project/.ai-dev-os/README.md" \
     || fail "demo starter README does not mention the stdio ai-start option"
   grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
