@@ -428,3 +428,20 @@ Update the Scrum delivery doc, `PLANS.md`, and sprint-memory guidance with a can
 
 Expected Impact:
 The repo keeps a restartable plan surface during active work without leaving misleading active sprint metadata behind after work lands.
+
+## Task 26
+
+Title: Add a reusable PLANS.md template for turn-scoped and multi-turn sprints
+Tracking: #71 (closed)
+
+Problem:
+The repo now defines what `PLANS.md` must contain, but starting a new sprint still depends on hand-copying the current file shape. That keeps the plan contract durable in theory while leaving setup ergonomics inconsistent in practice.
+
+Improvement Idea:
+Add a small reusable template for `PLANS.md` that covers both turn-scoped and intentionally multi-turn sprints, so new work starts from the canonical shape instead of ad hoc copying.
+
+Implementation Hint:
+Add a template file under a durable docs or tasks location, document when to use it from the Scrum delivery docs, and add a narrow structure test so the template keeps the canonical fields and closeout sections.
+
+Expected Impact:
+Starting a sprint becomes faster and more consistent, and the `PLANS.md` contract is easier to follow without drifting.

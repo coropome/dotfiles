@@ -182,6 +182,7 @@ verify_layout_scaffold() {
   assert_dir "$REPO/manifests/packages"
   assert_dir "$REPO/manifests/tmux"
   assert_dir "$REPO/templates/github-actions"
+  assert_dir "$REPO/templates/plans"
   assert_dir "$REPO/templates/ai-trust"
   assert_dir "$REPO/zsh/modules"
   assert_dir "$REPO/tmux/conf.d"
@@ -206,6 +207,7 @@ verify_layout_scaffold() {
   assert_file "$REPO/demo/sample-project/.ai-dev-os/prompts/review.prompt.yml"
   assert_file "$REPO/templates/github-actions/ai-dev-os-pr.yml"
   assert_file "$REPO/templates/github-actions/ai-dev-os-hosted-eval.yml"
+  assert_file "$REPO/templates/plans/PLANS.md"
   assert_file "$REPO/templates/ai-trust/claude-settings.json"
   assert_file "$REPO/templates/ai-trust/codex-config.toml"
   assert_file "$REPO/templates/ai-trust/gemini-settings.json"
@@ -368,6 +370,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/93-scrum-delivery.md does not connect Scrum cadence to PLANS.md"
   grep -Fq "PLANS Closeout Contract" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define the PLANS closeout contract"
+  grep -Fq "templates/plans/PLANS.md" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not point to the reusable PLANS template"
   grep -Fq "Sprint Status" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define sprint status in PLANS.md"
   grep -Fq "## Closeout" "$REPO/docs/93-scrum-delivery.md" \
@@ -388,6 +392,18 @@ verify_ai_dev_os_docs() {
     || fail "PLANS.md does not point to tasks/sprint-memory/"
   grep -Fq "## Closeout" "$REPO/PLANS.md" \
     || fail "PLANS.md does not define a closeout section"
+  grep -Fq "Sprint Status" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not define sprint status"
+  grep -Fq "Sprint Scope" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not define sprint scope"
+  grep -Fq "Memory Artifact" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not define memory artifact"
+  grep -Fq "Resume Point" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not define a resume point field"
+  grep -Fq "## Closeout" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not define a closeout section"
+  grep -Fq "multi-turn" "$REPO/templates/plans/PLANS.md" \
+    || fail "templates/plans/PLANS.md does not cover multi-turn sprints"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
