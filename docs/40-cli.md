@@ -22,14 +22,13 @@ AI Dev OS の入口は `ai --help` と `ai start`。starter repo で最初に困
 ai --help
 ai init
 ai doctor
-ai task
 ai workflows
 ai agents
 ai-agent --describe --workflow review
 ai start
 ```
 
-`ai --help` は main commands に加えて、現在の repo で有効な workflow alias を表示する。
+`ai --help` は main commands に加えて、runtime repo path の `ai doctor -> ai start`、starter repo path の `ai init -> ai doctor -> ai workflows -> ai start`、その後ろに `deeper use` を表示する。
 workflow に fallback chain がある場合は、`ai --help` がその discovery の入口になる。
 repo に `.ai-dev-os/workflows.yml` や `.ai-dev-os/agents.yml` があれば、その override も discovery output に反映される。
 

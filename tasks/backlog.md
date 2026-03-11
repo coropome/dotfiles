@@ -479,3 +479,20 @@ Adjust `bin/ai-start` output and add tests that lock in the post-start guidance 
 
 Expected Impact:
 Users who launch a workspace get the same next-step guidance they see everywhere else, which makes onboarding and daily use more consistent.
+
+## Task 29
+
+Title: Teach `ai --help` to show the beginner path before deeper commands
+Tracking: #77 (closed)
+
+Problem:
+`ai --help` still behaves mainly like a flat command catalog. That makes the highest-traffic CLI entrypoint weaker than the repo's actual beginner path, which now centers on `ai doctor`, `ai workflows`, and `ai start`.
+
+Improvement Idea:
+Keep `ai --help` compact, but add a short beginner-first path ahead of the workflow shortcut catalog so new users can see the recommended next steps without reading the entire command list.
+
+Implementation Hint:
+Add a small `First Steps` section to `bin/ai`, update CLI docs wording, and lock the ordering down in tests so `ai doctor` / `ai workflows` stay ahead of deeper commands.
+
+Expected Impact:
+The most common CLI discovery surface tells the same story as the rest of the repo, which reduces onboarding drift and makes the daily entrypoint more trustworthy.
