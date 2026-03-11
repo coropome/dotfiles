@@ -632,3 +632,20 @@ Update `bin/ai-doctor`, sync `docs/40-cli.md`, and extend `test/ai_doctor.sh` pl
 
 Expected Impact:
 Users can move from diagnosis to the right `ai start` path faster, without reading tmux-only intent into the doctor output.
+
+## Task 38
+
+Title: Teach `ai --help` the `ai start` backend contract
+Tracking: #95 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but `ai --help` still reads like the launch surface has only one path.
+
+Improvement Idea:
+Keep the first-steps block compact, but add a backend note that makes the current `tmux` default and the `stdio` alternative visible from the highest-traffic CLI entrypoint.
+
+Implementation Hint:
+Update `bin/ai`, sync `docs/40-cli.md`, and extend `test/ai_cli.sh` plus structure guards so the backend note stays ordered between the runtime and starter paths.
+
+Expected Impact:
+Users can discover the non-tmux path from `ai --help` without losing the beginner-first ordering or the current tmux-default story.

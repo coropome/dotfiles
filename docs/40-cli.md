@@ -28,7 +28,7 @@ ai-agent --describe --workflow review
 ai start
 ```
 
-`ai --help` は main commands に加えて、runtime repo path の `ai doctor -> ai start`、starter repo path の `ai init -> ai doctor -> ai workflows -> ai start`、その後ろに `deeper use` を表示する。
+`ai --help` は main commands に加えて、runtime repo path の `ai doctor -> ai start`、その直後に `backend` note として `tmux` default / `ai start --backend stdio`、starter repo path の `ai init -> ai doctor -> ai workflows -> ai start`、その後ろに `deeper use` を表示する。
 workflow に fallback chain がある場合は、`ai --help` がその discovery の入口になる。
 repo に `.ai-dev-os/workflows.yml` や `.ai-dev-os/agents.yml` があれば、その override も discovery output に反映される。
 unknown command に当たった時も、`ai` は `ai doctor` を先に、`ai workflows` を次に案内する。
