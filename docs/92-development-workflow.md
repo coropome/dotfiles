@@ -68,6 +68,7 @@ retrospective の出力は note で終わらせず、必要なら backlog, plans
 ## Scrum Cadence For Multi-Step Work
 
 issue-first workflow を守りつつ、multi-step work は軽量な Scrum cadence で回す。
+この collaboration では default として 1 user turn を 1 sprint slice とみなす。
 
 - Sprint Planning
   - 今回の sprint で close する issue と acceptance slice を決める
