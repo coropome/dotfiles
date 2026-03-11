@@ -47,7 +47,7 @@ agent CLI が足りない時:
 - `docs/99-troubleshooting.md`
 - trust config の starter は `ai trust init claude --project`
 
-この時の使い分けは、workflow / prompt / trust / fallback / runtime config なら `ai doctor`、bootstrap / symlink / PATH / shell / system state なら `make doctor`。
+この時の使い分けは、workflow / prompt / trust / fallback / runtime config なら `ai doctor`、host bootstrap / symlink / PATH / shell / system state なら `make doctor`。
 
 `ai code` / `ai review` / `ai improve` は起動時に repo context を更新し、workflow に紐づく prompt metadata を vendor CLI へ渡す。
 launch 詳細を見たい時は `ai-agent --describe --workflow <name>` を使う。

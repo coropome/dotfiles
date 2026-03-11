@@ -37,10 +37,10 @@ If a workflow cannot launch as expected, run `ai doctor` first to inspect fallba
   - use `ai doctor`
   - use this for workflow / prompt / trust / fallback / runtime config issues
 - CI or runtime pinning problem
-  - use `docs/42-github-actions.md`
+  - use the AI Dev OS runtime repo's `docs/42-github-actions.md`
   - use this when local onboarding works but generated GitHub Actions or runtime checkout does not
 - system or bootstrap problem
-  - use `make doctor`
+  - run `make doctor` from the AI Dev OS runtime repo
   - use this for bootstrap / symlink / PATH / shell / system state issues
 
 ## Which Path To Choose
@@ -69,5 +69,5 @@ gh workflow run ai-dev-os-hosted-eval.yml
 
 - `.github/workflows/ai-dev-os-pr.yml` validates prompt artifacts on pull requests and runs a starter smoke path
 - `.github/workflows/ai-dev-os-hosted-eval.yml` is manual opt-in for hosted evals
-- both workflows check out the target repository and `coropome/dotfiles` as the AI Dev OS runtime
+- both workflows check out the target repository and the default AI Dev OS runtime repo (`coropome/dotfiles`)
 - set `AI_DEV_OS_RUNTIME_REPOSITORY` and `AI_DEV_OS_RUNTIME_REF` in those workflows to pin a fork, branch, or tag

@@ -1,6 +1,6 @@
-# CLIツール最小チートシート（ditfiles）
+# CLIツール最小チートシート（AI Dev OS）
 
-目的：入れたはいいが使わない、を防ぐための「最小だけ」まとめ。
+目的：AI Dev OS の newcomer path と、必要最小限の host/runtime helper を短くまとめる。
 
 ## agent CLI の位置づけ
 
@@ -244,7 +244,7 @@ gh pr list
 
 ## delta: git diffを読みやすく
 
-ditfilesでは git の pager を delta に寄せている（install時に ~/.gitconfig に include を追加）。
+host git layer では pager を delta に寄せている（install 時に ~/.gitconfig に include を追加）。
 
 ```bash
 delta --version
@@ -259,7 +259,7 @@ z <dir>           # 近いディレクトリへジャンプ（履歴から）
 zi                # fzfがあれば対話的
 ```
 
-ditfilesでは zshrc で自動的に有効化する（zoxideが入っている場合）。
+host shell layer では zshrc で自動的に有効化する（zoxide が入っている場合）。
 
 ## htop: プロセス監視
 
@@ -305,4 +305,4 @@ ZSH_PROFILE=1 zsh -i -c exit
 ccat file.txt
 ```
 
-※ ditfilesは `cat` を上書きしない（事故防止）。
+※ host layer は `cat` を上書きしない（事故防止）。

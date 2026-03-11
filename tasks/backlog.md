@@ -237,3 +237,20 @@ Update `docs/05-demo-walkthrough.md` and tighten `test/demo_assets.sh` so the wa
 
 Expected Impact:
 The walkthrough becomes a better first-run learning path instead of just a list of commands to try.
+
+## Task 15
+
+Title: Refactor the repo so AI Dev OS is the primary product surface
+Tracking: #36
+
+Problem:
+The repo has already grown beyond a personal dotfiles setup, but many top-level surfaces still frame AI Dev OS as an add-on layered on top of "dotfiles". That makes onboarding, docs, and architecture boundaries feel inconsistent.
+
+Improvement Idea:
+Make AI Dev OS the primary product narrative and treat dotfiles, tmux, and bootstrap assets as underlying host/runtime layers rather than the main identity.
+
+Implementation Hint:
+Start with an ADR and high-signal surfaces such as README, philosophy/ownership docs, development workflow guidance, issue templates, and user-facing CLI wording. Keep the repository name and existing install/runtime mechanics unchanged unless a later issue explicitly changes them.
+
+Expected Impact:
+The repo reads and behaves like an AI workspace platform with host-environment layers, which makes future refactors and onboarding decisions easier to reason about.

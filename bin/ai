@@ -41,7 +41,7 @@ Resolved agent config: $("$BIN_DIR/ai-agent" --config-path agents)
 
 Project-local overrides:
   Put .ai-dev-os/workflows.yml or .ai-dev-os/agents.yml in a repo to override
-  workflow aliases, default agents, and routing without editing this dotfiles repo.
+  workflow aliases, default agents, and routing without editing the shared AI Dev OS runtime repo.
 EOF
 }
 

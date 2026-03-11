@@ -39,15 +39,15 @@ PR 向けの基本 workflow。
 - prompt artifact の local validation
 - `ai workflows` / `ai agents` / `ai-agent --describe --workflow review` などの CLI smoke test
 
-この workflow は target repo 自体に加えて、AI Dev OS runtime repo として `coropome/dotfiles` も checkout して実行する。
-target repo は検査対象、`coropome/dotfiles` は `ai` runtime と shell test asset の参照元として使う。
+この workflow は target repo 自体に加えて、AI Dev OS runtime repo も checkout して実行する。
+target repo は検査対象、runtime repo は `ai` command と shell test asset の参照元として使う。
 
 runtime checkout は次の env で切り替える。
 
 - `AI_DEV_OS_RUNTIME_REPOSITORY`
 - `AI_DEV_OS_RUNTIME_REF`
 
-既定では `coropome/dotfiles` を参照するが、fork に替えたり、branch / tag / fixed ref に pin して再現性を上げられる。
+既定の runtime repo は `coropome/dotfiles` だが、fork に替えたり、branch / tag / fixed ref に pin して再現性を上げられる。
 
 ## ai-dev-os-hosted-eval.yml
 
@@ -57,7 +57,7 @@ Hosted eval 用の optional workflow。
 - manual dispatch で必要な時だけ動かす
 - `gh models eval` など hosted backend を使う前提
 
-これも target repo と `coropome/dotfiles` の両方を checkout する。
+これも target repo と AI Dev OS runtime repo の両方を checkout する。
 hosted eval は opt-in とし、credential や usage policy は repo 側で明示的に管理する。
 こちらも `AI_DEV_OS_RUNTIME_REPOSITORY` と `AI_DEV_OS_RUNTIME_REF` を使って runtime repo と ref を固定できる。
 
@@ -94,7 +94,7 @@ CLI 側の最小説明は `docs/40-cli.md`、beginner 向け導線は `docs/00-q
   - PR 側の変更と runtime 側の変更を同時に疑う時は local path でも再現するか先に見る
 - runtime checkout target が間違っていそう
   - workflow 内の `AI_DEV_OS_RUNTIME_REPOSITORY` と `AI_DEV_OS_RUNTIME_REF` を見る
-  - `coropome/dotfiles` 前提のまま fork 固有の docs / templates / helper を期待していないか確認する
+  - default runtime repo (`coropome/dotfiles`) 前提のまま fork 固有の docs / templates / helper を期待していないか確認する
   - CI failure が local onboarding では再現しないなら runtime pinning の問題を先に疑う
 
 ## Pinning Patterns

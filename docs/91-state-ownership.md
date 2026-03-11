@@ -2,6 +2,8 @@
 
 チームで保守する時に「どこが何を管理しているか」を先に固定するためのメモ。
 
+この repo では AI Dev OS を primary surface とし、dotfiles / tmux / git include / bootstrap は host substrate として扱う。
+
 ## shell script が管理するもの
 
 - symlink の作成 / 削除
@@ -14,6 +16,31 @@
 - `install.sh`
 - `uninstall.sh`
 - `doctor.sh`
+
+## AI Dev OS control plane が管理するもの
+
+- `ai` CLI surface
+- workflow routing
+- agent metadata
+- prompt handoff / context handoff
+- starter repo scaffold
+- trust policy template への導線
+- workflow / trust / starter docs と tests
+
+対象:
+
+- `bin/ai`
+- `bin/ai-agent`
+- `bin/ai-init`
+- `bin/ai-doctor`
+- `bin/ai-trust`
+- `ai/`
+- `prompts/`
+- `templates/ai-trust/`
+- `templates/github-actions/`
+- `docs/40-cli.md`
+- `docs/41-ai-trust.md`
+- `docs/42-github-actions.md`
 
 ## Ansible が管理するもの
 
@@ -29,13 +56,13 @@
 - `ansible/run.sh`
 - `ansible/macos.yml`
 
-## dotfiles 本体が管理するもの
+## host configuration layer が管理するもの
 
 - zsh 設定
 - tmux 設定
 - git の一般設定
 - helper command
-- docs / tests
+- host bootstrap docs / tests
 
 ## plugin manager / 外部ツールに依存するもの
 

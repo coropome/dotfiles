@@ -1,8 +1,8 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #33 `docs/init: keep skip-mode generated README aligned with the default failure and adoption model`
-- Branch: `docs/33-skip-mode-readme-parity`
+- Active issue: #36 `refactor: make AI Dev OS the primary product surface`
+- Branch: `feat/36-ai-dev-os-primary-surface`
 
 ## MVP
 
@@ -17,14 +17,15 @@ Current newcomer MVP:
 
 ## Current Goal
 
-Keep skip-mode generated READMEs semantically aligned with the default starter README so `--no-github-actions` and `--no-hosted-eval` do not lose the same failure/adoption model.
+Refactor the highest-signal surfaces so AI Dev OS is the primary product framing and dotfiles/bootstrap are described as host substrate.
 
 ## Acceptance Slice
 
-- `--no-github-actions` output still explains when to use `ai doctor`, `docs/42-github-actions.md`, and `make doctor`
-- `--no-hosted-eval` output still preserves the local-only / PR CI / hosted eval later model
-- variant READMEs are not semantically thinner than the default README apart from skipped optional surfaces
-- tests cover skip-mode remediation and adoption guidance explicitly
+- ADR records AI Dev OS as the primary product surface
+- README and top-level docs describe AI Dev OS first, with host bootstrap as substrate
+- ownership and philosophy docs separate AI Dev OS control plane from host configuration layers
+- user-facing CLI and generated starter wording stop referring to this repo as a dotfiles repo
+- tests guard the new wording on the most important surfaces
 
 ## Scout Lanes
 
@@ -37,6 +38,6 @@ Keep skip-mode generated READMEs semantically aligned with the default starter R
 
 ## Next Queue
 
-- `docs: normalize ai doctor vs make doctor guidance across newcomer docs`
-- `feat: deepen ai doctor for vendor-native runtime consistency`
-- `docs/demo: sample-project root README を staged adoption と doctor split に揃える`
+- `refactor: reduce runtime repo identity coupling in generated starter guidance and templates`
+- `refactor: rename DITFILES-specific env/help surfaces that still leak host-era naming`
+- `docs/demo: sample-project root README を staged adoption と AI Dev OS-first framing に揃える`

@@ -171,7 +171,7 @@ print_agent_remediation() {
 
   case "$reason" in
     "missing dependency:"*)
-      echo "run: make agent" >&2
+      echo "run: make agent (from the AI Dev OS runtime repo)" >&2
       ;;
     "missing prompt file:"*)
       echo "create the prompt file or update prompt_file/prompt_handoff for $agent_name" >&2
@@ -203,7 +203,7 @@ print_resolution_failure() {
   echo "run: ai doctor" >&2
 
   if [[ "$combined_failures" == *"missing dependency:"* ]]; then
-    echo "run: make agent" >&2
+    echo "run: make agent (from the AI Dev OS runtime repo)" >&2
   fi
 
   if [[ "$combined_failures" == *"missing prompt file:"* ]]; then
