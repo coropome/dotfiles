@@ -217,12 +217,15 @@ verify_layout_scaffold() {
   assert_file "$REPO/context/build-context.sh"
   assert_executable "$REPO/context/build-context.sh"
   assert_file "$REPO/tasks/backlog.md"
+  assert_dir "$REPO/tasks/sprint-memory"
+  assert_file "$REPO/tasks/sprint-memory/README.md"
   assert_file "$REPO/docs/92-development-workflow.md"
   assert_file "$REPO/docs/93-scrum-delivery.md"
   assert_file "$REPO/docs/adr/README.md"
   assert_file "$REPO/docs/adr/0001-ai-dev-os-delivery-workflow.md"
   assert_file "$REPO/docs/adr/0002-ai-dev-os-primary-surface.md"
   assert_file "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md"
+  assert_file "$REPO/docs/adr/0004-ai-dev-os-retro-memory-loop.md"
   assert_file "$REPO/docs/05-demo-walkthrough.md"
   assert_file "$REPO/docs/41-ai-trust.md"
   assert_file "$REPO/docs/42-github-actions.md"
@@ -316,6 +319,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/92-development-workflow.md does not mention backlog refinement"
   grep -Fq "retrospective" "$REPO/docs/92-development-workflow.md" \
     || fail "docs/92-development-workflow.md does not mention retrospective"
+  grep -Fq "tasks/sprint-memory/" "$REPO/docs/92-development-workflow.md" \
+    || fail "docs/92-development-workflow.md does not mention compressed sprint memory"
   grep -Fq "Sprint Planning" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not have a Sprint Planning section"
   grep -Fq "Backlog Refinement" "$REPO/docs/93-scrum-delivery.md" \
@@ -324,6 +329,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/93-scrum-delivery.md does not have a Review / Demo section"
   grep -Fq "Retrospective" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not have a Retrospective section"
+  grep -Fq "Retrospective Feedback Loop" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the retrospective feedback loop"
+  grep -Fq "Sprint Memory" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define sprint memory"
   grep -Fq "Definition of Ready" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define Definition of Ready"
   grep -Fq "Definition of Done" "$REPO/docs/93-scrum-delivery.md" \
@@ -342,10 +351,22 @@ verify_ai_dev_os_docs() {
     || fail "docs/93-scrum-delivery.md does not keep review/demo evidence in Definition of Done"
   grep -Fq "retrospective note for the sprint exists" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not keep the retrospective note in Definition of Done"
+  grep -Fq "backlog, plans, docs, tests, instructions, ADR, or explicit no-op" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not map retrospective output to system updates"
+  grep -Fq "tasks/sprint-memory/issue-<id>.md" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the compressed memory artifact location"
+  grep -Fq "tasks/sprint-memory/raw/issue-<id>.md" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define the optional raw log location"
+  grep -Fq "System Updates" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not define system updates"
   grep -Fq "PLANS.md" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not connect Scrum cadence to PLANS.md"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/PLANS.md" \
     || fail "PLANS.md does not point to docs/93-scrum-delivery.md"
+  grep -Fq "Memory Artifact" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not define a memory artifact field"
+  grep -Fq "tasks/sprint-memory/" "$REPO/PLANS.md" \
+    || fail "PLANS.md does not point to tasks/sprint-memory/"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
@@ -358,12 +379,22 @@ verify_ai_dev_os_docs() {
     || fail "docs/adr/0003-ai-dev-os-scrum-cadence.md does not record the Scrum cadence decision"
   grep -Fq "small changes" "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md" \
     || fail "docs/adr/0003-ai-dev-os-scrum-cadence.md does not keep the small-change escape hatch"
+  grep -Fq "compressed sprint memory" "$REPO/docs/adr/0004-ai-dev-os-retro-memory-loop.md" \
+    || fail "docs/adr/0004-ai-dev-os-retro-memory-loop.md does not record the compressed sprint memory decision"
+  grep -Fq "Compressed Memory" "$REPO/tasks/sprint-memory/README.md" \
+    || fail "tasks/sprint-memory/README.md does not define compressed memory"
+  grep -Fq "System Updates" "$REPO/tasks/sprint-memory/README.md" \
+    || fail "tasks/sprint-memory/README.md does not define system updates"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not enforce issue-first work"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/AGENTS.md" \
     || fail "AGENTS.md does not point to docs/93-scrum-delivery.md"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not point to docs/93-scrum-delivery.md"
+  grep -Fq "tasks/sprint-memory/" "$REPO/AGENTS.md" \
+    || fail "AGENTS.md does not point to tasks/sprint-memory/"
+  grep -Fq "tasks/sprint-memory/" "$REPO/.github/copilot-instructions.md" \
+    || fail ".github/copilot-instructions.md does not point to tasks/sprint-memory/"
   grep -Fq "docs/05-demo-walkthrough.md" "$REPO/README.md" \
     || fail "README.md does not link to the demo walkthrough"
 }

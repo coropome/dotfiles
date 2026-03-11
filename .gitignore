@@ -10,3 +10,6 @@ ansible/local.yml
 
 # AI Dev OS generated context
 .context/
+
+# Optional raw coordination logs for sprint memory compression
+tasks/sprint-memory/raw/
