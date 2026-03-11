@@ -4,6 +4,9 @@
 全部 skip したい時は `--no-github-actions`、hosted eval だけ外したい時は `--no-hosted-eval` を使う。
 generated `.ai-dev-os/README.md` では local onboarding を main path に置き、このページの workflow 操作は optional section として案内する。
 
+starter workflow は shared AI Dev OS runtime を参照する。
+現在の shipped default は `coropome/dotfiles` と `main` だが、これは current default source であって product identity ではない。fork / branch / tag に pin して使える。
+
 生成対象:
 
 - `.github/workflows/ai-dev-os-pr.yml`
@@ -47,7 +50,7 @@ runtime checkout は次の env で切り替える。
 - `AI_DEV_OS_RUNTIME_REPOSITORY`
 - `AI_DEV_OS_RUNTIME_REF`
 
-既定の runtime repo は `coropome/dotfiles` だが、fork に替えたり、branch / tag / fixed ref に pin して再現性を上げられる。
+現在の default runtime source は `coropome/dotfiles` と `main` だが、fork に替えたり、branch / tag / fixed ref に pin して再現性を上げられる。
 
 ## ai-dev-os-hosted-eval.yml
 
@@ -57,7 +60,7 @@ Hosted eval 用の optional workflow。
 - manual dispatch で必要な時だけ動かす
 - `gh models eval` など hosted backend を使う前提
 
-これも target repo と AI Dev OS runtime repo の両方を checkout する。
+これも target repo と shared AI Dev OS runtime の両方を checkout する。
 hosted eval は opt-in とし、credential や usage policy は repo 側で明示的に管理する。
 こちらも `AI_DEV_OS_RUNTIME_REPOSITORY` と `AI_DEV_OS_RUNTIME_REF` を使って runtime repo と ref を固定できる。
 

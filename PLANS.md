@@ -1,8 +1,8 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #36 `refactor: make AI Dev OS the primary product surface`
-- Branch: `feat/36-ai-dev-os-primary-surface`
+- Active issue: #38 `refactor: reduce runtime repo identity coupling in starter guidance and templates`
+- Branch: `feat/38-runtime-repo-decoupling`
 
 ## MVP
 
@@ -17,15 +17,14 @@ Current newcomer MVP:
 
 ## Current Goal
 
-Refactor the highest-signal surfaces so AI Dev OS is the primary product framing and dotfiles/bootstrap are described as host substrate.
+Reduce runtime-repo identity coupling in generated starter guidance and GitHub Actions templates while keeping the current default runtime source compatible.
 
 ## Acceptance Slice
 
-- ADR records AI Dev OS as the primary product surface
-- README and top-level docs describe AI Dev OS first, with host bootstrap as substrate
-- ownership and philosophy docs separate AI Dev OS control plane from host configuration layers
-- user-facing CLI and generated starter wording stop referring to this repo as a dotfiles repo
-- tests guard the new wording on the most important surfaces
+- generated starter README describes a shared AI Dev OS runtime and the current default runtime source separately
+- GitHub Actions starter templates keep default runtime env vars but frame them as overrideable defaults
+- docs/42 explains current default runtime source without treating it as product identity
+- tests guard the less-coupled wording while preserving the default repo/ref behavior
 
 ## Scout Lanes
 
@@ -38,6 +37,6 @@ Refactor the highest-signal surfaces so AI Dev OS is the primary product framing
 
 ## Next Queue
 
-- `refactor: reduce runtime repo identity coupling in generated starter guidance and templates`
 - `refactor: rename DITFILES-specific env/help surfaces that still leak host-era naming`
 - `docs/demo: sample-project root README を staged adoption と AI Dev OS-first framing に揃える`
+- `refactor: separate runtime-repo docs from adopter-repo troubleshooting more explicitly`

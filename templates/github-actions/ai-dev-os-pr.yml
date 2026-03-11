@@ -11,6 +11,7 @@ permissions:
   contents: read
 
 env:
+  # Current default shared AI Dev OS runtime source. Override these to pin a fork, branch, or tag.
   AI_DEV_OS_RUNTIME_REPOSITORY: coropome/dotfiles
   AI_DEV_OS_RUNTIME_REF: main
 
@@ -23,7 +24,7 @@ jobs:
         with:
           path: repo
 
-      - name: Checkout AI Dev OS runtime
+      - name: Checkout shared AI Dev OS runtime
         uses: actions/checkout@v4
         with:
           repository: ${{ env.AI_DEV_OS_RUNTIME_REPOSITORY }}
@@ -49,7 +50,7 @@ jobs:
   starter-smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout AI Dev OS runtime
+      - name: Checkout shared AI Dev OS runtime
         uses: actions/checkout@v4
         with:
           repository: ${{ env.AI_DEV_OS_RUNTIME_REPOSITORY }}

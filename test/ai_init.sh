@@ -70,7 +70,7 @@ grep -Fq "## If Something Fails" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the failure model"
 grep -Fq "local onboarding problem" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document local onboarding remediation"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$TARGET_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document CI/runtime remediation"
 grep -Fq "run \`make doctor\` from the AI Dev OS runtime repo" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document bootstrap remediation"
@@ -84,8 +84,10 @@ grep -Fq "## Optional GitHub Actions Commands" "$TARGET_REPO/.ai-dev-os/README.m
   || fail "ai init did not separate optional GitHub Actions commands"
 grep -Fq ".github/workflows/ai-dev-os-pr.yml" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the PR starter workflow"
-grep -Fq "coropome/dotfiles" "$TARGET_REPO/.ai-dev-os/README.md" \
-  || fail "ai init did not document the runtime repository"
+grep -Fq "shared AI Dev OS runtime" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not describe the shared runtime relationship"
+grep -Fq "current default runtime source is \`coropome/dotfiles\` at \`main\`" "$TARGET_REPO/.ai-dev-os/README.md" \
+  || fail "ai init did not document the current default runtime source"
 grep -Fq "AI_DEV_OS_RUNTIME_REF" "$TARGET_REPO/.ai-dev-os/README.md" \
   || fail "ai init did not document the runtime ref pinning"
 [[ "$(<"$TARGET_REPO/.ai-dev-os/README.md")" != *"$REPO/templates/ai-trust/"* ]] \
@@ -120,7 +122,7 @@ grep -Fq "use this when hosted backend comparison becomes worth the extra creden
   || fail "ai init --no-hosted-eval lost hosted eval adoption reasoning"
 grep -Fq "## If Something Fails" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost the failure model"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval lost CI/runtime remediation"
 grep -Fq ".github/workflows/ai-dev-os-pr.yml" "$NO_HOSTED_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-hosted-eval did not keep PR workflow in README"
@@ -146,7 +148,7 @@ grep -Fq "## If Something Fails" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost the failure model"
 grep -Fq "use \`ai doctor\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost local remediation"
-grep -Fq "use the AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
+grep -Fq "use the current AI Dev OS runtime repo's \`docs/42-github-actions.md\`" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost CI/runtime remediation"
 grep -Fq "run \`make doctor\` from the AI Dev OS runtime repo" "$NO_GHA_REPO/.ai-dev-os/README.md" \
   || fail "ai init --no-github-actions lost bootstrap remediation"

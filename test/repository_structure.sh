@@ -286,6 +286,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/42-github-actions.md does not have an adoption decision guide"
   grep -Fq "AI_DEV_OS_RUNTIME_REF" "$REPO/docs/42-github-actions.md" \
     || fail "docs/42-github-actions.md does not mention runtime pinning"
+  grep -Fq "current default source" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not describe the current default runtime source"
   grep -Fq "AGENTS.md" "$REPO/docs/92-development-workflow.md" \
     || fail "docs/92-development-workflow.md does not mention AGENTS.md"
   grep -Fq "AI Dev OS" "$REPO/docs/90-philosophy.md" \
