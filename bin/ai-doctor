@@ -1,0 +1,416 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+
+usage() {
+  cat <<'EOF'
+usage: ai-doctor [--repo PATH] [--workflow NAME] [--agent NAME]
+
+Examples:
+  ai doctor
+  ai doctor --workflow review
+  ai doctor --agent claude
+  ai doctor --repo /path/to/repo
+EOF
+}
+
+join_with() {
+  local separator="$1"
+  shift
+
+  if [[ $# -eq 0 ]]; then
+    printf '\n'
+    return
+  fi
+
+  local output="$1"
+  shift
+
+  while [[ $# -gt 0 ]]; do
+    output+="$separator$1"
+    shift
+  done
+
+  printf '%s\n' "$output"
+}
+
+resolve_scope_path() {
+  local scope="$1"
+  local raw_path="$2"
+  local expanded_path
+
+  expanded_path="$(ai_expand_home_path "$raw_path")"
+
+  if [[ "$expanded_path" = /* ]]; then
+    printf '%s\n' "$expanded_path"
+    return 0
+  fi
+
+  case "$scope" in
+    project)
+      printf '%s/%s\n' "$TARGET_REPO" "$expanded_path"
+      ;;
+    user)
+      printf '%s/%s\n' "$HOME" "$expanded_path"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+load_agent_metadata() {
+  agent_name="$1"
+  command_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" command)"
+  role_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" role)"
+  provider_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" provider)"
+  prompt_file="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" prompt_file)"
+  prompt_handoff="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" prompt_handoff)"
+  context_handoff="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" context_handoff)"
+  trust_template="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" trust_template)"
+  project_config="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" project_config)"
+  user_config="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" user_config)"
+  mcp_config="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" mcp_config)"
+  project_extensions="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" project_extensions)"
+  docs_url="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" docs_url)"
+  resolved_prompt_file="$(ai_resolve_repo_file "$REPO_ROOT" "$TARGET_REPO" "$prompt_file" || true)"
+  candidate_prompt_file="$(ai_candidate_repo_file "$REPO_ROOT" "$TARGET_REPO" "$prompt_file" || true)"
+  context_file="$(ai_context_summary_file "$TARGET_REPO")"
+}
+
+agent_availability_reason() {
+  if [[ -z "$command_name" ]]; then
+    printf 'unknown agent definition\n'
+    return 0
+  fi
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    printf 'missing dependency: %s\n' "$command_name"
+    return 0
+  fi
+
+  if [[ -n "$prompt_handoff" && "$prompt_handoff" != "none" && -z "$resolved_prompt_file" ]]; then
+    printf 'missing prompt file: %s\n' "${candidate_prompt_file:-$prompt_file}"
+    return 0
+  fi
+
+  printf '\n'
+}
+
+ensure_context_summary() {
+  if [[ "$context_checked" == "1" ]]; then
+    [[ "$context_ready" == "1" ]]
+    return
+  fi
+
+  context_checked="1"
+  if "$BIN_DIR/ai-context" --repo "$TARGET_REPO" >/dev/null 2>&1 && [[ -f "$context_file" ]]; then
+    context_ready="1"
+    context_error=""
+    return 0
+  fi
+
+  context_ready="0"
+  context_error="missing repository context summary: $context_file"
+  return 1
+}
+
+infer_trust_vendor() {
+  local raw_hint="$1"
+
+  case "$raw_hint" in
+    *claude*)
+      printf 'claude\n'
+      ;;
+    *codex*)
+      printf 'codex\n'
+      ;;
+    *gemini*)
+      printf 'gemini\n'
+      ;;
+    *)
+      printf '%s\n' "$agent_name"
+      ;;
+  esac
+}
+
+infer_path_scope() {
+  local raw_path="$1"
+  local expanded_path
+
+  expanded_path="$(ai_expand_home_path "$raw_path")"
+  if [[ "$raw_path" == "~"* || "$expanded_path" == "$HOME"* ]]; then
+    printf 'user\n'
+  else
+    printf 'project\n'
+  fi
+}
+
+runtime_path_remediation() {
+  local trust_vendor="$1"
+  local raw_path="$2"
+  local scope
+
+  scope="$(infer_path_scope "$raw_path")"
+  if [[ "$scope" == "project" ]]; then
+    printf 'run: ai trust init %s --project --repo %s\n' "$trust_vendor" "$TARGET_REPO"
+  else
+    printf 'run: ai trust init %s --user\n' "$trust_vendor"
+  fi
+}
+
+report_workflow() {
+  local workflow_name="$1"
+  local default_agent fallback_agents selected_agent="" candidate_name candidate_reason
+  local is_duplicate workflow_status="OK"
+  local -a candidates=()
+  local -a failures=()
+
+  default_agent="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" default_agent)"
+  fallback_agents="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" fallback_agents)"
+
+  while IFS= read -r candidate_name; do
+    [[ -n "$candidate_name" ]] || continue
+    is_duplicate=0
+    if [[ -n "${candidates[*]-}" ]]; then
+      for existing_candidate in "${candidates[@]}"; do
+        if [[ "$existing_candidate" == "$candidate_name" ]]; then
+          is_duplicate=1
+          break
+        fi
+      done
+    fi
+    [[ $is_duplicate -eq 0 ]] && candidates+=("$candidate_name")
+  done < <(ai_workflow_candidate_agents "$WORKFLOWS_FILE" "$workflow_name")
+
+  printf 'workflow: %s\n' "$workflow_name"
+  printf '  default_agent: %s\n' "${default_agent:-unknown}"
+  [[ -n "$fallback_agents" ]] && printf '  fallback_agents: %s\n' "$fallback_agents"
+  if [[ -n "${candidates[*]-}" ]]; then
+    printf '  resolution_candidates: %s\n' "$(join_with ", " "${candidates[@]}")"
+  else
+    printf '  resolution_candidates:\n'
+  fi
+
+  if [[ -n "${candidates[*]-}" ]]; then
+    for candidate_name in "${candidates[@]}"; do
+      load_agent_metadata "$candidate_name"
+      candidate_reason="$(agent_availability_reason)"
+      if [[ -z "$candidate_reason" ]]; then
+        [[ -z "$selected_agent" ]] && selected_agent="$candidate_name"
+        printf '  candidate %s: OK\n' "$candidate_name"
+        continue
+      fi
+
+      failures+=("$candidate_reason")
+      printf '  candidate %s: FAIL %s\n' "$candidate_name" "$candidate_reason"
+    done
+  fi
+
+  if [[ -z "$selected_agent" ]]; then
+    workflow_status="FAIL no available candidates"
+    overall_exit=1
+  elif [[ "$selected_agent" != "${candidates[0]}" ]]; then
+    workflow_status="WARN fallback to $selected_agent"
+  fi
+
+  printf '  status: %s\n' "$workflow_status"
+  [[ -n "$selected_agent" ]] && printf '  selected_agent: %s\n' "$selected_agent"
+  if [[ -z "$selected_agent" ]]; then
+    printf '  remediation: run make agent and ai trust init/apply for the affected vendor\n'
+  fi
+  printf '\n'
+}
+
+report_agent() {
+  local agent_name="$1"
+  local project_config_path="" user_config_path="" trust_template_path="" mcp_config_path="" project_extensions_path=""
+  local agent_status="OK" trust_vendor=""
+
+  load_agent_metadata "$agent_name"
+  trust_vendor="$(infer_trust_vendor "${command_name:-} ${trust_template:-} ${provider_name:-} ${agent_name}")"
+
+  printf 'agent: %s\n' "$agent_name"
+  printf '  provider: %s\n' "${provider_name:-unknown}"
+  printf '  role: %s\n' "${role_name:-unknown}"
+
+  if [[ -n "$command_name" ]] && command -v "$command_name" >/dev/null 2>&1; then
+    printf '  dependency: OK %s\n' "$command_name"
+  else
+    printf '  dependency: FAIL missing dependency: %s\n' "${command_name:-unknown}"
+    agent_status="FAIL"
+    overall_exit=1
+  fi
+
+  if [[ -n "$prompt_file" ]]; then
+    if [[ -n "$prompt_handoff" && "$prompt_handoff" != "none" && -n "$resolved_prompt_file" ]]; then
+      printf '  prompt_file: OK %s\n' "$resolved_prompt_file"
+    elif [[ -n "$prompt_handoff" && "$prompt_handoff" != "none" ]]; then
+      printf '  prompt_file: FAIL %s\n' "${candidate_prompt_file:-$prompt_file}"
+      agent_status="FAIL"
+      overall_exit=1
+    else
+      printf '  prompt_file: INFO %s (handoff disabled)\n' "${candidate_prompt_file:-$prompt_file}"
+    fi
+  fi
+
+  if [[ -n "$context_handoff" && "$context_handoff" != "none" ]]; then
+    if ensure_context_summary; then
+      printf '  context_summary: OK %s\n' "$context_file"
+    else
+      printf '  context_summary: FAIL %s\n' "$context_error"
+      agent_status="FAIL"
+      overall_exit=1
+    fi
+  fi
+
+  if [[ -n "$trust_template" ]]; then
+    trust_template_path="$REPO_ROOT/$trust_template"
+    if [[ -f "$trust_template_path" ]]; then
+      printf '  trust_template: OK %s\n' "$trust_template_path"
+    else
+      printf '  trust_template: FAIL %s\n' "$trust_template_path"
+      agent_status="FAIL"
+      overall_exit=1
+    fi
+  fi
+
+  if [[ -n "$project_config" ]]; then
+    project_config_path="$(resolve_scope_path project "$project_config")"
+    if [[ -f "$project_config_path" ]]; then
+      printf '  project_config: OK %s\n' "$project_config_path"
+    else
+      printf '  project_config: WARN %s (%s)\n' \
+        "$project_config_path" \
+        "$(runtime_path_remediation "$trust_vendor" "$project_config")"
+      [[ "$agent_status" == "OK" ]] && agent_status="WARN"
+    fi
+  fi
+
+  if [[ -n "$user_config" ]]; then
+    user_config_path="$(resolve_scope_path user "$user_config")"
+    if [[ -f "$user_config_path" ]]; then
+      printf '  user_config: OK %s\n' "$user_config_path"
+    else
+      printf '  user_config: WARN %s (%s)\n' \
+        "$user_config_path" \
+        "$(runtime_path_remediation "$trust_vendor" "$user_config")"
+      [[ "$agent_status" == "OK" ]] && agent_status="WARN"
+    fi
+  fi
+
+  if [[ -n "$mcp_config" ]]; then
+    mcp_config_path="$(resolve_scope_path "$(infer_path_scope "$mcp_config")" "$mcp_config")"
+    if [[ -f "$mcp_config_path" ]]; then
+      printf '  mcp_config: OK %s\n' "$mcp_config_path"
+    else
+      printf '  mcp_config: WARN %s (%s)\n' \
+        "$mcp_config_path" \
+        "$(runtime_path_remediation "$trust_vendor" "$mcp_config")"
+      [[ "$agent_status" == "OK" ]] && agent_status="WARN"
+    fi
+  fi
+
+  if [[ -n "$project_extensions" ]]; then
+    project_extensions_path="$(resolve_scope_path project "$project_extensions")"
+    if [[ -d "$project_extensions_path" ]]; then
+      printf '  project_extensions: OK %s\n' "$project_extensions_path"
+    else
+      printf '  project_extensions: WARN %s (create the directory and add vendor-native project extensions if needed)\n' \
+        "$project_extensions_path"
+      [[ "$agent_status" == "OK" ]] && agent_status="WARN"
+    fi
+  fi
+
+  [[ -n "$docs_url" ]] && printf '  docs: %s\n' "$docs_url"
+  printf '  status: %s\n' "$agent_status"
+  printf '\n'
+}
+
+target_path="$PWD"
+workflow_filter=""
+agent_filter=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      target_path="$2"
+      shift 2
+      ;;
+    --workflow)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      workflow_filter="$2"
+      shift 2
+      ;;
+    --agent)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      agent_filter="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+TARGET_REPO="$(ai_target_repo_root "$target_path")"
+AGENTS_FILE="$(ai_agents_file "$REPO_ROOT" "$TARGET_REPO")"
+WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
+context_file="$(ai_context_summary_file "$TARGET_REPO")"
+context_checked="0"
+context_ready="0"
+context_error=""
+overall_exit=0
+
+if [[ -n "$workflow_filter" ]] && ! ai_has_named_key "$WORKFLOWS_FILE" workflows "$workflow_filter"; then
+  echo "unknown workflow: $workflow_filter" >&2
+  exit 2
+fi
+
+if [[ -n "$agent_filter" ]] && ! ai_has_named_key "$AGENTS_FILE" agents "$agent_filter"; then
+  echo "unknown agent: $agent_filter" >&2
+  exit 2
+fi
+
+printf 'AI Dev OS doctor\n'
+printf 'repo: %s\n' "$TARGET_REPO"
+printf 'agents_config: %s\n' "$AGENTS_FILE"
+printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
+printf '\n'
+
+printf 'Workflow Resolution\n'
+if [[ -n "$workflow_filter" ]]; then
+  report_workflow "$workflow_filter"
+else
+  while IFS= read -r workflow_name; do
+    [[ -n "$workflow_name" ]] || continue
+    report_workflow "$workflow_name"
+  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
+fi
+
+printf 'Agent Diagnostics\n'
+if [[ -n "$agent_filter" ]]; then
+  report_agent "$agent_filter"
+else
+  while IFS= read -r listed_agent; do
+    [[ -n "$listed_agent" ]] || continue
+    report_agent "$listed_agent"
+  done < <(ai_section_keys "$AGENTS_FILE" agents)
+fi
+
+exit "$overall_exit"

@@ -13,19 +13,12 @@ managed_config_specs() {
 }
 
 managed_helper_specs() {
-  printf '%s\n' \
-    "$HOME/.local/bin/tnew|$REPO/bin/tnew|executable" \
-    "$HOME/.local/bin/thelp|$REPO/bin/thelp|executable" \
-    "$HOME/.local/bin/tlist|$REPO/bin/tlist|executable" \
-    "$HOME/.local/bin/tgo|$REPO/bin/tgo|executable" \
-    "$HOME/.local/bin/tkill|$REPO/bin/tkill|executable" \
-    "$HOME/.local/bin/_tpick|$REPO/bin/_tpick|executable" \
-    "$HOME/.local/bin/ttutor|$REPO/bin/ttutor|executable" \
-    "$HOME/.local/bin/p|$REPO/bin/p|executable" \
-    "$HOME/.local/bin/_platform|$REPO/bin/_platform|executable" \
-    "$HOME/.local/bin/_clipboard_copy|$REPO/bin/_clipboard_copy|executable" \
-    "$HOME/.local/bin/_open|$REPO/bin/_open|executable" \
-    "$HOME/.local/bin/_tmux_help|$REPO/bin/_tmux_help|executable"
+  local helper
+
+  while IFS= read -r helper || [[ -n "${helper:-}" ]]; do
+    [[ -z "${helper:-}" || "${helper:0:1}" == "#" ]] && continue
+    printf '%s\n' "$HOME/.local/bin/$helper|$REPO/bin/$helper|executable"
+  done < "$REPO/manifests/helpers.txt"
 }
 
 managed_link_specs() {

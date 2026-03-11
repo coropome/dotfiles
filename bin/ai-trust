@@ -1,0 +1,250 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+AGENTS_FILE="$REPO_ROOT/ai/agents.yml"
+
+usage() {
+  cat <<'EOF'
+usage: ai-trust <init|apply> [vendor] [options]
+
+Commands:
+  init                  generate a starter trust config if missing
+  apply                 write the starter trust config, backing up existing files
+
+Vendors:
+  claude | codex | gemini | all
+
+Options:
+  --vendor <name>       explicit vendor selection
+  --scope <name>        project or user
+  --project             shorthand for --scope project
+  --user                shorthand for --scope user
+  --repo <path>         target repository for project scope
+  -h, --help            show this help
+
+Examples:
+  ai trust init claude --project
+  ai trust apply codex --user
+  ai trust init all --repo /path/to/repo
+EOF
+}
+
+timestamp() {
+  date '+%Y%m%d-%H%M%S'
+}
+
+resolve_target_path() {
+  local scope="$1"
+  local raw_path="$2"
+  local target_repo="$3"
+  local expanded_path
+
+  expanded_path="$(ai_expand_home_path "$raw_path")"
+
+  if [[ "$expanded_path" = /* ]]; then
+    printf '%s\n' "$expanded_path"
+    return 0
+  fi
+
+  case "$scope" in
+    project)
+      printf '%s/%s\n' "$target_repo" "$expanded_path"
+      ;;
+    user)
+      printf '%s/%s\n' "$HOME" "$expanded_path"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+resolve_vendor_field() {
+  local vendor="$1"
+  local field="$2"
+  ai_config_value "$AGENTS_FILE" agents "$vendor" "$field"
+}
+
+apply_vendor_template() {
+  local command_name="$1"
+  local vendor="$2"
+  local scope="$3"
+  local target_repo="$4"
+  local template_rel config_rel template_path target_path backup_path
+
+  template_rel="$(resolve_vendor_field "$vendor" trust_template)"
+  if [[ -z "$template_rel" ]]; then
+    echo "unsupported vendor: $vendor" >&2
+    echo "supported vendors: claude, codex, gemini, all" >&2
+    exit 2
+  fi
+
+  case "$scope" in
+    project)
+      config_rel="$(resolve_vendor_field "$vendor" project_config)"
+      ;;
+    user)
+      config_rel="$(resolve_vendor_field "$vendor" user_config)"
+      ;;
+    *)
+      echo "unsupported trust scope: $scope" >&2
+      echo "supported scopes: project, user" >&2
+      exit 2
+      ;;
+  esac
+
+  if [[ -z "$config_rel" ]]; then
+    echo "vendor $vendor does not define a $scope trust config path" >&2
+    echo "check $AGENTS_FILE or choose the other scope" >&2
+    exit 1
+  fi
+
+  template_path="$REPO_ROOT/$template_rel"
+  if [[ ! -f "$template_path" ]]; then
+    echo "missing trust template: $template_path" >&2
+    exit 1
+  fi
+
+  target_path="$(resolve_target_path "$scope" "$config_rel" "$target_repo")"
+  mkdir -p "$(dirname "$target_path")"
+
+  printf 'vendor: %s\n' "$vendor"
+  printf 'scope: %s\n' "$scope"
+  printf 'template: %s\n' "$template_path"
+  printf 'target: %s\n' "$target_path"
+
+  if [[ -f "$target_path" ]]; then
+    if cmp -s "$template_path" "$target_path"; then
+      printf 'skipped: %s (already matches template)\n' "$target_path"
+      return 0
+    fi
+
+    if [[ "$command_name" == "init" ]]; then
+      printf 'skipped: %s (already exists)\n' "$target_path"
+      printf 'next: ai trust apply %s --scope %s\n' "$vendor" "$scope"
+      return 0
+    fi
+
+    backup_path="$target_path.bak.$(timestamp)"
+    cp "$target_path" "$backup_path"
+    printf 'backup: %s\n' "$backup_path"
+  fi
+
+  cp "$template_path" "$target_path"
+
+  if [[ "$command_name" == "init" ]]; then
+    printf 'generated: %s\n' "$target_path"
+    return 0
+  fi
+
+  printf 'applied: %s\n' "$target_path"
+}
+
+command_name="${1:-}"
+if [[ -z "$command_name" ]]; then
+  usage
+  exit 2
+fi
+
+if [[ "$command_name" == "-h" || "$command_name" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+shift || true
+
+vendor_name=""
+scope_name="project"
+target_path="$PWD"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --vendor)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      vendor_name="$2"
+      shift 2
+      ;;
+    --scope)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      scope_name="$2"
+      shift 2
+      ;;
+    --project)
+      scope_name="project"
+      shift
+      ;;
+    --user)
+      scope_name="user"
+      shift
+      ;;
+    --repo)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      target_path="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [[ -z "$vendor_name" ]]; then
+        vendor_name="$1"
+        shift
+        continue
+      fi
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+case "$command_name" in
+  init|apply)
+    ;;
+  *)
+    echo "unknown ai-trust command: $command_name" >&2
+    usage >&2
+    exit 2
+    ;;
+esac
+
+[[ -n "$vendor_name" ]] || vendor_name="all"
+target_repo="$(ai_target_repo_root "$target_path")"
+
+case "$scope_name" in
+  project|user)
+    ;;
+  *)
+    echo "unsupported trust scope: $scope_name" >&2
+    echo "supported scopes: project, user" >&2
+    exit 2
+    ;;
+esac
+
+declare -a vendors=()
+case "$vendor_name" in
+  all)
+    vendors=(claude codex gemini)
+    ;;
+  claude|codex|gemini)
+    vendors=("$vendor_name")
+    ;;
+  *)
+    echo "unsupported vendor: $vendor_name" >&2
+    echo "supported vendors: claude, codex, gemini, all" >&2
+    exit 2
+    ;;
+esac
+
+for vendor in "${vendors[@]}"; do
+  apply_vendor_template "$command_name" "$vendor" "$scope_name" "$target_repo"
+done

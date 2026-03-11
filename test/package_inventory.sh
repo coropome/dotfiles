@@ -35,8 +35,10 @@ verify_ansible_playbook_uses_package_vars() {
 }
 
 verify_agent_target_uses_manifest() {
-  grep -Fq 'manifests/packages/agent-npm.txt' "$REPO/Makefile" \
-    || fail "make agent does not read manifests/packages/agent-npm.txt"
+  grep -Fq 'manifests/packages/agent-brew.txt' "$REPO/Makefile" \
+    || fail "make agent does not read manifests/packages/agent-brew.txt"
+  grep -Fq 'manifests/packages/agent-cask.txt' "$REPO/Makefile" \
+    || fail "make agent does not read manifests/packages/agent-cask.txt"
 }
 
 verify_brewfile_matches_manifest

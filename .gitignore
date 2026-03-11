@@ -6,3 +6,7 @@
 
 # Ansible: マシン固有変数（git_name / git_email など）
 ansible/local.yml
+.context/
+
+# AI Dev OS generated context
+.context/

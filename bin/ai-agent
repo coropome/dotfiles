@@ -1,0 +1,526 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+TARGET_REPO="$(ai_target_repo_root "$PWD")"
+AGENTS_FILE="$(ai_agents_file "$REPO_ROOT" "$TARGET_REPO")"
+WORKFLOWS_FILE="$(ai_workflows_file "$REPO_ROOT" "$TARGET_REPO")"
+
+usage() {
+  cat <<'EOF'
+usage: ai-agent [options] [agent-name [args...]]
+
+Options:
+  --list                 list configured agents with provider and role metadata
+  --list-workflows       list configured workflows with descriptions
+  --describe             print resolved agent metadata
+  --workflow <name>      resolve and run or describe a workflow
+  --config-path <kind>   print the resolved config path for agents or workflows
+  -h, --help             show this help
+
+Examples:
+  ai-agent --list
+  ai-agent --list-workflows
+  ai-agent --describe reviewer
+  ai-agent --describe --workflow review
+  ai-agent --workflow code
+EOF
+}
+
+join_with() {
+  local separator="$1"
+  shift
+
+  if [[ $# -eq 0 ]]; then
+    printf '\n'
+    return
+  fi
+
+  local output="$1"
+  shift
+
+  while [[ $# -gt 0 ]]; do
+    output+="$separator$1"
+    shift
+  done
+
+  printf '%s\n' "$output"
+}
+
+append_block() {
+  local current="${1:-}"
+  local addition="${2:-}"
+
+  if [[ -z "$addition" ]]; then
+    printf '%s' "$current"
+    return
+  fi
+
+  if [[ -z "$current" ]]; then
+    printf '%s' "$addition"
+    return
+  fi
+
+  printf '%s\n\n%s' "$current" "$addition"
+}
+
+render_handoff_block() {
+  local title="$1"
+  local source_path="$2"
+  local body="$3"
+
+  printf '%s\nsource: %s\n\n%s' "$title" "$source_path" "$body"
+}
+
+describe_launch_behavior() {
+  local prompt_handoff="$1"
+  local context_handoff="$2"
+  local -a behaviors=()
+
+  [[ -n "$prompt_handoff" ]] && behaviors+=("prompt->$prompt_handoff")
+  [[ -n "$context_handoff" ]] && behaviors+=("context->$context_handoff")
+
+  if [[ ${#behaviors[@]} -eq 0 ]]; then
+    printf 'passthrough\n'
+    return
+  fi
+
+  join_with ", " "${behaviors[@]}"
+}
+
+load_agent_metadata() {
+  agent_name="$1"
+  command_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "command")"
+  role_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "role")"
+  provider_name="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "provider")"
+  description="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "description")"
+  docs_url="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "docs_url")"
+  user_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "user_config")"
+  project_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_config")"
+  project_extensions="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "project_extensions")"
+  mcp_config="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "mcp_config")"
+  automation_mode="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "automation_mode")"
+  prompt_file="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "prompt_file")"
+  trust_template="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "trust_template")"
+  prompt_handoff="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "prompt_handoff")"
+  context_handoff="$(ai_config_value "$AGENTS_FILE" "agents" "$agent_name" "context_handoff")"
+  resolved_prompt_file="$(ai_resolve_repo_file "$REPO_ROOT" "$TARGET_REPO" "$prompt_file" || true)"
+  candidate_prompt_file="$(ai_candidate_repo_file "$REPO_ROOT" "$TARGET_REPO" "$prompt_file" || true)"
+  context_file="$(ai_context_summary_file "$TARGET_REPO")"
+}
+
+agent_unavailable_reason() {
+  if [[ -z "$command_name" ]]; then
+    printf 'unknown agent: %s\n' "$agent_name"
+    return 0
+  fi
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    printf 'missing dependency: %s\n' "$command_name"
+    return 0
+  fi
+
+  if [[ -n "$prompt_handoff" && -z "$resolved_prompt_file" ]]; then
+    printf 'missing prompt file: %s\n' "${candidate_prompt_file:-$prompt_file}"
+    return 0
+  fi
+
+  printf '\n'
+}
+
+print_agent_remediation() {
+  local reason="$1"
+
+  case "$reason" in
+    "missing prompt file:"*)
+      echo "missing prompt file for $agent_name: ${reason#missing prompt file: }" >&2
+      ;;
+    *)
+      echo "$reason" >&2
+      ;;
+  esac
+  if [[ -n "$workflow_name" ]]; then
+    echo "resolved workflow: $workflow_name" >&2
+  fi
+  echo "resolved agent: $agent_name" >&2
+  if [[ -n "$provider_name" ]]; then
+    echo "provider: $provider_name" >&2
+  fi
+  echo "agents config: $AGENTS_FILE" >&2
+  if [[ -n "$workflow_name" ]]; then
+    echo "workflows config: $WORKFLOWS_FILE" >&2
+  fi
+  echo "launch behavior: $(describe_launch_behavior "$prompt_handoff" "$context_handoff")" >&2
+  if [[ -n "$prompt_file" ]]; then
+    echo "prompt file: $prompt_file" >&2
+  fi
+  if [[ -n "$trust_template" ]]; then
+    echo "trust template: $trust_template" >&2
+  fi
+  if [[ -n "$docs_url" ]]; then
+    echo "docs: $docs_url" >&2
+  fi
+
+  case "$reason" in
+    "missing dependency:"*)
+      echo "run: make agent" >&2
+      ;;
+    "missing prompt file:"*)
+      echo "create the prompt file or update prompt_file/prompt_handoff for $agent_name" >&2
+      ;;
+  esac
+
+  echo "run: ai doctor" >&2
+}
+
+print_resolution_failure() {
+  local joined_candidates=""
+  local combined_failures=""
+  local failure
+
+  if [[ -n "${resolution_candidates[*]-}" ]]; then
+    joined_candidates="$(join_with ", " "${resolution_candidates[@]}")"
+  fi
+
+  echo "no available agent candidates for workflow: $workflow_name" >&2
+  [[ -n "$joined_candidates" ]] && echo "resolution_candidates: $joined_candidates" >&2
+  if [[ -n "${candidate_failures[*]-}" ]]; then
+    for failure in "${candidate_failures[@]}"; do
+      echo "$failure" >&2
+      combined_failures+="$failure"$'\n'
+    done
+  fi
+  echo "agents config: $AGENTS_FILE" >&2
+  echo "workflows config: $WORKFLOWS_FILE" >&2
+  echo "run: ai doctor" >&2
+
+  if [[ "$combined_failures" == *"missing dependency:"* ]]; then
+    echo "run: make agent" >&2
+  fi
+
+  if [[ "$combined_failures" == *"missing prompt file:"* ]]; then
+    echo "create the prompt file or update prompt_file/prompt_handoff for the affected agent" >&2
+  fi
+}
+
+list_agents() {
+  local agent_name provider_name role_name command_name description
+
+  printf 'agent | provider | role | command | description\n'
+  while IFS= read -r agent_name; do
+    [[ -n "$agent_name" ]] || continue
+    provider_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" provider)"
+    role_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" role)"
+    command_name="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" command)"
+    description="$(ai_config_value "$AGENTS_FILE" agents "$agent_name" description)"
+    printf '%s | %s | %s | %s | %s\n' \
+      "$agent_name" \
+      "${provider_name:-unknown}" \
+      "${role_name:-unknown}" \
+      "${command_name:-unknown}" \
+      "${description:-No description}"
+  done < <(ai_section_keys "$AGENTS_FILE" agents)
+
+  printf 'source: %s\n' "$AGENTS_FILE"
+}
+
+list_workflows() {
+  local workflow_name default_agent description candidate_chain
+
+  printf 'workflow | candidates | description\n'
+  while IFS= read -r workflow_name; do
+    [[ -n "$workflow_name" ]] || continue
+    default_agent="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" default_agent)"
+    description="$(ai_config_value "$WORKFLOWS_FILE" workflows "$workflow_name" description)"
+    candidate_chain="$(ai_workflow_candidate_chain "$WORKFLOWS_FILE" "$workflow_name")"
+    printf '%s | %s | %s\n' \
+      "$workflow_name" \
+      "${candidate_chain:-${default_agent:-unknown}}" \
+      "${description:-No description}"
+  done < <(ai_section_keys "$WORKFLOWS_FILE" workflows)
+
+  printf 'source: %s\n' "$WORKFLOWS_FILE"
+}
+
+config_kind=""
+action="run"
+workflow_name=""
+agent_name=""
+
+while [[ $# -gt 0 ]]; do
+  if [[ "$action" == "run" && ( -n "$workflow_name" || -n "$agent_name" ) ]]; then
+    break
+  fi
+
+  case "${1:-}" in
+    --list)
+      action="list"
+      shift
+      ;;
+    --list-workflows)
+      action="list_workflows"
+      shift
+      ;;
+    --describe)
+      action="describe"
+      shift
+      ;;
+    --workflow)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      workflow_name="$2"
+      shift 2
+      ;;
+    --config-path)
+      [[ $# -ge 2 ]] || { usage >&2; exit 2; }
+      config_kind="$2"
+      action="config_path"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      if [[ "$action" == "run" && ( -n "$workflow_name" || -n "$agent_name" ) ]]; then
+        break
+      fi
+      echo "unknown option: ${1:-}" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      if [[ -z "$agent_name" ]]; then
+        agent_name="$1"
+        shift
+        continue
+      fi
+      break
+      ;;
+  esac
+done
+
+case "$action" in
+  list)
+    list_agents
+    exit 0
+    ;;
+  list_workflows)
+    list_workflows
+    exit 0
+    ;;
+  config_path)
+    case "$config_kind" in
+      agents)
+        printf '%s\n' "$AGENTS_FILE"
+        ;;
+      workflows)
+        printf '%s\n' "$WORKFLOWS_FILE"
+        ;;
+      *)
+        echo "unknown config kind: $config_kind" >&2
+        exit 2
+        ;;
+    esac
+    exit 0
+    ;;
+esac
+
+if [[ -n "$workflow_name" ]]; then
+  agent_name="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "default_agent")"
+  fallback_agents_raw="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "fallback_agents")"
+  if [[ -z "$agent_name" ]]; then
+    echo "unknown workflow: $workflow_name" >&2
+    echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
+    exit 2
+  fi
+elif [[ -z "$agent_name" ]]; then
+  usage
+  exit 2
+fi
+
+declare -a resolution_candidates=()
+declare -a candidate_failures=()
+selected_agent_name=""
+
+if [[ -n "$workflow_name" ]]; then
+  while IFS= read -r candidate_name; do
+    local_duplicate=0
+    [[ -n "$candidate_name" ]] || continue
+    if [[ -n "${resolution_candidates[*]-}" ]]; then
+      for existing_candidate in "${resolution_candidates[@]}"; do
+        if [[ "$existing_candidate" == "$candidate_name" ]]; then
+          local_duplicate=1
+          break
+        fi
+      done
+    fi
+    [[ $local_duplicate -eq 0 ]] && resolution_candidates+=("$candidate_name")
+  done < <(ai_workflow_candidate_agents "$WORKFLOWS_FILE" "$workflow_name")
+else
+  resolution_candidates=("$agent_name")
+fi
+
+if [[ -z "${resolution_candidates[*]-}" ]]; then
+  echo "unknown workflow: $workflow_name" >&2
+  echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
+  exit 2
+fi
+
+agent_name="${resolution_candidates[0]}"
+load_agent_metadata "$agent_name"
+
+if [[ "$action" == "describe" ]]; then
+  if [[ -z "$command_name" ]]; then
+    echo "unknown agent: $agent_name" >&2
+    echo "run \`ai agents\` to inspect configured agents and their roles" >&2
+    exit 2
+  fi
+  printf 'agent: %s\n' "$agent_name"
+  if [[ -n "$workflow_name" ]]; then
+    printf 'workflow: %s\n' "$workflow_name"
+    if [[ -n "$fallback_agents_raw" ]]; then
+      printf 'fallback_agents: %s\n' "$fallback_agents_raw"
+    fi
+    printf 'resolution_candidates: %s\n' "$(join_with ", " "${resolution_candidates[@]}")"
+  fi
+  [[ -n "$description" ]] && printf 'description: %s\n' "$description"
+  printf 'command: %s\n' "$command_name"
+  printf 'role: %s\n' "${role_name:-unknown}"
+  [[ -n "$provider_name" ]] && printf 'provider: %s\n' "$provider_name"
+  [[ -n "$automation_mode" ]] && printf 'automation_mode: %s\n' "$automation_mode"
+  [[ -n "$docs_url" ]] && printf 'docs_url: %s\n' "$docs_url"
+  [[ -n "$user_config" ]] && printf 'user_config: %s\n' "$user_config"
+  [[ -n "$project_config" ]] && printf 'project_config: %s\n' "$project_config"
+  [[ -n "$project_extensions" ]] && printf 'project_extensions: %s\n' "$project_extensions"
+  [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
+  printf 'launch_behavior: %s\n' "$(describe_launch_behavior "$prompt_handoff" "$context_handoff")"
+  [[ -n "$prompt_file" ]] && printf 'prompt_file: %s\n' "$prompt_file"
+  [[ -n "$candidate_prompt_file" ]] && printf 'resolved_prompt_file: %s\n' "$candidate_prompt_file"
+  [[ -n "$prompt_handoff" ]] && printf 'prompt_handoff: %s\n' "$prompt_handoff"
+  [[ -n "$context_handoff" ]] && printf 'context_handoff: %s\n' "$context_handoff"
+  [[ -n "$context_handoff" ]] && printf 'resolved_context_file: %s\n' "$context_file"
+  [[ -n "$trust_template" ]] && printf 'trust_template: %s\n' "$trust_template"
+  printf 'agents_config: %s\n' "$AGENTS_FILE"
+  printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
+  exit 0
+fi
+
+for candidate_name in "${resolution_candidates[@]}"; do
+  agent_name="$candidate_name"
+  load_agent_metadata "$agent_name"
+  candidate_reason="$(agent_unavailable_reason)"
+
+  if [[ -z "$candidate_reason" ]]; then
+    selected_agent_name="$agent_name"
+    break
+  fi
+
+  candidate_failures+=("candidate $agent_name: $candidate_reason")
+done
+
+if [[ -z "$selected_agent_name" ]]; then
+  agent_name="${resolution_candidates[0]}"
+  load_agent_metadata "$agent_name"
+  if [[ -n "$workflow_name" && "${#resolution_candidates[@]}" -gt 1 ]]; then
+    print_resolution_failure
+  else
+    print_agent_remediation "${candidate_failures[0]#candidate $agent_name: }"
+  fi
+  exit 1
+fi
+
+if [[ "$selected_agent_name" != "${resolution_candidates[0]}" && -n "$workflow_name" ]]; then
+  echo "workflow $workflow_name: falling back from ${resolution_candidates[0]} to $selected_agent_name" >&2
+fi
+
+agent_name="$selected_agent_name"
+load_agent_metadata "$agent_name"
+
+if [[ -n "$context_handoff" ]]; then
+  if ! "$BIN_DIR/ai-context" --repo "$TARGET_REPO" >/dev/null; then
+    echo "failed to refresh repository context for $TARGET_REPO" >&2
+    echo "run \`ai context --repo $TARGET_REPO\` to inspect the problem" >&2
+    exit 1
+  fi
+
+  if [[ ! -f "$context_file" ]]; then
+    echo "missing repository context summary: $context_file" >&2
+    echo "run \`ai context --repo $TARGET_REPO\` to rebuild repository context" >&2
+    exit 1
+  fi
+fi
+
+launch_prompt_payload=""
+launch_prompt_arg=""
+declare -a launch_prefix_args=()
+
+if [[ -n "$resolved_prompt_file" ]]; then
+  prompt_body="$(<"$resolved_prompt_file")"
+  prompt_block="$(render_handoff_block "Workflow prompt" "$resolved_prompt_file" "$prompt_body")"
+
+  case "$prompt_handoff" in
+    append-system-prompt)
+      launch_prefix_args+=(--append-system-prompt "$prompt_block")
+      ;;
+    prompt)
+      launch_prompt_payload="$(append_block "$launch_prompt_payload" "$prompt_block")"
+      ;;
+    ""|none)
+      ;;
+    *)
+      echo "unsupported prompt handoff for $agent_name: $prompt_handoff" >&2
+      echo "supported prompt handoff modes: append-system-prompt, prompt, none" >&2
+      exit 1
+      ;;
+  esac
+fi
+
+if [[ -n "$context_handoff" ]]; then
+  context_body="$(<"$context_file")"
+  context_block="$(render_handoff_block "Repository context" "$context_file" "$context_body")"
+
+  case "$context_handoff" in
+    append-system-prompt)
+      launch_prefix_args+=(--append-system-prompt "$context_block")
+      ;;
+    prompt)
+      launch_prompt_payload="$(append_block "$launch_prompt_payload" "$context_block")"
+      ;;
+    ""|none)
+      ;;
+    *)
+      echo "unsupported context handoff for $agent_name: $context_handoff" >&2
+      echo "supported context handoff modes: append-system-prompt, prompt, none" >&2
+      exit 1
+      ;;
+  esac
+fi
+
+if [[ -n "$launch_prompt_payload" ]]; then
+  launch_prompt_arg="$launch_prompt_payload"
+fi
+
+if [[ -n "$launch_prompt_arg" ]]; then
+  if [[ ${#launch_prefix_args[@]} -gt 0 ]]; then
+    exec "$command_name" "${launch_prefix_args[@]}" "$@" "$launch_prompt_arg"
+  fi
+  exec "$command_name" "$@" "$launch_prompt_arg"
+fi
+
+if [[ ${#launch_prefix_args[@]} -gt 0 ]]; then
+  exec "$command_name" "${launch_prefix_args[@]}" "$@"
+fi
+
+exec "$command_name" "$@"

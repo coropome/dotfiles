@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/_ai_common"
+REPO_ROOT="$(ai_repo_root "$BIN_DIR")"
+TARGET_REPO="$(ai_target_repo_root "$PWD")"
+
+usage() {
+  cat <<'EOF'
+usage: ai-eval [--list] [--hosted] [prompt-name]
+EOF
+}
+
+prompt_roots() {
+  if [[ -d "$TARGET_REPO/.ai-dev-os/prompts" ]]; then
+    printf '%s\n' "$TARGET_REPO/.ai-dev-os/prompts"
+  fi
+  printf '%s\n' "$REPO_ROOT/prompts"
+}
+
+find_prompt_file() {
+  local prompt_name="$1"
+  local root candidate
+
+  while IFS= read -r root; do
+    candidate="$root/$prompt_name.prompt.yml"
+    if [[ -f "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(prompt_roots)
+
+  return 1
+}
+
+list_prompts() {
+  local root
+
+  while IFS= read -r root; do
+    find "$root" -maxdepth 1 -type f -name '*.prompt.yml' -print
+  done < <(prompt_roots) | sed 's#.*/##' | sed 's#\.prompt\.yml$##' | sort -u
+}
+
+count_key() {
+  local file="$1"
+  local key="$2"
+  awk -v key="$key" '
+    $0 ~ "^" key ":" { in_section=1; next }
+    in_section && /^[A-Za-z0-9_-]+:/ { exit }
+    in_section && /^  - / { count++ }
+    END { print count+0 }
+  ' "$file"
+}
+
+field_value() {
+  local file="$1"
+  local key="$2"
+  awk -F': ' -v key="$key" '$1 == key { print $2; exit }' "$file"
+}
+
+validate_prompt_file() {
+  local file="$1"
+  local required
+
+  for required in name description messages testData; do
+    grep -Eq "^${required}:" "$file" || {
+      echo "invalid prompt artifact: missing $required in $file" >&2
+      return 1
+    }
+  done
+}
+
+hosted_mode=0
+
+if [[ "${1:-}" == "--list" ]]; then
+  list_prompts
+  exit 0
+fi
+
+if [[ "${1:-}" == "--hosted" ]]; then
+  hosted_mode=1
+  shift || true
+fi
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+prompt_name="${1:-}"
+if [[ -z "$prompt_name" ]]; then
+  usage >&2
+  exit 2
+fi
+
+prompt_file="$(find_prompt_file "$prompt_name" || true)"
+if [[ -z "$prompt_file" ]]; then
+  echo "unknown prompt artifact: $prompt_name" >&2
+  exit 2
+fi
+
+validate_prompt_file "$prompt_file"
+
+if [[ $hosted_mode -eq 1 ]]; then
+  if ! command -v gh >/dev/null 2>&1; then
+    echo "hosted eval requires GitHub CLI with GitHub Models support; run: make agent or install gh" >&2
+    exit 1
+  fi
+  exec gh models eval --file "$prompt_file"
+fi
+
+printf 'prompt: %s\n' "$(field_value "$prompt_file" name)"
+printf 'file: %s\n' "$prompt_file"
+printf 'mode: local-structure-check\n'
+printf 'test_cases: %s\n' "$(count_key "$prompt_file" testData)"
+printf 'evaluators: %s\n' "$(count_key "$prompt_file" evaluators)"
+printf 'hosted_hint: gh models eval --file %s\n' "$prompt_file"

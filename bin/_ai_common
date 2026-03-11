@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ai_script_path() {
+  local script_path="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
+
+  if [[ -L "$script_path" ]]; then
+    script_path="$(readlink "$script_path")"
+  fi
+
+  printf '%s\n' "$script_path"
+}
+
+ai_bin_dir() {
+  local script_path="${1:-$(ai_script_path)}"
+  cd "$(dirname "$script_path")" && pwd -P
+}
+
+ai_repo_root() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+  cd "$bin_dir/.." && pwd -P
+}
+
+ai_detect_os() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+
+  case "$("$bin_dir/_platform" --variant)" in
+    darwin)
+      printf 'mac\n'
+      ;;
+    linux)
+      printf 'linux\n'
+      ;;
+    wsl)
+      printf 'wsl\n'
+      ;;
+    *)
+      printf 'unknown\n'
+      ;;
+  esac
+}
+
+ai_target_repo_root() {
+  local target_dir="${1:-$PWD}"
+
+  if git -C "$target_dir" rev-parse --show-toplevel >/dev/null 2>&1; then
+    git -C "$target_dir" rev-parse --show-toplevel
+  else
+    cd "$target_dir" && pwd -P
+  fi
+}
+
+ai_context_dir() {
+  local target_repo="${1:-$(ai_target_repo_root)}"
+  printf '%s/.context\n' "$target_repo"
+}
+
+ai_context_summary_file() {
+  local target_repo="${1:-$(ai_target_repo_root)}"
+  printf '%s/summary.md\n' "$(ai_context_dir "$target_repo")"
+}
+
+ai_expand_home_path() {
+  local raw_path="${1:-}"
+
+  if [[ "$raw_path" == "~" ]]; then
+    printf '%s\n' "$HOME"
+    return 0
+  fi
+
+  if [[ "${raw_path:0:1}" == "~" && "${raw_path:1:1}" == "/" ]]; then
+    printf '%s/%s\n' "$HOME" "${raw_path:2}"
+    return 0
+  fi
+
+  printf '%s\n' "$raw_path"
+}
+
+ai_candidate_repo_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+  local raw_path="${3:-}"
+  local expanded_path
+
+  [[ -n "$raw_path" ]] || return 1
+  expanded_path="$(ai_expand_home_path "$raw_path")"
+
+  if [[ "$expanded_path" = /* ]]; then
+    printf '%s\n' "$expanded_path"
+    return 0
+  fi
+
+  if [[ "$expanded_path" == .ai-dev-os/* ]]; then
+    printf '%s/%s\n' "$target_repo" "$expanded_path"
+    return 0
+  fi
+
+  if [[ -e "$target_repo/$expanded_path" ]]; then
+    printf '%s/%s\n' "$target_repo" "$expanded_path"
+    return 0
+  fi
+
+  printf '%s/%s\n' "$repo_root" "$expanded_path"
+}
+
+ai_resolve_repo_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+  local raw_path="${3:-}"
+  local candidate
+
+  candidate="$(ai_candidate_repo_file "$repo_root" "$target_repo" "$raw_path" || true)"
+  [[ -n "$candidate" ]] || return 1
+  [[ -e "$candidate" ]] || return 1
+  printf '%s\n' "$candidate"
+}
+
+ai_load_os_layer() {
+  local bin_dir="${1:-$(ai_bin_dir)}"
+  local repo_root="${2:-$(ai_repo_root "$bin_dir")}"
+
+  AI_OS="${AI_OS:-$(ai_detect_os "$bin_dir")}"
+  export AI_OS
+
+  if [[ ! -f "$repo_root/os/$AI_OS.sh" ]]; then
+    echo "unsupported AI_OS: $AI_OS" >&2
+    return 1
+  fi
+
+  # shellcheck source=/dev/null
+  source "$repo_root/os/$AI_OS.sh"
+}
+
+ai_agents_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+
+  if [[ -f "$target_repo/.ai-dev-os/agents.yml" ]]; then
+    printf '%s/.ai-dev-os/agents.yml\n' "$target_repo"
+    return
+  fi
+
+  printf '%s/ai/agents.yml\n' "$repo_root"
+}
+
+ai_workflows_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+
+  if [[ -f "$target_repo/.ai-dev-os/workflows.yml" ]]; then
+    printf '%s/.ai-dev-os/workflows.yml\n' "$target_repo"
+    return
+  fi
+
+  printf '%s/ai/workflows.yml\n' "$repo_root"
+}
+
+ai_config_value() {
+  local file="$1"
+  local section="$2"
+  local key="$3"
+  local nested_key="${4:-}"
+
+  awk -v section="$section" -v key="$key" -v nested_key="$nested_key" '
+    $0 ~ "^" section ":" { in_section=1; next }
+    in_section && $0 ~ "^[A-Za-z0-9_-]+:" { exit }
+    in_section && $0 ~ "^  " key ":" {
+      if (nested_key == "") {
+        line=$0
+        sub("^  " key ": ", "", line)
+        print line
+        exit
+      }
+      in_key=1
+      next
+    }
+    in_key && $0 ~ "^  [A-Za-z0-9_-]+:" { exit }
+    in_key && $0 ~ "^    " nested_key ":" {
+      line=$0
+      sub("^    " nested_key ": ", "", line)
+      print line
+      exit
+    }
+  ' "$file"
+}
+
+ai_section_keys() {
+  local file="$1"
+  local section="$2"
+
+  awk -v section="$section" '
+    $0 ~ "^" section ":" { in_section=1; next }
+    in_section && /^[A-Za-z0-9_-]+:/ { exit }
+    in_section && /^  [A-Za-z0-9_-]+:/ {
+      line=$0
+      sub(/^  /, "", line)
+      sub(/:$/, "", line)
+      print line
+    }
+  ' "$file"
+}
+
+ai_has_named_key() {
+  local file="$1"
+  local section="$2"
+  local key="$3"
+
+  ai_section_keys "$file" "$section" | grep -Fxq "$key"
+}
+
+ai_trim() {
+  local value="${1:-}"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s\n' "$value"
+}
+
+ai_list_items() {
+  local raw_value="${1:-}"
+  local item trimmed
+
+  [[ -n "$raw_value" ]] || return 0
+
+  while IFS= read -r item; do
+    trimmed="$(ai_trim "$item")"
+    [[ -n "$trimmed" ]] || continue
+    printf '%s\n' "$trimmed"
+  done < <(printf '%s\n' "$raw_value" | tr ',' '\n')
+}
+
+ai_workflow_fallback_agents() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local fallback_agents
+
+  fallback_agents="$(ai_config_value "$workflows_file" workflows "$workflow_name" fallback_agents)"
+  ai_list_items "$fallback_agents"
+}
+
+ai_workflow_candidate_agents() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local default_agent
+
+  default_agent="$(ai_config_value "$workflows_file" workflows "$workflow_name" default_agent)"
+  [[ -n "$default_agent" ]] && printf '%s\n' "$default_agent"
+  ai_workflow_fallback_agents "$workflows_file" "$workflow_name"
+}
+
+ai_workflow_candidate_chain() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local candidate chain=""
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -z "$chain" ]]; then
+      chain="$candidate"
+    else
+      chain="$chain -> $candidate"
+    fi
+  done < <(ai_workflow_candidate_agents "$workflows_file" "$workflow_name")
+
+  printf '%s\n' "$chain"
+}
+
+ai_session_name() {
+  local repo_root="$1"
+  local tmux_layout="$2"
+  local prefix base
+
+  prefix="$(
+    awk -F= '
+      /^AI_TMUX_SESSION_PREFIX=/{print $2; found=1; exit}
+      /^AI_SESSION_PREFIX=/{print $2; found=1; exit}
+      /^AI_TMUX_SESSION_NAME=/{print $2; found=1; exit}
+      END { if (!found) print "" }
+    ' "$tmux_layout"
+  )"
+  prefix="${prefix%\"}"
+  prefix="${prefix#\"}"
+  [[ -n "$prefix" ]] || prefix="ai-dev-os"
+
+  base="$(basename "$repo_root")"
+  base="${base//[^A-Za-z0-9_-]/-}"
+  base="${base##-}"
+  base="${base%%-}"
+  [[ -n "$base" ]] || base="workspace"
+
+  printf '%s-%s\n' "$prefix" "$base"
+}

@@ -17,6 +17,10 @@ fail() {
   exit 1
 }
 
+helper_names() {
+  grep -Ev '^[[:space:]]*(#|$)' "$REPO/manifests/helpers.txt"
+}
+
 assert_symlink() {
   local target="$1"
   local expected="$2"
@@ -183,7 +187,7 @@ seed_existing_files() {
   printf "old git module" > "$TEST_HOME/.config/ditfiles/conf.d/local.gitconfig"
   printf "old gitignore" > "$TEST_HOME/.config/ditfiles/gitignore_global"
   printf "old starship" > "$TEST_HOME/.config/starship.toml"
-  for helper in tnew thelp tlist tgo tkill _tpick ttutor p _platform _clipboard_copy _open _tmux_help; do
+  for helper in $(helper_names); do
     printf "old %s" "$helper" > "$TEST_HOME/.local/bin/$helper"
   done
 }
@@ -239,7 +243,7 @@ verify_install() {
   assert_symlink "$TEST_HOME/.config/ditfiles/conf.d" "$REPO/git/conf.d"
   assert_symlink "$TEST_HOME/.config/ditfiles/gitignore_global" "$REPO/git/gitignore_global"
   assert_symlink "$TEST_HOME/.config/starship.toml" "$REPO/zsh/starship.toml"
-  for helper in tnew thelp tlist tgo tkill _tpick ttutor p _platform _clipboard_copy _open _tmux_help; do
+  for helper in $(helper_names); do
     assert_symlink "$TEST_HOME/.local/bin/$helper" "$REPO/bin/$helper"
   done
   [[ -d "$TEST_HOME/.tmux/plugins/tpm/.git" ]] || fail "TPM checkout was not created"
@@ -253,7 +257,7 @@ verify_install() {
   assert_backup_exists "$TEST_HOME/.config/ditfiles/conf.d"
   assert_backup_exists "$TEST_HOME/.config/ditfiles/gitignore_global"
   assert_backup_exists "$TEST_HOME/.config/starship.toml"
-  for helper in tnew thelp tlist tgo tkill _tpick ttutor p _platform _clipboard_copy _open _tmux_help; do
+  for helper in $(helper_names); do
     assert_backup_exists "$TEST_HOME/.local/bin/$helper"
   done
 
@@ -466,7 +470,7 @@ verify_uninstall() {
   assert_file_contents "$TEST_HOME/.config/ditfiles/conf.d/local.gitconfig" "old git module"
   assert_file_contents "$TEST_HOME/.config/ditfiles/gitignore_global" "old gitignore"
   assert_file_contents "$TEST_HOME/.config/starship.toml" "old starship"
-  for helper in tnew thelp tlist tgo tkill _tpick ttutor p _platform _clipboard_copy _open _tmux_help; do
+  for helper in $(helper_names); do
     assert_file_contents "$TEST_HOME/.local/bin/$helper" "old $helper"
   done
 

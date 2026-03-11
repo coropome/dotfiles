@@ -28,6 +28,13 @@ assert_executable() {
   [[ -x "$path" ]] || fail "expected executable: $path"
 }
 
+assert_symlink_target() {
+  local path="$1"
+  local expected="$2"
+  [[ -L "$path" ]] || fail "expected symlink: $path"
+  [[ "$(readlink "$path")" == "$expected" ]] || fail "$path points to $(readlink "$path"), expected $expected"
+}
+
 verify_links_manifest() {
   local manifest="$REPO/manifests/bootstrap/links.tsv"
   local line target source type source_path
@@ -70,6 +77,7 @@ verify_helper_inventory() {
   local manifest="$REPO/manifests/helpers.txt"
   local helper
   local -a helpers=()
+  local required
 
   assert_file "$manifest"
   while IFS= read -r helper || [[ -n "${helper:-}" ]]; do
@@ -79,6 +87,11 @@ verify_helper_inventory() {
   done < "$manifest"
 
   [[ ${#helpers[@]} -gt 0 ]] || fail "no helpers found in $manifest"
+
+  for required in ai ai-init ai-start ai-agent ai-context ai-doctor ai-task ai-eval ai-trust ai-install ai-copy ai-open; do
+    printf '%s\n' "${helpers[@]}" | grep -Fxq "$required" \
+      || fail "missing helper '$required' in $manifest"
+  done
 }
 
 verify_tmux_plugin_manifest() {
@@ -131,7 +144,8 @@ verify_package_manifests() {
     "$REPO/manifests/packages/core-brew.txt" \
     "$REPO/manifests/packages/macos-brew.txt" \
     "$REPO/manifests/packages/macos-cask.txt" \
-    "$REPO/manifests/packages/agent-npm.txt"
+    "$REPO/manifests/packages/agent-brew.txt" \
+    "$REPO/manifests/packages/agent-cask.txt"
   do
     assert_file "$manifest"
     line="$(grep -Ev '^\s*(#|$)' "$manifest" | head -1 || true)"
@@ -142,13 +156,154 @@ verify_package_manifests() {
 }
 
 verify_layout_scaffold() {
+  assert_file "$REPO/install"
+  assert_file "$REPO/AGENTS.md"
+  assert_exists "$REPO/CLAUDE.md"
+  assert_exists "$REPO/GEMINI.md"
+  assert_symlink_target "$REPO/CLAUDE.md" "AGENTS.md"
+  assert_symlink_target "$REPO/GEMINI.md" "AGENTS.md"
+  assert_executable "$REPO/install"
+  assert_dir "$REPO/ai"
+  assert_dir "$REPO/os"
+  assert_dir "$REPO/prompts"
+  assert_dir "$REPO/context"
+  assert_dir "$REPO/tasks"
+  assert_dir "$REPO/.github"
+  assert_dir "$REPO/.github/ISSUE_TEMPLATE"
+  assert_dir "$REPO/demo/sample-project"
+  assert_dir "$REPO/demo/sample-project/.ai-dev-os"
+  assert_dir "$REPO/demo/sample-project/.github"
+  assert_dir "$REPO/demo/sample-project/.github/workflows"
+  assert_dir "$REPO/demo/sample-project/.ai-dev-os/prompts"
+  assert_dir "$REPO/docs/adr"
   assert_dir "$REPO/lib/bootstrap"
   assert_dir "$REPO/lib/dotfiles"
   assert_dir "$REPO/manifests/bootstrap"
   assert_dir "$REPO/manifests/packages"
   assert_dir "$REPO/manifests/tmux"
+  assert_dir "$REPO/templates/github-actions"
+  assert_dir "$REPO/templates/ai-trust"
   assert_dir "$REPO/zsh/modules"
   assert_dir "$REPO/tmux/conf.d"
+  assert_file "$REPO/ai/agents.yml"
+  assert_file "$REPO/ai/workflows.yml"
+  assert_file "$REPO/os/mac.sh"
+  assert_file "$REPO/os/linux.sh"
+  assert_file "$REPO/os/wsl.sh"
+  assert_file "$REPO/prompts/architect.md"
+  assert_file "$REPO/prompts/implementer.md"
+  assert_file "$REPO/prompts/reviewer.md"
+  assert_file "$REPO/prompts/researcher.md"
+  assert_file "$REPO/prompts/review.prompt.yml"
+  assert_file "$REPO/demo/sample-project/README.md"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/agents.yml"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/workflows.yml"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/README.md"
+  assert_file "$REPO/demo/sample-project/.github/workflows/ai-dev-os-pr.yml"
+  assert_file "$REPO/demo/sample-project/.github/workflows/ai-dev-os-hosted-eval.yml"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/prompts/implementer.md"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/prompts/reviewer.md"
+  assert_file "$REPO/demo/sample-project/.ai-dev-os/prompts/review.prompt.yml"
+  assert_file "$REPO/templates/github-actions/ai-dev-os-pr.yml"
+  assert_file "$REPO/templates/github-actions/ai-dev-os-hosted-eval.yml"
+  assert_file "$REPO/templates/ai-trust/claude-settings.json"
+  assert_file "$REPO/templates/ai-trust/codex-config.toml"
+  assert_file "$REPO/templates/ai-trust/gemini-settings.json"
+  assert_file "$REPO/.github/ISSUE_TEMPLATE/feature.yml"
+  assert_file "$REPO/.github/ISSUE_TEMPLATE/bug.yml"
+  assert_file "$REPO/.github/ISSUE_TEMPLATE/config.yml"
+  assert_file "$REPO/.github/copilot-instructions.md"
+  assert_file "$REPO/.github/pull_request_template.md"
+  assert_file "$REPO/context/build-context.sh"
+  assert_executable "$REPO/context/build-context.sh"
+  assert_file "$REPO/tasks/backlog.md"
+  assert_file "$REPO/docs/92-development-workflow.md"
+  assert_file "$REPO/docs/adr/README.md"
+  assert_file "$REPO/docs/adr/0001-ai-dev-os-delivery-workflow.md"
+  assert_file "$REPO/docs/05-demo-walkthrough.md"
+  assert_file "$REPO/docs/41-ai-trust.md"
+  assert_file "$REPO/docs/42-github-actions.md"
+  assert_file "$REPO/tmux/layout.conf"
+}
+
+verify_ai_dev_os_docs() {
+  grep -Fq "ai start" "$REPO/README.md" \
+    || fail "README.md does not mention ai start"
+  grep -Fq "./install" "$REPO/README.md" \
+    || fail "README.md does not contain the OSS quickstart install path"
+  grep -Fq "Beginner path" "$REPO/README.md" \
+    || fail "README.md does not distinguish the beginner path"
+  grep -Fq "Advanced / manual path" "$REPO/README.md" \
+    || fail "README.md does not distinguish the advanced path"
+  grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ai start"
+  grep -Fq "ai init" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ai init"
+  grep -Fq "./install" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention ./install"
+  grep -Fq "Beginner Path" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not have a beginner path section"
+  grep -Fq "Advanced Path" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not have an advanced path section"
+  grep -Fq "make agent" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not cover missing agent CLIs"
+  grep -Fq "## AI Dev OS Starter Repos" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not have an AI Dev OS starter repo section"
+  grep -Fq "ai doctor" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not mention ai doctor"
+  grep -Fq "make doctor" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not mention make doctor"
+  grep -Fq "ai trust init" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not mention ai trust remediation"
+  grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
+  grep -Fq "ai init" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document ai init"
+  grep -Fq ".claude/settings.json" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document vendor-native config boundaries"
+  grep -Fq "ai eval" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document ai eval"
+  grep -Fq "ai trust" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document ai trust"
+  grep -Fq "ai init" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document ai init"
+  grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not explain role metadata"
+  grep -Fq "templates/ai-trust/" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not mention trust templates"
+  grep -Fq "project-only" "$REPO/docs/41-ai-trust.md" \
+    || fail "docs/41-ai-trust.md does not document trust defaults"
+  grep -Fq "ai trust init" "$REPO/docs/41-ai-trust.md" \
+    || fail "docs/41-ai-trust.md does not document ai trust commands"
+  grep -Fq "## Troubleshooting" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not have a troubleshooting section"
+  grep -Fq "## Which Path To Choose" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not have an adoption decision guide"
+  grep -Fq "AI_DEV_OS_RUNTIME_REF" "$REPO/docs/42-github-actions.md" \
+    || fail "docs/42-github-actions.md does not mention runtime pinning"
+  grep -Fq "AGENTS.md" "$REPO/docs/92-development-workflow.md" \
+    || fail "docs/92-development-workflow.md does not mention AGENTS.md"
+  grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
+    || fail ".github/copilot-instructions.md does not enforce issue-first work"
+  grep -Fq "docs/05-demo-walkthrough.md" "$REPO/README.md" \
+    || fail "README.md does not link to the demo walkthrough"
+}
+
+verify_doctor_guidance_consistency() {
+  grep -Fq 'ai doctor` で workflow / prompt / trust / fallback / runtime config' "$REPO/README.md" \
+    || fail "README.md does not keep the canonical ai doctor guidance"
+  grep -Fq 'make doctor` で bootstrap / symlink / PATH / shell / system state' "$REPO/README.md" \
+    || fail "README.md does not keep the canonical make doctor guidance"
+  grep -Fq "workflow / prompt / trust / fallback / runtime config なら \`ai doctor\`" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not keep the canonical ai doctor guidance"
+  grep -Fq "bootstrap / symlink / PATH / shell / system state なら \`make doctor\`" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not keep the canonical make doctor guidance"
+  grep -Fq "workflow / prompt / trust / fallback / runtime config を見る時は \`make doctor\` ではなく \`ai doctor\`" "$REPO/docs/31-support-matrix.md" \
+    || fail "docs/31-support-matrix.md does not keep the canonical ai doctor guidance"
+  grep -Fq "workflow / prompt / trust / fallback / runtime config を診断する" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not keep the canonical ai doctor guidance"
+  grep -Fq "dotfiles install / symlink / PATH / shell / bootstrap / system state を見る" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not keep the canonical make doctor guidance"
 }
 
 verify_layout_scaffold
@@ -158,5 +313,7 @@ verify_tmux_plugin_manifest
 verify_git_layout
 verify_tmux_compatibility_hooks
 verify_package_manifests
+verify_ai_dev_os_docs
+verify_doctor_guidance_consistency
 
 echo "repository structure test passed"

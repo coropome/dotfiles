@@ -1,0 +1,50 @@
+name: Bug
+description: Report a runtime bug, regression, or broken workflow.
+title: "bug: "
+labels:
+  - type:bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What broke?
+      placeholder: `ai start` exits before creating the tmux session.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Platform, shell, terminal, and relevant versions.
+      placeholder: macOS 15 / zsh / Ghostty / tmux 3.5a
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Exact steps to reproduce.
+      placeholder: |
+        1. Run `make install`
+        2. Open a new terminal
+        3. Run `ai start`
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs / Evidence
+      description: Command output, screenshots, or file references.
+  - type: textarea
+    id: fix_hint
+    attributes:
+      label: Suspected Cause / Fix Hint
+      description: Optional investigation notes.

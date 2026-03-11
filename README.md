@@ -1,32 +1,35 @@
-# ditfiles
+# AI Dev OS / ditfiles
 
-Mac + zsh + iTerm2 + tmux を「最初から」使うための dotfiles。
+macOS-first の AI development environment。dotfiles と tmux を内部基盤として使いながら、beginner には `ai start` を入口として見せる。
 
-- 入口は **`tnew`**（tmux セッション作成/復帰の入口）
+- beginner 向けの入口は **`ai start`**
+- tmux を直接使う場合の入口は **`tnew`**
 
 設計思想: `docs/90-philosophy.md`
 管理境界: `docs/91-state-ownership.md`
+開発ルール: `docs/92-development-workflow.md`
+agent instruction: `AGENTS.md`
 
 ---
 
-## Quickstart（30秒）
+## OSS Quickstart
 
 ```bash
 git clone https://github.com/coropome/dotfiles.git
 cd dotfiles
 
-# core setup（brew + dotfiles）
-make install
+# bootstrap
+./install
+make agent
+ai doctor
 
-# （任意）アプリ/CLIの導入（Homebrew）
-make mac
-
-# （任意）キーボード調整（挙動が変わるので分離）
-make keyboard
-
-# 新しいターミナルを開いたら（または手動で）
-tnew
+# workspace
+ai start
 ```
+
+これが beginner path。最初はこの flow だけでよい。
+
+current newcomer MVP は、`./install` と `make agent` のあとに既存 repo で `ai init -> ai doctor -> ai start` まで自走できること。
 
 前提:
 
@@ -34,10 +37,75 @@ tnew
 - `make install` の前に **Homebrew** が必要
 - 実運用上は **Xcode Command Line Tools** も必要
 - Linux / WSL では `make install` / `make mac` はサポート外。runtime 設定の参照先として docs を使う
+  - `ai-open` / `ai-copy` が late failure する時は `docs/31-support-matrix.md` と `docs/99-troubleshooting.md` を見る
 
-詳細なフェーズ説明: `docs/02-bootstrap-flow.md`
-サポート範囲: `docs/31-support-matrix.md`
-最短の導入ガイド: `docs/00-quickstart.md`
+次に読む:
+
+- 最短の導入ガイド: `docs/00-quickstart.md`
+- 10分 demo: `docs/05-demo-walkthrough.md`
+- フェーズ説明: `docs/02-bootstrap-flow.md`
+- サポート範囲: `docs/31-support-matrix.md`
+
+## Paths
+
+- Beginner path
+  - `./install`
+  - `make agent`
+  - `ai start`
+- Advanced / manual path
+  - `make install`
+  - `make mac`
+  - `make agent`
+  - `tnew`, `tmux`, local overrides, manual vendor config
+
+## If Agent CLI Is Missing
+
+- `ai start` の前に `make agent` を実行する
+- trust config の starter は `ai trust init claude --project`
+- `ai doctor` で workflow / prompt / trust / fallback / runtime config 側を確認する
+- `make doctor` で bootstrap / symlink / PATH / shell / system state 側を確認する
+- 詳細な分岐は `docs/99-troubleshooting.md`
+
+`ai code` / `ai review` / `ai improve` は agent metadata に定義した `prompt_file` と repo context を vendor CLI に handoff する。
+workflow chain をざっと見たい時は `ai --help` か `ai workflows` を使う。
+どちらも default agent に加えて fallback chain の確認入口になる。
+必要なら `ai-agent --describe --workflow review` で launch behavior と参照 config を確認する。
+workflow に `fallback_agents` を comma-separated で定義しておくと、primary agent が unavailable の時に次の候補へ切り替える。
+trust template も terminal から `ai trust init` / `ai trust apply` で生成・適用できる。詳細は `docs/41-ai-trust.md`。
+
+### 別の repo で AI Dev OS を使う
+
+dotfiles 自体を入れたあと、作業したい repo では次だけで始められる。
+
+```bash
+cd /path/to/your-repo
+ai init
+ai doctor
+ai workflows
+ai start
+```
+
+`ai init` は `.ai-dev-os/` を project-local に生成し、既存ファイルは上書きしない。
+default では GitHub Actions starter も生成する。不要なら `--no-github-actions`、hosted eval だけ外したいなら `--no-hosted-eval` を使う。
+starter workflow には `fallback_agents` も入れられるので、primary agent が unavailable の時の退避先も repo-local に持てる。
+starter を触ったあとに困ったら、まず `ai doctor` で workflow 解決と missing config を確認する。
+generated README の next step もこの MVP path に沿って、実行可能な command だけを出す。
+trust guidance は machine-specific path を埋め込まず、`ai trust init` / `ai trust apply` ベースで案内する。
+
+GitHub Actions starter も必要なら一緒に生成できる。
+
+- `.github/workflows/ai-dev-os-pr.yml`
+- `.github/workflows/ai-dev-os-hosted-eval.yml`
+
+`ai-dev-os-pr.yml` は PR 向けの prompt validation と CLI smoke test 用。
+`ai-dev-os-hosted-eval.yml` は manual dispatch 前提の opt-in hosted eval 用。
+どちらも target repo に加えて AI Dev OS runtime repo を checkout して使う。
+runtime source は `AI_DEV_OS_RUNTIME_REPOSITORY` と `AI_DEV_OS_RUNTIME_REF` で切り替えられ、fork / branch / tag への pin もできる。
+`--no-github-actions` を付けた時は、この CI 手順を飛ばして `ai doctor` / `ai workflows` / `ai start` を次の一歩にする。
+`--no-hosted-eval` を付けた時は、README 上の next step は PR workflow 中心になり、hosted eval は後から opt-in で足す。
+詳細は `docs/42-github-actions.md`。
+CI が local path ではなく runtime checkout / pinning 側で壊れていそうなら、同 doc の troubleshooting を先に見る。
+どの path を選ぶか迷う時も、local-only / PR CI / hosted eval の decision guide は同 doc に寄せている。
 
 ### install の挙動（重要）
 
@@ -51,9 +119,12 @@ tnew
 
 ## まず覚える（これだけ）
 
+- `ai start`：AI Dev OS の workspace を起動
+- `ai code` / `ai review` / `ai agents`：AI workflow の入口
+- `tnew`：tmux を直接扱いたい時の入口
+
 prefix は **Ctrl-a**（互換: **Ctrl-b** もOK）
 
-- `tnew`：迷ったらこれ
 - `prefix + |` / `prefix + -`：pane 分割
 - `prefix + d`：detach
 - `prefix + ?` / `prefix + /`：help
@@ -135,10 +206,10 @@ git layer の構成と include の仕組み、optional signing の考え方は `
 - まずは `make help`
 - `make install`：core setup
 - `make mac`：アプリ / CLI 導入
+- `make agent`：AI agent CLI セットアップ
 - `make doctor`：状態確認
 - `make test`：回帰確認
 - `make uninstall`：symlink と git include を戻す
-- `make agent`：agent CLI セットアップ
 - 詳細な target 一覧: `make help`
 - macOS 系 target の説明: `docs/30-mac-setup.md`
 - support boundary と manual apply: `docs/31-support-matrix.md`
@@ -169,6 +240,8 @@ git / CLI:
 
 - `docs/03-git.md`
 - `docs/40-cli.md`
+- `docs/42-github-actions.md`
+- `docs/41-ai-trust.md`
 
 local customization / secrets:
 
@@ -180,6 +253,7 @@ repo policy / maintenance:
 
 - `docs/90-philosophy.md`
 - `docs/91-state-ownership.md`
+- `docs/92-development-workflow.md`
 - `docs/99-troubleshooting.md`
 
 ---

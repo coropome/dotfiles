@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+"$repo_root/install.sh" "$@"
+
+printf "\nAI Dev OS bootstrap complete.\n"
+printf "Next step: ai start\n"

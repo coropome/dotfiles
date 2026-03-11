@@ -40,7 +40,7 @@
 ## plugin manager / 外部ツールに依存するもの
 
 - tmux plugin の実行時挙動
-- npm global install される agent CLI
+- Homebrew install される agent CLI
 - Homebrew package の実際の version
 
 ## out of scope

@@ -77,6 +77,11 @@ run_doctor() {
   HOME="$TEST_HOME" PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/doctor.sh" > "$DOCTOR_OUT"
 }
 
+run_doctor_with_proc_version() {
+  local proc_version="$1"
+  HOME="$TEST_HOME" PATH="$STUB_BIN:/usr/bin:/bin" DITFILES_TEST_PROC_VERSION="$proc_version" "$REPO/doctor.sh" > "$DOCTOR_OUT"
+}
+
 assert_contains() {
   local expected="$1"
   grep -Fq "$expected" "$DOCTOR_OUT" || fail "doctor output missing: $expected"
@@ -87,8 +92,19 @@ run_doctor
 
 assert_contains "[WARN] not macOS (bootstrap is macOS-first; doctor is best-effort here)"
 assert_contains "[NG] brew not found (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] claude not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] gemini not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
+assert_contains "[NG] codex not found (manual agent setup on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[NG] $TEST_HOME/.zshrc missing (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[NG] git include.path missing (manual bootstrap on non-macOS; see docs/31-support-matrix.md)"
 assert_contains "[..] xcode-select: skipped on non-macOS"
+assert_contains "[NG] ai-open backend missing: xdg-open (install xdg-utils on Linux)"
+assert_contains "[NG] ai-copy backend missing: install wl-copy, xclip, or xsel on Linux"
+
+run_doctor_with_proc_version "Linux version Microsoft"
+
+assert_contains "[..] platform variant: WSL"
+assert_contains "[NG] ai-open backend missing: install wslu for wslview or ensure explorer.exe is available in WSL"
+assert_contains "[NG] ai-copy backend missing: clip.exe (run from WSL with Windows integration enabled)"
 
 echo "doctor platform test passed"
