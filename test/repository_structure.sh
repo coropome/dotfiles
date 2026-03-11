@@ -249,6 +249,8 @@ verify_ai_dev_os_docs() {
     || fail "README.md does not distinguish the beginner path"
   grep -Fq "Advanced / manual path" "$REPO/README.md" \
     || fail "README.md does not distinguish the advanced path"
+  grep -Fq "ai start --backend stdio" "$REPO/README.md" \
+    || fail "README.md does not mention the stdio ai-start alternative"
   grep -Fq "ai start" "$REPO/docs/00-quickstart.md" \
     || fail "docs/00-quickstart.md does not mention ai start"
   grep -Fq "ai init" "$REPO/docs/00-quickstart.md" \
@@ -259,6 +261,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/00-quickstart.md does not have a beginner path section"
   grep -Fq "Advanced Path" "$REPO/docs/00-quickstart.md" \
     || fail "docs/00-quickstart.md does not have an advanced path section"
+  grep -Fq "default backend は \`tmux\`" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not describe the default ai-start backend"
+  grep -Fq "ai start --backend stdio" "$REPO/docs/00-quickstart.md" \
+    || fail "docs/00-quickstart.md does not mention the stdio ai-start alternative"
   grep -Fq "make agent" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not cover missing agent CLIs"
   grep -Fq "## AI Dev OS Starter Repos" "$REPO/docs/99-troubleshooting.md" \
@@ -269,6 +275,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/99-troubleshooting.md does not mention make doctor"
   grep -Fq "ai trust init" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not mention ai trust remediation"
+  grep -Fq "ai start --backend stdio" "$REPO/docs/99-troubleshooting.md" \
+    || fail "docs/99-troubleshooting.md does not mention the stdio ai-start escape hatch"
   grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
   grep -Fq "ai init" "$REPO/docs/40-cli.md" \

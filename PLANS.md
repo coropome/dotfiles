@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #87 `feat: add a workspace backend adapter to ai start`
-- Branch: `feat/87-ai-start-backend-adapter`
-- Memory Artifact: `tasks/sprint-memory/issue-87.md`
-- Resume Point: ai-start backend adapter landed; next sprint can explore richer backends from a fresh issue-backed branch
+- Active issue: #89 `docs: align newcomer docs with ai-start backend options`
+- Branch: `docs/89-ai-start-backend-docs`
+- Memory Artifact: `tasks/sprint-memory/issue-89.md`
+- Resume Point: newcomer docs now reflect tmux default plus stdio alternative; next sprint can move to generated starter or richer backend surfaces
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Implement the first workspace backend adapter so `ai start` keeps tmux as default without fixing terminal choice forever.
+Align newcomer-facing docs with the current `ai start` backend contract so terminal choice stays flexible in practice as well as in code.
 
 ## Working Agreement
 
@@ -33,21 +33,21 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - `ai start` workspace backend adapter
+  - newcomer/docs alignment for `ai start` backends
   - concrete surfaces
-  - [`bin/ai-start`](./bin/ai-start)
-  - [`docs/31-support-matrix.md`](./docs/31-support-matrix.md)
-  - [`docs/40-cli.md`](./docs/40-cli.md)
+  - [`README.md`](./README.md)
+  - [`docs/00-quickstart.md`](./docs/00-quickstart.md)
+  - [`docs/05-demo-walkthrough.md`](./docs/05-demo-walkthrough.md)
+  - [`docs/99-troubleshooting.md`](./docs/99-troubleshooting.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`test/demo_assets.sh`](./test/demo_assets.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - `ai start` supports backend selection
-  - default behavior remains tmux-backed
-  - `stdio` backend works without tmux
-  - docs explain backend selection and current default
-  - tests cover backend selection and the non-tmux path
+  - high-traffic newcomer docs mention `tmux` as the current default and `stdio` as an alternative
+  - troubleshooting points to `stdio` as a valid escape hatch when only the tmux default path is blocked
+  - demo walkthrough stays aligned with the beginner path while exposing the stdio option
+  - tests guard the new wording
 
 ## Squad
 
@@ -61,16 +61,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#87` is the sprint slice for this turn
+  - issue `#89` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 34 was converted into issue `#87`
+  - Task 35 was added and converted into issue `#89`
 - Review / Demo
-  - show tmux as default backend and stdio as a non-tmux alternative
+  - show tmux as default backend and stdio as the lighter newcomer-facing alternative
 - Retrospective
-  - keep backend abstraction narrower than terminal strategy
+  - keep docs aligned immediately after behavior changes
 
 ## Verification
 
+- `bash test/demo_assets.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -78,13 +79,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - update [`bin/ai-start`](./bin/ai-start) to support backend selection with tmux as default and stdio as the first alternative
-  - align [`docs/40-cli.md`](./docs/40-cli.md) and [`docs/31-support-matrix.md`](./docs/31-support-matrix.md) with the new backend contract
-  - lock the non-tmux path in [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - align README, quickstart, demo walkthrough, and troubleshooting with `tmux` default plus `stdio` alternative
+  - keep the newcomer path order unchanged while exposing the non-tmux escape hatch
+  - lock the wording with structure and demo guards
 - Retrospective
-  - keep: prove the abstraction with one small alternative backend before considering terminal-native integrations
-  - change: encode backend defaults and alternatives in output/docs/tests together
-  - stop: treating tmux-only implementation as enough once the boundary is already explicit
+  - keep: update the highest-traffic docs right after changing a core entrypoint contract
+  - change: treat troubleshooting as part of the beginner-path contract, not as an afterthought
+  - stop: leaving newcomer docs on an older backend story after the code moves ahead
 - System Updates
   - backlog: updated
   - plans: updated
@@ -96,8 +97,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping implementation aligned with the already-decided architecture boundary
+  - keeping high-traffic docs aligned with code-level backend changes
 - change
-  - prove backend flexibility with a small non-tmux mode first
+  - move the docs follow-through into the very next sprint when an entrypoint contract changes
 - stop
-  - leaving terminal choice fixed in practice after deciding it should stay flexible
+  - assuming CLI docs alone are enough once README and troubleshooting still say less

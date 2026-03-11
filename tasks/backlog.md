@@ -581,3 +581,20 @@ Keep `tmux` as the default backend initially, define a narrow backend contract, 
 
 Expected Impact:
 AI Dev OS can evolve its workspace launch surface without rewriting the control plane every time a better terminal integration appears.
+
+## Task 35
+
+Title: Align newcomer docs with `ai start` backend options
+Tracking: #89 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but high-traffic newcomer docs still read as if tmux is the only path.
+
+Improvement Idea:
+Refresh newcomer-facing docs and troubleshooting so they present `tmux` as the current default and `stdio` as a lighter escape hatch when terminal choice should stay flexible.
+
+Implementation Hint:
+Update README, quickstart, demo walkthrough, and troubleshooting. Add narrow wording guards and walkthrough checks so the contract does not drift back to tmux-only language.
+
+Expected Impact:
+Users can discover the non-tmux path from the first docs they read, without losing the default tmux story or the beginner path ordering.
