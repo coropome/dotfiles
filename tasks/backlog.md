@@ -381,7 +381,7 @@ The repo's delivery template reflects the operating model instead of relying on 
 ## Task 23
 
 Title: Teach issue templates to capture likely system updates and sprint shape
-Tracking: pending
+Tracking: #61 (closed)
 
 Problem:
 The repo now has stronger Scrum and sprint-memory rules, but issue creation still stops at problem, goal, proposal, and acceptance criteria. That makes likely docs/tests/instructions/ADR impact and sprint shape too easy to defer until implementation starts.
