@@ -132,6 +132,7 @@ case "$command_name" in
       exec "$BIN_DIR/ai-agent" --workflow "$command_name" "$@"
     fi
     echo "unknown ai command: $command_name" >&2
+    echo "run \`ai doctor\` to diagnose repo/runtime readiness first" >&2
     echo "run \`ai workflows\` to see available workflow aliases and descriptions" >&2
     echo "repo-local overrides may add commands via .ai-dev-os/workflows.yml" >&2
     usage >&2

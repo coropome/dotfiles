@@ -451,6 +451,11 @@ unusable_failure="$(
 [[ "$unusable_failure" == *"run: ai doctor"* ]] || fail "unusable workflow did not suggest ai doctor"
 
 unknown_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" nope 2>&1 >/dev/null || true)"
+[[ "$unknown_output" == *"run \`ai doctor\` to diagnose repo/runtime readiness first"* ]] || fail "unknown ai command did not include doctor remediation"
 [[ "$unknown_output" == *"run \`ai workflows\` to see available workflow aliases and descriptions"* ]] || fail "unknown ai command did not include workflow remediation"
+unknown_doctor_line="$(printf '%s\n' "$unknown_output" | rg '^run `ai doctor`' -n)"
+unknown_workflows_line="$(printf '%s\n' "$unknown_output" | rg '^run `ai workflows`' -n)"
+[[ -n "$unknown_doctor_line" && -n "$unknown_workflows_line" ]] || fail "unknown ai command did not print ordered recovery lines"
+[[ "${unknown_doctor_line%%:*}" -lt "${unknown_workflows_line%%:*}" ]] || fail "unknown ai command did not point to ai doctor before ai workflows"
 
 echo "ai cli test passed"

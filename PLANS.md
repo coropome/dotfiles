@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #79 `docs: add beginner-first next-step guidance to ai doctor`
-- Branch: `docs/79-ai-doctor-next-steps`
-- Memory Artifact: `tasks/sprint-memory/issue-79.md`
-- Resume Point: ai-doctor next-step guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
+- Active issue: #81 `docs: align unknown-command recovery in ai with the beginner path`
+- Branch: `docs/81-ai-unknown-command-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-81.md`
+- Resume Point: unknown-command recovery is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Make `ai doctor` a better recovery surface by ending with beginner-first next-step guidance for healthy, warn, and fail outcomes.
+Align the generic unknown-command recovery path in `ai` with the same beginner-first order used by help, start, and doctor.
 
 ## Working Agreement
 
@@ -33,19 +33,18 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - beginner-first `ai doctor` next-step guidance
+  - beginner-first unknown-command recovery guidance
 - concrete surfaces
-  - [`bin/ai-doctor`](./bin/ai-doctor)
+  - [`bin/ai`](./bin/ai)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
-  - [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
 - acceptance slice
-  - `ai doctor` prints a compact next-step block at the end
-  - healthy output points to `ai workflows` before `ai start`
-  - warn output keeps beginner-first ordering and can point to deeper inspection after `ai workflows`
-  - fail output tells users to fix gaps and rerun `ai doctor` before `ai start`
+  - unknown-command output points to `ai doctor` before `ai workflows`
+  - workflow-alias discovery remains visible in the fallback output
+  - tests lock the fallback ordering
+  - any touched docs keep the same recovery order
 
 ## Squad
 
@@ -59,13 +58,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#79` is the sprint slice for this turn
+  - issue `#81` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 30 was added and converted into issue `#79`
+  - Task 31 was added and converted into issue `#81`
 - Review / Demo
-  - show the new `ai doctor` next-step block for healthy, warn, and fail cases
+  - show the unknown-command recovery order and keep workflow discovery visible
 - Retrospective
-  - keep `ai doctor` terminal-short and explicit about what to do next
+  - keep the unknown-command path short and terminal-friendly
 
 ## Verification
 
@@ -76,13 +75,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - add an outcome-based `Next Steps` footer to [`bin/ai-doctor`](./bin/ai-doctor)
-  - keep healthy output on `ai workflows -> ai start`, warn output on `ai workflows -> optional ai-agent --describe --workflow <name> -> ai start`, and fail output on `fix -> rerun ai doctor -> ai workflows`
-  - align [`docs/40-cli.md`](./docs/40-cli.md) and lock the footer ordering in [`test/ai_doctor.sh`](./test/ai_doctor.sh)
+  - update [`bin/ai`](./bin/ai) so unknown-command fallback points to `ai doctor` before `ai workflows`
+  - keep workflow-alias discovery visible after the doctor-first remediation
+  - align [`docs/40-cli.md`](./docs/40-cli.md) and lock the fallback order in [`test/ai_cli.sh`](./test/ai_cli.sh)
 - Retrospective
-  - keep: extend beginner-first guidance to recovery surfaces after discovery and startup surfaces are aligned
-  - change: treat the exact last lines of diagnostic output as part of the contract when the task is specifically about next steps
-  - stop: ending the canonical recovery command with no clear next action
+  - keep: close the broadest fallback paths after the stronger happy-path surfaces are aligned
+  - change: add a narrow docs guard when a recovery phrase becomes part of the canonical CLI story
+  - stop: letting generic fallback surfaces lag behind the guided beginner path
 - System Updates
   - backlog: updated
   - plans: updated
@@ -96,6 +95,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - align the recovery surface with the same beginner path used in discovery and startup messages
+  - align generic fallback paths with the same beginner path used in the stronger entry surfaces
 - stop
-  - leaving `ai doctor` as a raw diagnostic dump after the rest of the repo moved to guided next steps
+  - leaving one broad fallback path on an older, thinner recovery story
