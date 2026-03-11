@@ -23,6 +23,8 @@ ai trust init claude --project
 ai start
 ```
 
+`ai start` の current default backend は `tmux`。terminal choice を固定したくない時は `ai start --backend stdio` を使える。
+
 ## Trust Setup
 
 - repo-local starter: `ai trust init claude --project`
@@ -47,6 +49,7 @@ If a workflow cannot launch as expected, run `ai doctor` first to inspect fallba
 
 - local-only first
   - stay on `ai doctor` / `ai workflows` / `ai start`
+  - default backend は `tmux`、lighter path は `ai start --backend stdio`
   - use this when CI is not the current problem
 - PR CI next
   - keep `.github/workflows/ai-dev-os-pr.yml`

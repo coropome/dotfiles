@@ -598,3 +598,20 @@ Update README, quickstart, demo walkthrough, and troubleshooting. Add narrow wor
 
 Expected Impact:
 Users can discover the non-tmux path from the first docs they read, without losing the default tmux story or the beginner path ordering.
+
+## Task 36
+
+Title: Align `ai init` starter guidance with `ai start` backend options
+Tracking: #91 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but generated starter guidance still treats `ai start` as a single undifferentiated path.
+
+Improvement Idea:
+Update the generated starter README and `ai init` next-step output so they present `tmux` as the current default and `stdio` as the lighter alternative when terminal choice should stay flexible.
+
+Implementation Hint:
+Update `bin/ai-init`, keep the demo starter fixture in sync, and extend `test/ai_init.sh` plus structure/demo guards to lock the wording down.
+
+Expected Impact:
+The first generated artifact a new adopter reads tells the same backend story as the runtime docs and CLI surface.

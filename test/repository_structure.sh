@@ -277,6 +277,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/99-troubleshooting.md does not mention ai trust remediation"
   grep -Fq "ai start --backend stdio" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not mention the stdio ai-start escape hatch"
+  grep -Fq "ai start --backend stdio" "$REPO/demo/sample-project/.ai-dev-os/README.md" \
+    || fail "demo starter README does not mention the stdio ai-start option"
   grep -Fq ".ai-dev-os/workflows.yml" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document .ai-dev-os/workflows.yml"
   grep -Fq "ai init" "$REPO/docs/40-cli.md" \
