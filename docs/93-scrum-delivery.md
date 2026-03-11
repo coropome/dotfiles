@@ -57,6 +57,7 @@ Definition of Ready:
 - newcomer-facing change なら docs surface の一貫性も確認する
 - demo が必要な change では、実行順や利用者の見え方を説明できる状態にする
 - multi-agent sprint では、review/demo までに compressed memory に decisions, lane outcomes, rerun commands を揃える
+- PR では `.github/pull_request_template.md` の `Sprint Context` に sprint memory, review/demo, system updates を短く残す
 
 ## Retrospective
 
