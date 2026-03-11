@@ -6,5 +6,43 @@ if [[ -L "$SCRIPT_PATH" ]]; then
   SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
 fi
 BIN_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd -P)"
+BACKLOG_FILE="${AI_TASK_BACKLOG_FILE:-$BIN_DIR/../tasks/backlog.md}"
 
-cat "$BIN_DIR/../tasks/backlog.md"
+if [[ ! -f "$BACKLOG_FILE" ]]; then
+  echo "missing backlog file: $BACKLOG_FILE" >&2
+  exit 1
+fi
+
+pending_tasks=()
+while IFS= read -r pending_task; do
+  pending_tasks+=("$pending_task")
+done < <(
+  awk '
+    /^## Task / {
+      task = $0
+      sub(/^## /, "", task)
+      title = ""
+      next
+    }
+    /^Title: / {
+      title = substr($0, 8)
+      next
+    }
+    /^Tracking: pending$/ {
+      if (task != "" && title != "") {
+        print task ": " title
+      }
+    }
+  ' "$BACKLOG_FILE"
+)
+
+printf 'AI Dev OS Pending Tasks\n'
+printf 'Pending count: %d\n' "${#pending_tasks[@]}"
+if [[ ${#pending_tasks[@]} -eq 0 ]]; then
+  printf -- '- none\n'
+else
+  printf '%s\n' "${pending_tasks[@]}" | sed 's/^/- /'
+fi
+printf '\n'
+
+cat "$BACKLOG_FILE"

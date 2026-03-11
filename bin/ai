@@ -26,7 +26,7 @@ Main Commands:
   agent         run or inspect a configured agent
   context       build repository context
   doctor        inspect workflow resolution and agent readiness
-  task          show the current backlog
+  task          summarize pending backlog work for refinement and print the backlog
   eval          inspect or validate prompt artifacts
   trust         generate or apply vendor-native trust config
   install       run the OS abstraction install wrapper
