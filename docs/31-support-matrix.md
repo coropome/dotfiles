@@ -5,7 +5,7 @@
 - OS: **macOS**
 - パッケージ管理: **Homebrew**
 - shell: **zsh**
-- multiplexer: **tmux**
+- multiplexer: **tmux** (`ai start` の current backend)
 
 ## best-effort / 将来対応の余地
 
@@ -25,7 +25,7 @@
 - bash
 - zsh
 - git
-- tmux
+- tmux (`ai start` は today これを要求する)
 
 ## Linux / WSL で今使えるもの
 

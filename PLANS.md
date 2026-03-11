@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #83 `docs: add beginner-first next-step guidance to ai workflows`
-- Branch: `docs/83-ai-workflows-next-steps`
-- Memory Artifact: `tasks/sprint-memory/issue-83.md`
-- Resume Point: `ai workflows` next-step guidance landed; start the next sprint from a fresh issue-backed branch
+- Active issue: #85 `adr: define terminal orchestration modes beyond tmux`
+- Branch: `docs/85-terminal-orchestration-modes`
+- Memory Artifact: `tasks/sprint-memory/issue-85.md`
+- Resume Point: terminal-orchestration boundary is fixed; next sprint can implement the workspace backend adapter from a fresh issue-backed branch
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Make `ai workflows` act like a real beginner-path bridge instead of a flat metadata dump.
+Decide the durable boundary between AI Dev OS as an agent control plane and tmux as the current workspace backend.
 
 ## Working Agreement
 
@@ -33,19 +33,20 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - beginner-first next-step guidance for `ai workflows`
+  - terminal-orchestration boundary ADR and supporting docs
   - concrete surfaces
-  - [`bin/ai-agent`](./bin/ai-agent)
-  - [`docs/40-cli.md`](./docs/40-cli.md)
+  - [`docs/adr/0006-terminal-orchestration-modes.md`](./docs/adr/0006-terminal-orchestration-modes.md)
+  - [`docs/90-philosophy.md`](./docs/90-philosophy.md)
+  - [`docs/91-state-ownership.md`](./docs/91-state-ownership.md)
+  - [`docs/31-support-matrix.md`](./docs/31-support-matrix.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - `ai workflows` ends with a compact next-step footer
-  - the footer points to `ai-agent --describe --workflow <name>` before `ai start`
-  - tests lock the footer wording and order
-  - docs explain the new guidance without blurring `ai doctor` and `ai workflows`
+  - ADR defines AI control plane, workspace backend, and terminal-native integration boundaries
+  - docs state that tmux is currently required for `ai start`, but is not the north-star product boundary
+  - follow-up implementation work is captured in backlog
+  - structure tests guard the new ADR and key wording
 
 ## Squad
 
@@ -59,17 +60,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#83` is the sprint slice for this turn
+  - issue `#85` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 32 was added and converted into issue `#83`
+  - Task 33 was added and converted into issue `#85`; Task 34 is the implementation follow-up
 - Review / Demo
-  - show the `ai workflows` footer order: inspect one workflow, then continue with `ai start`
+  - show the new boundary: AI surface first, tmux as current backend, terminal-native frontends as optional integrations
 - Retrospective
-  - keep discovery surfaces short and ordered
+  - keep architecture decisions ahead of expensive backend rewrites
 
 ## Verification
 
-- `bash test/ai_cli.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -77,26 +77,26 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - update [`bin/ai-agent`](./bin/ai-agent) so `ai workflows` ends with compact next-step guidance
-  - keep workflow inspection ahead of workspace launch in both CLI output and docs
-  - lock the footer wording and order in [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - add an ADR that defines tmux as the current workspace backend rather than the AI Dev OS control plane
+  - align philosophy, ownership, and support docs with that boundary
+  - leave a follow-up backlog task for a future workspace backend adapter
 - Retrospective
-  - keep: close beginner-path gaps in the order users actually hit the surfaces
-  - change: add a small next-step contract once a discovery command becomes part of the canonical path
-  - stop: treating `ai workflows` like a raw metadata dump after it became a guided beginner-step
+  - keep: decide long-term boundaries before replacing host-runtime machinery
+  - change: separate durable control-plane decisions from current backend defaults
+  - stop: letting the current tmux implementation silently define the product boundary
 - System Updates
   - backlog: updated
   - plans: updated
   - docs: updated
   - tests: updated
   - instructions: not needed
-  - ADR: not needed
+  - ADR: updated
 
 ## Retrospective
 
 - keep
-  - treating workflow discovery surfaces as part of the guided beginner path
+  - treating host-runtime design as a first-class product decision
 - change
-  - align the middle of the beginner path after the top-level entry surfaces are consistent
+  - decide backend boundaries explicitly before chasing terminal trends
 - stop
-  - leaving `ai workflows` as a raw catalog when the repo now treats it as a core next step
+  - treating tmux as part of the north-star product definition just because it is the current implementation

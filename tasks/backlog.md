@@ -547,3 +547,37 @@ Update `bin/ai-agent --list-workflows`, document the guidance in `docs/40-cli.md
 
 Expected Impact:
 Users can move from workflow discovery to the right next action without dropping out of the guided beginner path.
+
+## Task 33
+
+Title: Define terminal orchestration modes beyond tmux
+Tracking: #85 (closed)
+
+Problem:
+`ai start` is the primary beginner entrypoint, but its implementation is tightly coupled to tmux. That makes the current backend look like part of the product identity even though the higher-value AI surface lives in workflow routing, vendor-native config, context, trust, and starter onboarding.
+
+Improvement Idea:
+Write down a durable boundary where tmux remains the current workspace backend, but not the long-term control plane or mandatory north-star surface.
+
+Implementation Hint:
+Capture the decision in an ADR, reflect it in philosophy/ownership/support docs, and leave a follow-up implementation task for a workspace backend adapter.
+
+Expected Impact:
+The repo can keep tmux where it is strong today without locking the future product shape to a single terminal backend.
+
+## Task 34
+
+Title: Add a workspace backend adapter for `ai start`
+Tracking: pending
+
+Problem:
+Even if tmux is only the current backend by design, `ai start` still hardcodes tmux as the only workspace execution path. That prevents the product from offering terminal-native or non-attached modes later.
+
+Improvement Idea:
+Introduce a small workspace backend adapter so `ai start` can target `tmux` first while leaving room for `stdio` or terminal-native frontends later.
+
+Implementation Hint:
+Keep `tmux` as the default backend initially, define a narrow backend contract, and add a first alternative mode that can prove the abstraction without changing the newcomer path by default.
+
+Expected Impact:
+AI Dev OS can evolve its workspace launch surface without rewriting the control plane every time a better terminal integration appears.
