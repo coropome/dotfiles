@@ -328,12 +328,20 @@ verify_ai_dev_os_docs() {
     || fail "docs/93-scrum-delivery.md does not define Definition of Ready"
   grep -Fq "Definition of Done" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define Definition of Done"
+  grep -Fq "single-step の小さな変更" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not keep the small-change ceremony carve-out"
   grep -Fq "Product / Backlog" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define the Product / Backlog role"
   grep -Fq "Delivery / Scrum" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define the Delivery / Scrum role"
   grep -Fq "Reviewer / QA" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not define the Reviewer / QA role"
+  grep -Fq "複数 role を兼務してよい" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not allow one person to hold multiple roles"
+  grep -Fq "review/demo evidence exists" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not keep review/demo evidence in Definition of Done"
+  grep -Fq "retrospective note for the sprint exists" "$REPO/docs/93-scrum-delivery.md" \
+    || fail "docs/93-scrum-delivery.md does not keep the retrospective note in Definition of Done"
   grep -Fq "PLANS.md" "$REPO/docs/93-scrum-delivery.md" \
     || fail "docs/93-scrum-delivery.md does not connect Scrum cadence to PLANS.md"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/PLANS.md" \
@@ -348,6 +356,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/adr/0002-ai-dev-os-primary-surface.md does not record the AI Dev OS product-surface decision"
   grep -Fq "lightweight Scrum cadence" "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md" \
     || fail "docs/adr/0003-ai-dev-os-scrum-cadence.md does not record the Scrum cadence decision"
+  grep -Fq "small changes" "$REPO/docs/adr/0003-ai-dev-os-scrum-cadence.md" \
+    || fail "docs/adr/0003-ai-dev-os-scrum-cadence.md does not keep the small-change escape hatch"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not enforce issue-first work"
   grep -Fq "docs/93-scrum-delivery.md" "$REPO/AGENTS.md" \

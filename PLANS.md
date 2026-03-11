@@ -78,6 +78,15 @@ Specialists can be added per sprint when needed:
 ## Retrospective
 
 - keep
+  - backlog -> issue -> branch の順で切ってから squad を組む流れ
+- change
+  - lightweight process の escape hatch は最初から明文化する
+- stop
+  - ceremony を暗黙知のまま期待する進め方
+
+## Retrospective
+
+- keep
   - tie new operating rules to grep-based structure tests so they do not silently disappear
 - change
   - update `PLANS.md` earlier when the slice changes, so the active issue and squad stay correct without a catch-up edit
