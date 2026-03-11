@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #109 `chore: refactor top-level ai dispatch helpers`
-- Branch: `chore/109-ai-dispatch-helpers`
-- Memory Artifact: `tasks/sprint-memory/issue-109.md`
-- Resume Point: top-level ai dispatch now routes through direct-command, workflow-alias, and unknown-command helpers; next sprint can keep tightening shell internals or move into expansion work
+- Active issue: #111 `chore: refactor ai-agent resolution helpers`
+- Branch: `chore/111-ai-agent-resolution-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-111.md`
+- Resume Point: ai-agent now routes config-path output, candidate resolution, and describe/recovery paths through helpers; next sprint can keep tightening shell internals or move into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Refactor the top-level `ai` entrypoint so the code stays easy to read and extend without changing the current command behavior contract.
+Refactor `ai-agent` resolution and describe flows so the code stays easy to read and extend without changing the current workflow routing and recovery contracts.
 
 ## Working Agreement
 
@@ -33,16 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - cleaner top-level `ai` dispatch flow
+  - cleaner `ai-agent` resolution and describe flow
   - concrete surfaces
-  - [`bin/ai`](./bin/ai)
+  - [`bin/ai-agent`](./bin/ai-agent)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
   - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - acceptance slice
-  - top-level `ai` keeps current direct command and workflow alias behavior unchanged
-  - direct dispatch, workflow alias dispatch, and unknown-command recovery move into clearer helpers
-  - tests lock the refactor with an explicit unknown-command assertion
+  - `ai-agent` keeps current list, describe, workflow resolution, and launch behavior unchanged
+  - config-path output, candidate resolution, and describe/recovery logic move into clearer helpers
+  - tests lock the refactor with an explicit unknown-workflow recovery assertion
 
 ## Squad
 
@@ -56,11 +56,11 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#109` is the sprint slice for this turn
+  - issue `#111` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 45 was added and converted into issue `#109`
+  - Task 46 was added and converted into issue `#111`
 - Review / Demo
-  - show `bin/ai` reading as helper-based command resolution while keeping the same direct commands and unknown-command behavior
+  - show `bin/ai-agent` reading as helper-based resolution while keeping the same describe and recovery behavior
 - Retrospective
   - keep shell cleanup moving once user-facing contracts settle
 
@@ -73,13 +73,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - refactor top-level `ai` dispatch into helpers without changing direct-command or workflow-alias behavior
-  - keep unknown-command recovery stable
-  - lock the refactor with CLI tests, including explicit unknown-command coverage
+  - refactor `ai-agent` resolution and describe flows into helpers without changing routing behavior
+  - keep unknown-workflow and unknown-agent recovery stable
+  - lock the refactor with CLI tests, including explicit unknown-workflow coverage
 - Retrospective
   - keep: use small refactors once product wording has stabilized
-  - change: add one explicit recovery-path assertion whenever entrypoint dispatch is rearranged
-  - stop: letting top-level command routing keep growing inline
+  - change: add one explicit recovery-path assertion whenever resolution logic is rearranged
+  - stop: letting `ai-agent` keep accumulating one long staged control path
 - System Updates
   - backlog: updated
   - plans: updated
@@ -91,8 +91,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - cleaning shell entrypoints once outward behavior is stable
+  - cleaning heavy shell resolution surfaces once outward behavior is stable
 - change
   - lock refactors with a targeted recovery assertion instead of relying only on broad coverage
 - stop
-  - allowing top-level command dispatch to keep spreading across one case block
+  - allowing ai-agent resolution, describe, and recovery logic to keep spreading across one control path

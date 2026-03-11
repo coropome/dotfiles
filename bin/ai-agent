@@ -253,6 +253,104 @@ list_workflows() {
   printf '  - then continue the beginner path: ai start\n'
 }
 
+print_config_path() {
+  local config_kind="$1"
+
+  case "$config_kind" in
+    agents)
+      printf '%s\n' "$AGENTS_FILE"
+      ;;
+    workflows)
+      printf '%s\n' "$WORKFLOWS_FILE"
+      ;;
+    *)
+      echo "unknown config kind: $config_kind" >&2
+      exit 2
+      ;;
+  esac
+}
+
+print_unknown_workflow() {
+  local workflow_name="$1"
+
+  echo "unknown workflow: $workflow_name" >&2
+  echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
+  exit 2
+}
+
+print_unknown_agent() {
+  local agent_name="$1"
+
+  echo "unknown agent: $agent_name" >&2
+  echo "run \`ai agents\` to inspect configured agents and their roles" >&2
+  exit 2
+}
+
+append_unique_candidate() {
+  local candidate_name="$1"
+  local existing_candidate
+
+  [[ -n "$candidate_name" ]] || return 0
+  if [[ -n "${resolution_candidates[*]-}" ]]; then
+    for existing_candidate in "${resolution_candidates[@]}"; do
+      [[ "$existing_candidate" == "$candidate_name" ]] && return 0
+    done
+  fi
+
+  resolution_candidates+=("$candidate_name")
+}
+
+resolve_candidates() {
+  local candidate_name
+
+  resolution_candidates=()
+  if [[ -n "$workflow_name" ]]; then
+    while IFS= read -r candidate_name; do
+      append_unique_candidate "$candidate_name"
+    done < <(ai_workflow_candidate_agents "$WORKFLOWS_FILE" "$workflow_name")
+  else
+    resolution_candidates=("$agent_name")
+  fi
+
+  if [[ -z "${resolution_candidates[*]-}" ]]; then
+    print_unknown_workflow "$workflow_name"
+  fi
+}
+
+print_describe_output() {
+  if [[ -z "$command_name" ]]; then
+    print_unknown_agent "$agent_name"
+  fi
+
+  printf 'agent: %s\n' "$agent_name"
+  if [[ -n "$workflow_name" ]]; then
+    printf 'workflow: %s\n' "$workflow_name"
+    if [[ -n "$fallback_agents_raw" ]]; then
+      printf 'fallback_agents: %s\n' "$fallback_agents_raw"
+    fi
+    printf 'resolution_candidates: %s\n' "$(join_with ", " "${resolution_candidates[@]}")"
+  fi
+  [[ -n "$description" ]] && printf 'description: %s\n' "$description"
+  printf 'command: %s\n' "$command_name"
+  printf 'role: %s\n' "${role_name:-unknown}"
+  [[ -n "$provider_name" ]] && printf 'provider: %s\n' "$provider_name"
+  [[ -n "$automation_mode" ]] && printf 'automation_mode: %s\n' "$automation_mode"
+  [[ -n "$docs_url" ]] && printf 'docs_url: %s\n' "$docs_url"
+  [[ -n "$user_config" ]] && printf 'user_config: %s\n' "$user_config"
+  [[ -n "$project_config" ]] && printf 'project_config: %s\n' "$project_config"
+  [[ -n "$project_extensions" ]] && printf 'project_extensions: %s\n' "$project_extensions"
+  [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
+  printf 'launch_behavior: %s\n' "$(describe_launch_behavior "$prompt_handoff" "$context_handoff")"
+  [[ -n "$prompt_file" ]] && printf 'prompt_file: %s\n' "$prompt_file"
+  [[ -n "$candidate_prompt_file" ]] && printf 'resolved_prompt_file: %s\n' "$candidate_prompt_file"
+  [[ -n "$prompt_handoff" ]] && printf 'prompt_handoff: %s\n' "$prompt_handoff"
+  [[ -n "$context_handoff" ]] && printf 'context_handoff: %s\n' "$context_handoff"
+  [[ -n "$context_handoff" ]] && printf 'resolved_context_file: %s\n' "$context_file"
+  [[ -n "$trust_template" ]] && printf 'trust_template: %s\n' "$trust_template"
+  printf 'agents_config: %s\n' "$AGENTS_FILE"
+  printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
+}
+
 config_kind=""
 action="run"
 workflow_name=""
@@ -324,18 +422,7 @@ case "$action" in
     exit 0
     ;;
   config_path)
-    case "$config_kind" in
-      agents)
-        printf '%s\n' "$AGENTS_FILE"
-        ;;
-      workflows)
-        printf '%s\n' "$WORKFLOWS_FILE"
-        ;;
-      *)
-        echo "unknown config kind: $config_kind" >&2
-        exit 2
-        ;;
-    esac
+    print_config_path "$config_kind"
     exit 0
     ;;
 esac
@@ -344,9 +431,7 @@ if [[ -n "$workflow_name" ]]; then
   agent_name="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "default_agent")"
   fallback_agents_raw="$(ai_config_value "$WORKFLOWS_FILE" "workflows" "$workflow_name" "fallback_agents")"
   if [[ -z "$agent_name" ]]; then
-    echo "unknown workflow: $workflow_name" >&2
-    echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
-    exit 2
+    print_unknown_workflow "$workflow_name"
   fi
 elif [[ -z "$agent_name" ]]; then
   usage
@@ -357,66 +442,13 @@ declare -a resolution_candidates=()
 declare -a candidate_failures=()
 selected_agent_name=""
 
-if [[ -n "$workflow_name" ]]; then
-  while IFS= read -r candidate_name; do
-    local_duplicate=0
-    [[ -n "$candidate_name" ]] || continue
-    if [[ -n "${resolution_candidates[*]-}" ]]; then
-      for existing_candidate in "${resolution_candidates[@]}"; do
-        if [[ "$existing_candidate" == "$candidate_name" ]]; then
-          local_duplicate=1
-          break
-        fi
-      done
-    fi
-    [[ $local_duplicate -eq 0 ]] && resolution_candidates+=("$candidate_name")
-  done < <(ai_workflow_candidate_agents "$WORKFLOWS_FILE" "$workflow_name")
-else
-  resolution_candidates=("$agent_name")
-fi
-
-if [[ -z "${resolution_candidates[*]-}" ]]; then
-  echo "unknown workflow: $workflow_name" >&2
-  echo "run \`ai workflows\` to inspect available workflow names and descriptions" >&2
-  exit 2
-fi
+resolve_candidates
 
 agent_name="${resolution_candidates[0]}"
 load_agent_metadata "$agent_name"
 
 if [[ "$action" == "describe" ]]; then
-  if [[ -z "$command_name" ]]; then
-    echo "unknown agent: $agent_name" >&2
-    echo "run \`ai agents\` to inspect configured agents and their roles" >&2
-    exit 2
-  fi
-  printf 'agent: %s\n' "$agent_name"
-  if [[ -n "$workflow_name" ]]; then
-    printf 'workflow: %s\n' "$workflow_name"
-    if [[ -n "$fallback_agents_raw" ]]; then
-      printf 'fallback_agents: %s\n' "$fallback_agents_raw"
-    fi
-    printf 'resolution_candidates: %s\n' "$(join_with ", " "${resolution_candidates[@]}")"
-  fi
-  [[ -n "$description" ]] && printf 'description: %s\n' "$description"
-  printf 'command: %s\n' "$command_name"
-  printf 'role: %s\n' "${role_name:-unknown}"
-  [[ -n "$provider_name" ]] && printf 'provider: %s\n' "$provider_name"
-  [[ -n "$automation_mode" ]] && printf 'automation_mode: %s\n' "$automation_mode"
-  [[ -n "$docs_url" ]] && printf 'docs_url: %s\n' "$docs_url"
-  [[ -n "$user_config" ]] && printf 'user_config: %s\n' "$user_config"
-  [[ -n "$project_config" ]] && printf 'project_config: %s\n' "$project_config"
-  [[ -n "$project_extensions" ]] && printf 'project_extensions: %s\n' "$project_extensions"
-  [[ -n "$mcp_config" ]] && printf 'mcp_config: %s\n' "$mcp_config"
-  printf 'launch_behavior: %s\n' "$(describe_launch_behavior "$prompt_handoff" "$context_handoff")"
-  [[ -n "$prompt_file" ]] && printf 'prompt_file: %s\n' "$prompt_file"
-  [[ -n "$candidate_prompt_file" ]] && printf 'resolved_prompt_file: %s\n' "$candidate_prompt_file"
-  [[ -n "$prompt_handoff" ]] && printf 'prompt_handoff: %s\n' "$prompt_handoff"
-  [[ -n "$context_handoff" ]] && printf 'context_handoff: %s\n' "$context_handoff"
-  [[ -n "$context_handoff" ]] && printf 'resolved_context_file: %s\n' "$context_file"
-  [[ -n "$trust_template" ]] && printf 'trust_template: %s\n' "$trust_template"
-  printf 'agents_config: %s\n' "$AGENTS_FILE"
-  printf 'workflows_config: %s\n' "$WORKFLOWS_FILE"
+  print_describe_output
   exit 0
 fi
 

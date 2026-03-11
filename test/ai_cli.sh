@@ -336,6 +336,12 @@ workflow_describe_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$R
 [[ "$workflow_describe_output" == *"resolution_candidates: reviewer, claude, gemini"* ]] || fail "ai-agent describe missing resolution candidates"
 [[ "$workflow_describe_output" == *"agents_config: $REPO/ai/agents.yml"* ]] || fail "ai-agent did not report the resolved agent config"
 
+unknown_workflow_describe_output="$(
+  cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-agent" --describe --workflow missing 2>&1 >/dev/null || true
+)"
+[[ "$unknown_workflow_describe_output" == *"unknown workflow: missing"* ]] || fail "ai-agent did not keep the unknown-workflow error"
+[[ "$unknown_workflow_describe_output" == *"run \`ai workflows\` to inspect available workflow names and descriptions"* ]] || fail "ai-agent did not keep workflow recovery guidance for unknown workflow"
+
 task_output="$(cd "$GLOBAL_REPO" && AI_TASK_BACKLOG_FILE="$PENDING_BACKLOG" PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" task)"
 [[ "$task_output" == *"AI Dev OS Pending Tasks"* ]] || fail "ai task did not print the pending summary header"
 [[ "$task_output" == *"Pending count: 1"* ]] || fail "ai task did not print the pending task count"
