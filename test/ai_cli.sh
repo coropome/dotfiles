@@ -352,6 +352,7 @@ printf "copied" | PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-copy"
 start_output="$(PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai-start" --repo "$TEST_REPO")"
 [[ -f "$TEST_REPO/.context/summary.md" ]] || fail "ai-start did not refresh summary.md"
 [[ "$start_output" == *"AI Dev OS workspace ready:"* ]] || fail "ai-start did not print the workspace-ready line"
+[[ "$start_output" == *"Backend: tmux"* ]] || fail "ai-start did not report the tmux backend"
 [[ "$start_output" == *"Next: ai doctor | ai workflows"* ]] || fail "ai-start did not print the beginner guidance"
 [[ "$start_output" == *"Then: ai code | ai review | ai task | ai agents"* ]] || fail "ai-start did not keep the deeper commands visible"
 start_next_line="$(printf '%s\n' "$start_output" | rg '^Next:' -n)"
@@ -366,7 +367,15 @@ assert_contains "$TMUX_LOG" "select-layout -t ai-dev-os-project:workspace tiled"
 PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" stop --repo "$TEST_REPO" >/dev/null
 assert_contains "$TMUX_LOG" "kill-session -t ai-dev-os-project"
 
+tmux_log_before_stdio="$(cat "$TMUX_LOG")"
 rm -f "$STUB_BIN/tmux"
+stdio_output="$(PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" --backend stdio)"
+[[ "$stdio_output" == *"AI Dev OS workspace ready: stdio"* ]] || fail "ai-start stdio backend did not print the stdio workspace label"
+[[ "$stdio_output" == *"Backend: stdio"* ]] || fail "ai-start stdio backend did not report the stdio backend"
+[[ "$stdio_output" == *"Next: ai doctor | ai workflows"* ]] || fail "ai-start stdio backend did not keep the beginner guidance"
+[[ "$(cat "$TMUX_LOG")" == "$tmux_log_before_stdio" ]] || fail "ai-start stdio backend unexpectedly touched tmux"
+PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" --backend stdio --stop >/dev/null
+
 start_failure="$(
   PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" 2>&1 >/dev/null || true
 )"

@@ -568,7 +568,7 @@ The repo can keep tmux where it is strong today without locking the future produ
 ## Task 34
 
 Title: Add a workspace backend adapter for `ai start`
-Tracking: pending
+Tracking: #87 (closed)
 
 Problem:
 Even if tmux is only the current backend by design, `ai start` still hardcodes tmux as the only workspace execution path. That prevents the product from offering terminal-native or non-attached modes later.

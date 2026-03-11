@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #85 `adr: define terminal orchestration modes beyond tmux`
-- Branch: `docs/85-terminal-orchestration-modes`
-- Memory Artifact: `tasks/sprint-memory/issue-85.md`
-- Resume Point: terminal-orchestration boundary is fixed; next sprint can implement the workspace backend adapter from a fresh issue-backed branch
+- Active issue: #87 `feat: add a workspace backend adapter to ai start`
+- Branch: `feat/87-ai-start-backend-adapter`
+- Memory Artifact: `tasks/sprint-memory/issue-87.md`
+- Resume Point: ai-start backend adapter landed; next sprint can explore richer backends from a fresh issue-backed branch
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Decide the durable boundary between AI Dev OS as an agent control plane and tmux as the current workspace backend.
+Implement the first workspace backend adapter so `ai start` keeps tmux as default without fixing terminal choice forever.
 
 ## Working Agreement
 
@@ -33,20 +33,21 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - terminal-orchestration boundary ADR and supporting docs
+  - `ai start` workspace backend adapter
   - concrete surfaces
-  - [`docs/adr/0006-terminal-orchestration-modes.md`](./docs/adr/0006-terminal-orchestration-modes.md)
-  - [`docs/90-philosophy.md`](./docs/90-philosophy.md)
-  - [`docs/91-state-ownership.md`](./docs/91-state-ownership.md)
+  - [`bin/ai-start`](./bin/ai-start)
   - [`docs/31-support-matrix.md`](./docs/31-support-matrix.md)
+  - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - ADR defines AI control plane, workspace backend, and terminal-native integration boundaries
-  - docs state that tmux is currently required for `ai start`, but is not the north-star product boundary
-  - follow-up implementation work is captured in backlog
-  - structure tests guard the new ADR and key wording
+  - `ai start` supports backend selection
+  - default behavior remains tmux-backed
+  - `stdio` backend works without tmux
+  - docs explain backend selection and current default
+  - tests cover backend selection and the non-tmux path
 
 ## Squad
 
@@ -60,13 +61,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#85` is the sprint slice for this turn
+  - issue `#87` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 33 was added and converted into issue `#85`; Task 34 is the implementation follow-up
+  - Task 34 was converted into issue `#87`
 - Review / Demo
-  - show the new boundary: AI surface first, tmux as current backend, terminal-native frontends as optional integrations
+  - show tmux as default backend and stdio as a non-tmux alternative
 - Retrospective
-  - keep architecture decisions ahead of expensive backend rewrites
+  - keep backend abstraction narrower than terminal strategy
 
 ## Verification
 
@@ -77,26 +78,26 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - add an ADR that defines tmux as the current workspace backend rather than the AI Dev OS control plane
-  - align philosophy, ownership, and support docs with that boundary
-  - leave a follow-up backlog task for a future workspace backend adapter
+  - update [`bin/ai-start`](./bin/ai-start) to support backend selection with tmux as default and stdio as the first alternative
+  - align [`docs/40-cli.md`](./docs/40-cli.md) and [`docs/31-support-matrix.md`](./docs/31-support-matrix.md) with the new backend contract
+  - lock the non-tmux path in [`test/ai_cli.sh`](./test/ai_cli.sh)
 - Retrospective
-  - keep: decide long-term boundaries before replacing host-runtime machinery
-  - change: separate durable control-plane decisions from current backend defaults
-  - stop: letting the current tmux implementation silently define the product boundary
+  - keep: prove the abstraction with one small alternative backend before considering terminal-native integrations
+  - change: encode backend defaults and alternatives in output/docs/tests together
+  - stop: treating tmux-only implementation as enough once the boundary is already explicit
 - System Updates
   - backlog: updated
   - plans: updated
   - docs: updated
   - tests: updated
   - instructions: not needed
-  - ADR: updated
+  - ADR: not needed
 
 ## Retrospective
 
 - keep
-  - treating host-runtime design as a first-class product decision
+  - keeping implementation aligned with the already-decided architecture boundary
 - change
-  - decide backend boundaries explicitly before chasing terminal trends
+  - prove backend flexibility with a small non-tmux mode first
 - stop
-  - treating tmux as part of the north-star product definition just because it is the current implementation
+  - leaving terminal choice fixed in practice after deciding it should stay flexible

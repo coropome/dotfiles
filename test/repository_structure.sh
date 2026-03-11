@@ -291,8 +291,10 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document unknown-command recovery guidance"
   grep -Fq "一覧を見たあとは、必要なら \`ai-agent --describe --workflow <name>\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai workflows next-step guidance"
-  grep -Fq "workspace launch は today は tmux-backed session を使う" "$REPO/docs/40-cli.md" \
+  grep -Fq "workspace launch は today は tmux-backed session を default に使う" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document the current tmux-backed ai-start implementation"
+  grep -Fq "ai start --backend stdio" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document the stdio backend override"
   grep -Fq "healthy path では \`ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document healthy ai doctor next steps"
   grep -Fq "warn path では \`ai workflows -> optional ai-agent --describe --workflow <name> -> ai start\`" "$REPO/docs/40-cli.md" \
@@ -500,8 +502,10 @@ verify_doctor_guidance_consistency() {
     || fail "docs/00-quickstart.md does not keep the canonical make doctor guidance"
   grep -Fq "workflow / prompt / trust / fallback / runtime config を見る時は \`make doctor\` ではなく \`ai doctor\`" "$REPO/docs/31-support-matrix.md" \
     || fail "docs/31-support-matrix.md does not keep the canonical ai doctor guidance"
-  grep -Fq "multiplexer: **tmux** (\`ai start\` の current backend)" "$REPO/docs/31-support-matrix.md" \
+  grep -Fq "multiplexer: **tmux** (\`ai start\` の current default backend)" "$REPO/docs/31-support-matrix.md" \
     || fail "docs/31-support-matrix.md does not describe tmux as the current ai-start backend"
+  grep -Fq "stdio (\`ai start --backend stdio\` は tmux なしで動く)" "$REPO/docs/31-support-matrix.md" \
+    || fail "docs/31-support-matrix.md does not document the stdio backend"
   grep -Fq "workflow / prompt / trust / fallback / runtime config を診断する" "$REPO/docs/99-troubleshooting.md" \
     || fail "docs/99-troubleshooting.md does not keep the canonical ai doctor guidance"
   grep -Fq "host bootstrap / symlink / PATH / shell / system state を見る" "$REPO/docs/99-troubleshooting.md" \
