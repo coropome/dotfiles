@@ -330,7 +330,7 @@ The README becomes easier to scan for newcomers without losing the advanced-path
 ## Task 20
 
 Title: Establish a Scrum operating cadence for backlog, delivery, and retrospectives
-Tracking: #49
+Tracking: #49 (closed)
 
 Problem:
 The repo now has a stronger issue-first workflow and clearer product north star, but ongoing work still depends too much on ad hoc execution. There is no durable repo-level agreement for sprint planning, backlog refinement, review, retrospective cadence, or which skill sets should be staffed for multi-step delivery.
