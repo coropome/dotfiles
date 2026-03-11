@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #105 `chore: refactor ai-doctor runtime status helpers`
-- Branch: `chore/105-ai-doctor-runtime-helpers`
-- Memory Artifact: `tasks/sprint-memory/issue-105.md`
-- Resume Point: ai-doctor now reports runtime config and extension status through helpers; next sprint can either keep tightening shell internals or move into expansion work
+- Active issue: #107 `chore: refactor ai-init starter readme helpers`
+- Branch: `chore/107-ai-init-readme-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-107.md`
+- Resume Point: ai-init now builds the starter README through section helpers; next sprint can keep tightening shell internals or move into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Refactor `ai-doctor` runtime status reporting so the code stays easy to read and extend without changing the current diagnostics contract.
+Refactor `ai-init` starter README generation so the code stays easy to read and extend without changing the current generated output contract.
 
 ## Working Agreement
 
@@ -33,16 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - cleaner `ai-doctor` runtime status reporting
+  - cleaner `ai-init` starter README generation
   - concrete surfaces
-  - [`bin/ai-doctor`](./bin/ai-doctor)
+  - [`bin/ai-init`](./bin/ai-init)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
+  - [`test/ai_init.sh`](./test/ai_init.sh)
   - acceptance slice
-  - `ai-doctor` keeps current runtime-status output unchanged
-  - repeated file/directory-backed status reporting moves into clearer helpers
-  - tests lock the refactor with at least one explicit filtered-output assertion
+  - `ai-init` keeps current starter README output unchanged across current flag variants
+  - repeated README section generation moves into clearer helpers
+  - tests lock the refactor with an explicit section-duplication assertion
 
 ## Squad
 
@@ -56,30 +56,30 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#105` is the sprint slice for this turn
+  - issue `#107` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 43 was added and converted into issue `#105`
+  - Task 44 was added and converted into issue `#107`
 - Review / Demo
-  - show `bin/ai-doctor` reading as helper-based runtime status reporting while keeping the same diagnostics
+  - show `bin/ai-init` reading as helper-based README assembly while keeping the same generated starter output
 - Retrospective
   - keep shell cleanup moving once user-facing contracts settle
 
 ## Verification
 
-- `bash test/ai_doctor.sh`
+- `bash test/ai_init.sh`
 - `make lint`
 - `make test`
 
 ## Closeout
 
 - Review / Demo
-  - refactor `ai-doctor` runtime status reporting into helpers without changing doctor output
-  - keep project/user/mcp/extensions diagnostics stable
-  - lock the refactor with doctor tests, including filtered-output coverage
+  - refactor `ai-init` starter README generation into helpers without changing generated output
+  - keep the no-hosted and no-github-actions variants stable
+  - lock the refactor with ai-init tests, including section-duplication coverage
 - Retrospective
   - keep: use small refactors once product wording has stabilized
-  - change: add one extra targeted assertion whenever shell diagnostics are rearranged
-  - stop: letting repeated runtime-status reporting keep growing inline
+  - change: add one explicit duplication guard whenever a long generated document is restructured
+  - stop: letting generated README variants keep duplicating section blocks inline
 - System Updates
   - backlog: updated
   - plans: updated
@@ -91,8 +91,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - cleaning shell diagnostics once outward behavior is stable
+  - cleaning shell-generated document assembly once outward behavior is stable
 - change
-  - lock refactors with a targeted filtered-output assertion instead of relying only on broad coverage
+  - lock refactors with a targeted duplication assertion instead of relying only on broad coverage
 - stop
-  - allowing runtime-status reporting to keep spreading across repeated blocks
+  - allowing generated README section logic to keep spreading across repeated blocks
