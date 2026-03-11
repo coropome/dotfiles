@@ -216,6 +216,7 @@ filtered_output="$(
 [[ "$filtered_output" == *"workflow: native"* ]] || fail "filtered ai-doctor output did not include the selected workflow"
 [[ "$filtered_output" == *"agent: local_reviewer"* ]] || fail "filtered ai-doctor output did not include the selected agent"
 [[ "$filtered_output" != *"workflow: unusable"* ]] || fail "filtered ai-doctor output included unrelated workflows"
+[[ "$filtered_output" != *"agent: claude_native"* ]] || fail "filtered ai-doctor output included unrelated agents"
 
 doctor_failure="$(
   cd "$TEST_REPO"

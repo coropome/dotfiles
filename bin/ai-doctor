@@ -168,6 +168,43 @@ runtime_path_remediation() {
   fi
 }
 
+runtime_status_file() {
+  local label="$1"
+  local raw_path="$2"
+  local trust_vendor="$3"
+  local scope="$4"
+  local status_path=""
+
+  status_path="$(resolve_scope_path "$scope" "$raw_path")"
+  if [[ -f "$status_path" ]]; then
+    printf '  %s: OK %s\n' "$label" "$status_path"
+    return 0
+  fi
+
+  printf '  %s: WARN %s (%s)\n' \
+    "$label" \
+    "$status_path" \
+    "$(runtime_path_remediation "$trust_vendor" "$raw_path")"
+  return 1
+}
+
+runtime_status_directory() {
+  local label="$1"
+  local raw_path="$2"
+  local message="$3"
+  local scope="$4"
+  local status_path=""
+
+  status_path="$(resolve_scope_path "$scope" "$raw_path")"
+  if [[ -d "$status_path" ]]; then
+    printf '  %s: OK %s\n' "$label" "$status_path"
+    return 0
+  fi
+
+  printf '  %s: WARN %s (%s)\n' "$label" "$status_path" "$message"
+  return 1
+}
+
 report_workflow() {
   local workflow_name="$1"
   local default_agent fallback_agents selected_agent="" candidate_name candidate_reason
@@ -235,7 +272,7 @@ report_workflow() {
 
 report_agent() {
   local agent_name="$1"
-  local project_config_path="" user_config_path="" trust_template_path="" mcp_config_path="" project_extensions_path=""
+  local trust_template_path=""
   local agent_status="OK" trust_vendor=""
 
   load_agent_metadata "$agent_name"
@@ -287,48 +324,29 @@ report_agent() {
   fi
 
   if [[ -n "$project_config" ]]; then
-    project_config_path="$(resolve_scope_path project "$project_config")"
-    if [[ -f "$project_config_path" ]]; then
-      printf '  project_config: OK %s\n' "$project_config_path"
-    else
-      printf '  project_config: WARN %s (%s)\n' \
-        "$project_config_path" \
-        "$(runtime_path_remediation "$trust_vendor" "$project_config")"
+    if ! runtime_status_file "project_config" "$project_config" "$trust_vendor" "project"; then
       [[ "$agent_status" == "OK" ]] && agent_status="WARN"
     fi
   fi
 
   if [[ -n "$user_config" ]]; then
-    user_config_path="$(resolve_scope_path user "$user_config")"
-    if [[ -f "$user_config_path" ]]; then
-      printf '  user_config: OK %s\n' "$user_config_path"
-    else
-      printf '  user_config: WARN %s (%s)\n' \
-        "$user_config_path" \
-        "$(runtime_path_remediation "$trust_vendor" "$user_config")"
+    if ! runtime_status_file "user_config" "$user_config" "$trust_vendor" "user"; then
       [[ "$agent_status" == "OK" ]] && agent_status="WARN"
     fi
   fi
 
   if [[ -n "$mcp_config" ]]; then
-    mcp_config_path="$(resolve_scope_path "$(infer_path_scope "$mcp_config")" "$mcp_config")"
-    if [[ -f "$mcp_config_path" ]]; then
-      printf '  mcp_config: OK %s\n' "$mcp_config_path"
-    else
-      printf '  mcp_config: WARN %s (%s)\n' \
-        "$mcp_config_path" \
-        "$(runtime_path_remediation "$trust_vendor" "$mcp_config")"
+    if ! runtime_status_file "mcp_config" "$mcp_config" "$trust_vendor" "$(infer_path_scope "$mcp_config")"; then
       [[ "$agent_status" == "OK" ]] && agent_status="WARN"
     fi
   fi
 
   if [[ -n "$project_extensions" ]]; then
-    project_extensions_path="$(resolve_scope_path project "$project_extensions")"
-    if [[ -d "$project_extensions_path" ]]; then
-      printf '  project_extensions: OK %s\n' "$project_extensions_path"
-    else
-      printf '  project_extensions: WARN %s (create the directory and add vendor-native project extensions if needed)\n' \
-        "$project_extensions_path"
+    if ! runtime_status_directory \
+      "project_extensions" \
+      "$project_extensions" \
+      "create the directory and add vendor-native project extensions if needed" \
+      "project"; then
       [[ "$agent_status" == "OK" ]] && agent_status="WARN"
     fi
   fi

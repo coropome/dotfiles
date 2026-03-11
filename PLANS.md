@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #103 `chore: refactor ai-start backend handling into helpers`
-- Branch: `chore/103-ai-start-backend-helpers`
-- Memory Artifact: `tasks/sprint-memory/issue-103.md`
-- Resume Point: ai-start now routes backend validation, stop, launch, and attach behavior through helpers; next sprint can either keep polishing shell internals or shift fully into expansion work
+- Active issue: #105 `chore: refactor ai-doctor runtime status helpers`
+- Branch: `chore/105-ai-doctor-runtime-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-105.md`
+- Resume Point: ai-doctor now reports runtime config and extension status through helpers; next sprint can either keep tightening shell internals or move into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Refactor `ai-start` backend handling so the code stays easy to read and extend without changing the current tmux/stdio contract.
+Refactor `ai-doctor` runtime status reporting so the code stays easy to read and extend without changing the current diagnostics contract.
 
 ## Working Agreement
 
@@ -33,16 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - cleaner `ai-start` backend orchestration
+  - cleaner `ai-doctor` runtime status reporting
   - concrete surfaces
-  - [`bin/ai-start`](./bin/ai-start)
+  - [`bin/ai-doctor`](./bin/ai-doctor)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
   - acceptance slice
-  - `ai-start` keeps the current tmux/stdio behavior unchanged
-  - backend validation, stop, launch, and attach logic move into clearer helpers
-  - tests lock the refactor with at least one explicit edge-case assertion
+  - `ai-doctor` keeps current runtime-status output unchanged
+  - repeated file/directory-backed status reporting moves into clearer helpers
+  - tests lock the refactor with at least one explicit filtered-output assertion
 
 ## Squad
 
@@ -56,30 +56,30 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#103` is the sprint slice for this turn
+  - issue `#105` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 42 was added and converted into issue `#103`
+  - Task 43 was added and converted into issue `#105`
 - Review / Demo
-  - show `bin/ai-start` reading as helper-based orchestration while keeping the same tmux/stdio behavior
+  - show `bin/ai-doctor` reading as helper-based runtime status reporting while keeping the same diagnostics
 - Retrospective
-  - keep code cleanup moving once the surface-level contract settles
+  - keep shell cleanup moving once user-facing contracts settle
 
 ## Verification
 
-- `bash test/ai_cli.sh`
+- `bash test/ai_doctor.sh`
 - `make lint`
 - `make test`
 
 ## Closeout
 
 - Review / Demo
-  - refactor `ai-start` into backend helpers without changing the tmux/stdio contract
-  - keep help, start, stop, attach, and failure behavior stable
-  - lock the refactor with CLI tests, including the unknown-backend path
+  - refactor `ai-doctor` runtime status reporting into helpers without changing doctor output
+  - keep project/user/mcp/extensions diagnostics stable
+  - lock the refactor with doctor tests, including filtered-output coverage
 - Retrospective
   - keep: use small refactors once product wording has stabilized
-  - change: add one extra edge-case assertion when refactoring shell control flow
-  - stop: leaving backend branching to grow linearly inside one script body
+  - change: add one extra targeted assertion whenever shell diagnostics are rearranged
+  - stop: letting repeated runtime-status reporting keep growing inline
 - System Updates
   - backlog: updated
   - plans: updated
@@ -91,8 +91,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - cleaning shell control flow once outward behavior is stable
+  - cleaning shell diagnostics once outward behavior is stable
 - change
-  - lock refactors with a targeted edge-case assertion instead of relying only on happy-path coverage
+  - lock refactors with a targeted filtered-output assertion instead of relying only on broad coverage
 - stop
-  - allowing backend orchestration logic to keep spreading across repeated case blocks
+  - allowing runtime-status reporting to keep spreading across repeated blocks
