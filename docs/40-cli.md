@@ -56,6 +56,7 @@ trust 設定は beginner surface の常時コマンドというより、`ai doct
 `ai start` の起動後は、まず `ai doctor` と `ai workflows` を見れば beginner path に戻りやすい。
 `ai start` の workspace launch は today は tmux-backed session を default に使うが、その backend は current implementation であり AI Dev OS control plane そのものではない。
 terminal choice を固定したくない時は `ai start --backend stdio` か `AI_WORKSPACE_BACKEND=stdio ai start` を使える。default は引き続き `tmux`。
+`ai-start --help` もこの contract を短く出し、`tmux` default、`stdio` alternative、`AI_WORKSPACE_BACKEND` override をその場で確認できる。
 default の tmux path が missing dependency で止まった時も、`ai start` は `make install` に加えて `ai start --backend stdio` を案内する。
 project-local scaffold を作りたい時は `ai init` を使う。
 `ai doctor` は workflow resolution、missing binary、missing prompt/config、fallback path、vendor-native runtime path (`project_config`, `user_config`, `mcp_config`, `project_extensions`) を human-readable に返す。healthy path では `ai workflows -> ai start` に加えて `ai start --backend stdio` も案内し、warn path では `ai workflows -> optional ai-agent --describe --workflow <name> -> ai start` に加えて non-tmux path を案内する。fail path では `fix the reported gaps above -> rerun ai doctor -> ai workflows` の next step を最後に返す。

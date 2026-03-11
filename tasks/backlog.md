@@ -666,3 +666,20 @@ Update `bin/ai-start`, sync `docs/40-cli.md` or troubleshooting wording if neede
 
 Expected Impact:
 Users can recover from a missing tmux dependency faster without reading the tmux default as a hard product requirement.
+
+## Task 40
+
+Title: Teach `ai-start --help` the backend choice contract
+Tracking: #99 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but `ai-start --help` still prints only the bare usage line. That leaves the command-specific help surface weaker than the rest of the backend-aware guidance.
+
+Improvement Idea:
+Keep `ai-start --help` compact, but make it explain the current `tmux` default, the `stdio` alternative, and the `AI_WORKSPACE_BACKEND` override.
+
+Implementation Hint:
+Update `bin/ai-start`, sync `docs/40-cli.md`, and extend `test/ai_cli.sh` plus structure guards so the help output stays aligned with the backend contract.
+
+Expected Impact:
+Users can discover the right launch mode directly from `ai-start --help` instead of inferring it from broader docs or trial and error.
