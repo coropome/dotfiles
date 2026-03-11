@@ -307,7 +307,9 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document the stdio backend override"
   grep -Fq "healthy path では \`ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document healthy ai doctor next steps"
-  grep -Fq "warn path では \`ai workflows -> optional ai-agent --describe --workflow <name> -> ai start\`" "$REPO/docs/40-cli.md" \
+  grep -Fq "healthy path では \`ai workflows -> ai start\` に加えて \`ai start --backend stdio\`" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document the healthy ai doctor stdio alternative"
+  grep -Fq "warn path では \`ai workflows -> optional ai-agent --describe --workflow <name> -> ai start\` に加えて non-tmux path" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document warn-case ai doctor next steps"
   grep -Fq "fail path では \`fix the reported gaps above -> rerun ai doctor -> ai workflows\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document fail-case ai doctor next steps"

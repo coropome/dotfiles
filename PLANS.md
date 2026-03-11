@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #91 `docs: align ai-init starter guidance with ai-start backend options`
-- Branch: `docs/91-ai-init-backend-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-91.md`
-- Resume Point: generated starter guidance now reflects tmux default plus stdio alternative; next sprint can move to backend-aware doctor or richer starter surfaces
+- Active issue: #93 `docs: make ai-doctor next steps backend-aware`
+- Branch: `docs/93-ai-doctor-backend-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-93.md`
+- Resume Point: ai-doctor next steps now reflect tmux default plus stdio alternative; next sprint can tighten troubleshooting or move to richer backend surfaces
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align generated starter guidance with the current `ai start` backend contract so first-run artifacts tell the same story as the runtime docs.
+Align `ai doctor` next steps with the current `ai start` backend contract so recovery surfaces tell the same story as launch surfaces.
 
 ## Working Agreement
 
@@ -33,19 +33,18 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - backend-aware `ai init` starter guidance
+  - backend-aware `ai doctor` next steps
   - concrete surfaces
-  - [`bin/ai-init`](./bin/ai-init)
-  - [`demo/sample-project/.ai-dev-os/README.md`](./demo/sample-project/.ai-dev-os/README.md)
+  - [`bin/ai-doctor`](./bin/ai-doctor)
+  - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_init.sh`](./test/ai_init.sh)
-  - [`test/demo_assets.sh`](./test/demo_assets.sh)
+  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - generated starter README mentions `tmux` as the current default and `stdio` as an alternative
-  - `ai init` output mentions the backend-aware `ai start` contract
-  - demo starter fixture stays in sync
+  - healthy and warn doctor outputs mention the stdio ai-start alternative
+  - fail-case guidance stays focused on fixing reported gaps first
+  - docs explain the backend-aware doctor footer
   - tests guard the new wording
 
 ## Squad
@@ -60,18 +59,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#91` is the sprint slice for this turn
+  - issue `#93` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 36 was added and converted into issue `#91`
+  - Task 37 was added and converted into issue `#93`
 - Review / Demo
-  - show generated starter guidance using tmux default plus stdio alternative
+  - show ai-doctor healthy/warn next steps using tmux default plus stdio alternative
 - Retrospective
-  - keep generated surfaces aligned immediately after runtime/docs changes
+  - keep recovery surfaces aligned right after launch-surface changes
 
 ## Verification
 
-- `bash test/demo_assets.sh`
-- `bash test/ai_init.sh`
+- `bash test/ai_doctor.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -79,13 +77,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - align `ai init` output and generated starter README with `tmux` default plus `stdio` alternative
-  - keep the local-first onboarding order unchanged
-  - lock the wording with init/demo/structure guards
+  - align ai-doctor healthy/warn next steps with `tmux` default plus `stdio` alternative
+  - keep the fail case focused on fixing reported gaps first
+  - lock the wording with doctor and structure guards
 - Retrospective
-  - keep: follow top-level docs with generated-surface alignment in the next sprint
-  - change: treat `ai init` output as part of the beginner contract, not just scaffolding noise
-  - stop: leaving generated starter artifacts one backend story behind
+  - keep: follow launch-surface changes with recovery-surface alignment in the next sprint
+  - change: treat ai-doctor footer lines as part of the backend contract once they become guidance
+  - stop: leaving doctor output on an older single-path story
 - System Updates
   - backlog: updated
   - plans: updated
@@ -97,8 +95,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping generated starter surfaces aligned with code-level backend changes
+  - keeping recovery surfaces aligned with code-level backend changes
 - change
-  - move generated-surface follow-through into the next sprint after top-level docs land
+  - move recovery follow-through into the next sprint after launch surfaces land
 - stop
-  - assuming runtime docs are enough once starter artifacts still say less
+  - assuming launch docs are enough once doctor still says less

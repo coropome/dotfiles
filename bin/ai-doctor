@@ -355,8 +355,10 @@ print_next_steps() {
   fi
   if [[ "$any_warn" -eq 1 ]]; then
     printf '  - if the warnings look acceptable, next: ai start\n'
+    printf '  - if you want a non-tmux path, use: ai start --backend stdio\n'
   else
     printf '  - next: ai start\n'
+    printf '  - optional non-tmux path: ai start --backend stdio\n'
   fi
 }
 
