@@ -1,8 +1,8 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #38 `refactor: reduce runtime repo identity coupling in starter guidance and templates`
-- Branch: `feat/38-runtime-repo-decoupling`
+- Active issue: #40 `refactor: add AI Dev OS env aliases for user-facing overrides`
+- Branch: `feat/40-ai-dev-os-env-aliases`
 
 ## MVP
 
@@ -17,14 +17,14 @@ Current newcomer MVP:
 
 ## Current Goal
 
-Reduce runtime-repo identity coupling in generated starter guidance and GitHub Actions templates while keeping the current default runtime source compatible.
+Add AI Dev OS env aliases for user-facing override variables while keeping `DITFILES_*` as backward-compatible fallbacks.
 
 ## Acceptance Slice
 
-- generated starter README describes a shared AI Dev OS runtime and the current default runtime source separately
-- GitHub Actions starter templates keep default runtime env vars but frame them as overrideable defaults
-- docs/42 explains current default runtime source without treating it as product identity
-- tests guard the less-coupled wording while preserving the default repo/ref behavior
+- `bin/p` prefers `AI_DEV_OS_PROJECT_ROOTS` and `AI_DEV_OS_PROJECT_MAX_DEPTH` while keeping fallback support
+- editor override logic accepts `AI_DEV_OS_EDITOR` and `AI_DEV_OS_FORCE_VIM`
+- newcomer docs recommend `AI_DEV_OS_*` names for new configs and note backward compatibility
+- tests cover alias precedence and compatibility behavior
 
 ## Scout Lanes
 
@@ -37,6 +37,6 @@ Reduce runtime-repo identity coupling in generated starter guidance and GitHub A
 
 ## Next Queue
 
-- `refactor: rename DITFILES-specific env/help surfaces that still leak host-era naming`
 - `docs/demo: sample-project root README を staged adoption と AI Dev OS-first framing に揃える`
 - `refactor: separate runtime-repo docs from adopter-repo troubleshooting more explicitly`
+- `refactor: rename remaining DITFILES-specific internal/help surfaces after user-facing aliases settle`

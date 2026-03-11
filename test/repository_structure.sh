@@ -272,6 +272,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai trust"
   grep -Fq "ai init" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai init"
+  grep -Fq "AI_DEV_OS_PROJECT_ROOTS" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not document AI Dev OS project root aliases"
   grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not explain role metadata"
   grep -Fq "templates/ai-trust/" "$REPO/docs/40-cli.md" \
@@ -294,6 +296,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/90-philosophy.md does not use the AI Dev OS framing"
   grep -Fq "AI Dev OS control plane" "$REPO/docs/91-state-ownership.md" \
     || fail "docs/91-state-ownership.md does not describe the AI Dev OS control plane boundary"
+  grep -Fq "AI_DEV_OS_EDITOR" "$REPO/docs/61-local-customization.md" \
+    || fail "docs/61-local-customization.md does not recommend AI Dev OS editor aliases"
   grep -Fq "primary product surface" "$REPO/docs/adr/0002-ai-dev-os-primary-surface.md" \
     || fail "docs/adr/0002-ai-dev-os-primary-surface.md does not record the AI Dev OS product-surface decision"
   grep -Fq "do not implement without a GitHub Issue" "$REPO/.github/copilot-instructions.md" \

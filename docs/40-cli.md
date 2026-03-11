@@ -279,14 +279,14 @@ eza -la
 p
 ```
 
-探索ルートは `DITFILES_PROJECT_ROOTS` で `:` 区切り指定できる。
+探索ルートは `AI_DEV_OS_PROJECT_ROOTS` で `:` 区切り指定できる。
 
 ```bash
-export DITFILES_PROJECT_ROOTS="$HOME/work:$HOME/oss:$HOME/dotfiles"
-export DITFILES_PROJECT_MAX_DEPTH=4
+export AI_DEV_OS_PROJECT_ROOTS="$HOME/work:$HOME/oss:$HOME/dotfiles"
+export AI_DEV_OS_PROJECT_MAX_DEPTH=4
 ```
 
-古い `P_ROOTS` も後方互換で受け付けるが、新規設定は `DITFILES_PROJECT_ROOTS` を使う。
+`DITFILES_PROJECT_ROOTS` / `DITFILES_PROJECT_MAX_DEPTH` と古い `P_ROOTS` も後方互換で受け付けるが、新規設定は `AI_DEV_OS_PROJECT_ROOTS` / `AI_DEV_OS_PROJECT_MAX_DEPTH` を使う。
 
 ## zsh 起動時間の計測
 

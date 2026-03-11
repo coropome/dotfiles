@@ -48,6 +48,16 @@ run_p() {
     "$REPO/bin/p" >/dev/null
 }
 
+run_p_with_ai_dev_os_roots() {
+  local root="$1"
+  rm -f "$SELECTED_PWD"
+  P_TEST_SELECTED_PWD="$SELECTED_PWD" \
+    HOME="$TEST_HOME" \
+    PATH="$STUB_BIN:$ORIG_PATH" \
+    AI_DEV_OS_PROJECT_ROOTS="$root" \
+    "$REPO/bin/p" >/dev/null
+}
+
 assert_selected_pwd() {
   local expected="$1"
   [[ -f "$SELECTED_PWD" ]] || fail "tnew was not invoked"
@@ -74,8 +84,27 @@ verify_p_detects_git_worktree_files() {
   assert_selected_pwd "$projects_root/beta"
 }
 
+verify_p_prefers_ai_dev_os_project_roots() {
+  local preferred_root="$TMPDIR_ROOT/ai-dev-os-projects"
+  local fallback_root="$TMPDIR_ROOT/ditfiles-projects"
+
+  mkdir -p "$preferred_root/gamma/.git"
+  mkdir -p "$fallback_root/delta/.git"
+
+  rm -f "$SELECTED_PWD"
+  P_TEST_SELECTED_PWD="$SELECTED_PWD" \
+    HOME="$TEST_HOME" \
+    PATH="$STUB_BIN:$ORIG_PATH" \
+    AI_DEV_OS_PROJECT_ROOTS="$preferred_root" \
+    DITFILES_PROJECT_ROOTS="$fallback_root" \
+    "$REPO/bin/p" >/dev/null
+
+  assert_selected_pwd "$preferred_root/gamma"
+}
+
 setup_stubs
 verify_p_runs_on_bash32
 verify_p_detects_git_worktree_files
+verify_p_prefers_ai_dev_os_project_roots
 
 echo "p helper test passed"

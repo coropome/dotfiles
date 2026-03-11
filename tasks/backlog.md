@@ -271,3 +271,20 @@ Focus on `bin/ai-init`, generated README copy, GitHub Actions templates, and the
 
 Expected Impact:
 Adopters can understand and customize the shared AI Dev OS runtime more easily, and starter repos feel less like thin wrappers around a hard-coded dotfiles repository.
+
+## Task 17
+
+Title: Add AI Dev OS env aliases for user-facing host overrides
+Tracking: #40
+
+Problem:
+User-facing docs and helper commands still expose `DITFILES_*` environment variables such as `DITFILES_PROJECT_ROOTS` and `DITFILES_EDITOR`, which leaks host-era naming into the AI Dev OS surface.
+
+Improvement Idea:
+Introduce `AI_DEV_OS_*` aliases for the user-facing override variables while keeping `DITFILES_*` as backward-compatible fallbacks for existing setups.
+
+Implementation Hint:
+Start with the smallest safe surface: `bin/p`, editor override handling, and the docs that tell users which env vars to set. Avoid renaming internal test-only `DITFILES_TEST_*` knobs or on-disk `~/.config/ditfiles` paths in the same change.
+
+Expected Impact:
+New user guidance and shell overrides align with AI Dev OS framing, while existing local configs continue to work unchanged.
