@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #73 `feat: teach ai task to summarize pending backlog work before printing the backlog`
-- Branch: `feat/73-ai-task-pending-summary`
-- Memory Artifact: `tasks/sprint-memory/issue-73.md`
-- Resume Point: ai-task summary upgrade landed; next sprint should start from a new issue-backed branch and refresh this plan from the template
+- Active issue: #75 `docs: align ai start workspace-ready guidance with the beginner path`
+- Branch: `docs/75-ai-start-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-75.md`
+- Resume Point: ai-start guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Make `ai task` a better backlog-refinement entrypoint by showing pending work first without losing the full backlog output.
+Align `ai start` workspace-ready guidance with the repo's beginner path so the first post-launch next steps are `ai doctor` and `ai workflows`.
 
 ## Working Agreement
 
@@ -33,20 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - a pending-summary upgrade for `ai task`
+  - beginner-first `ai start` workspace-ready guidance
 - concrete surfaces
-  - [`bin/ai-task`](./bin/ai-task)
-  - [`bin/ai`](./bin/ai)
+  - [`bin/ai-start`](./bin/ai-start)
+  - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`PLANS.md`](./PLANS.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`test/ai_cli.sh`](./test/ai_cli.sh)
-  - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - `ai task` prints a pending summary before the full backlog
-  - the summary includes task number and title for pending tasks
-  - `ai task` says when there are no pending tasks
-  - help/docs wording reflects summary-plus-backlog behavior
+  - `ai start` prints `ai doctor` and `ai workflows` in its ready guidance
+  - beginner guidance appears before deeper commands
+  - deeper commands remain visible after the beginner guidance
+  - tests lock the updated guidance ordering
 
 ## Squad
 
@@ -60,13 +59,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#73` is the sprint slice for this turn
+  - issue `#75` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 27 was added and converted into issue `#73`
+  - Task 28 was added and converted into issue `#75`
 - Review / Demo
-  - show the pending summary, no-pending fallback, and full backlog preservation
+  - show the post-start next-step guidance and its ordering
 - Retrospective
-  - keep `ai task` lightweight and text-only; do not turn it into an interactive task manager
+  - keep the workspace-ready message short and terminal-friendly
 
 ## Verification
 
@@ -77,13 +76,14 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - prepend pending-task summary output in [`bin/ai-task`](./bin/ai-task) while preserving the full backlog body
-  - update [`bin/ai`](./bin/ai) and [`docs/40-cli.md`](./docs/40-cli.md) so `ai task` reads as a backlog-refinement entrypoint
-  - cover pending and no-pending cases, plus summary/body ordering, in [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - update [`bin/ai-start`](./bin/ai-start) so workspace-ready guidance starts with `ai doctor | ai workflows`
+  - keep deeper commands visible after the beginner guidance
+  - lock the guidance ordering and success path in [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - add a docs drift guard in [`test/repository_structure.sh`](./test/repository_structure.sh)
 - Retrospective
-  - keep: improving operator entrypoints without adding a new command surface
-  - change: test behavior against fixed backlog fixtures instead of the live repo backlog state
-  - stop: relying on raw file dumps for daily backlog refinement
+  - keep: make post-launch guidance match the same beginner path used in docs
+  - change: assert command success as part of UX guidance tests instead of only inspecting output text
+  - stop: leaving `ai start` on an older command list after the rest of the repo moved to `ai doctor -> ai workflows -> ai start`
 - System Updates
   - backlog: updated
   - plans: updated
@@ -97,6 +97,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - improve operator entrypoints after the planning substrate is stable
+  - align workspace launch messaging with the same beginner path used everywhere else
 - stop
-  - treating `ai task` as a raw file dump when backlog refinement is now part of the operating model
+  - leaving `ai start` on an older command list that does not match current onboarding guidance

@@ -462,3 +462,20 @@ Parse task titles and `Tracking:` state from `tasks/backlog.md`, print a compact
 
 Expected Impact:
 Operators can use `ai task` to spot next candidates quickly without losing access to the full backlog context.
+
+## Task 28
+
+Title: Align `ai start` workspace-ready guidance with the beginner path
+Tracking: #75 (closed)
+
+Problem:
+`ai start` opens the workspace, but its ready message still emphasizes `ai code | ai review | ai agents | ai task`. That is out of step with the repo's beginner path, which now says `ai doctor -> ai workflows -> ai start` before deeper commands.
+
+Improvement Idea:
+Update the `ai start` ready message so it points users at `ai doctor` and `ai workflows` first, while still keeping deeper commands visible for experienced users.
+
+Implementation Hint:
+Adjust `bin/ai-start` output and add tests that lock in the post-start guidance ordering. Keep the message short and terminal-friendly.
+
+Expected Impact:
+Users who launch a workspace get the same next-step guidance they see everywhere else, which makes onboarding and daily use more consistent.
