@@ -136,4 +136,5 @@ bug issue には少なくとも次を書く。
 - tests / lint の結果がある
 - rollout risk が書かれている
 
-Scrum cadence で進めた work では、PR summary から sprint commitment と review/demo evidence が辿れる状態を保つ。
+Scrum cadence で進めた work では、PR summary から sprint memory, review/demo evidence, retrospective-driven system updates が辿れる状態を保つ。
+`.github/pull_request_template.md` の `Sprint Context` はその最小入力面で、small change なら `n/a` で済ませてよい。

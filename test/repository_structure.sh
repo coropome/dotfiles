@@ -395,6 +395,14 @@ verify_ai_dev_os_docs() {
     || fail "AGENTS.md does not point to tasks/sprint-memory/"
   grep -Fq "tasks/sprint-memory/" "$REPO/.github/copilot-instructions.md" \
     || fail ".github/copilot-instructions.md does not point to tasks/sprint-memory/"
+  grep -Fq "Sprint Memory" "$REPO/.github/pull_request_template.md" \
+    || fail ".github/pull_request_template.md does not prompt for sprint memory"
+  grep -Fq "Review / Demo" "$REPO/.github/pull_request_template.md" \
+    || fail ".github/pull_request_template.md does not prompt for review/demo evidence"
+  grep -Fq "System Updates" "$REPO/.github/pull_request_template.md" \
+    || fail ".github/pull_request_template.md does not prompt for system updates"
+  grep -Fq "n/a (small change)" "$REPO/.github/pull_request_template.md" \
+    || fail ".github/pull_request_template.md does not preserve the small-change escape hatch"
   grep -Fq "docs/05-demo-walkthrough.md" "$REPO/README.md" \
     || fail "README.md does not link to the demo walkthrough"
 }
