@@ -293,6 +293,8 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai init"
   grep -Fq "runtime repo path の \`ai doctor -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not mention ai help first-steps guidance"
+  grep -Fq "\`backend\` note として \`tmux\` default / \`ai start --backend stdio\`" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not keep the ai-help backend note"
   grep -Fq "starter repo path の \`ai init -> ai doctor -> ai workflows -> ai start\`" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not keep the starter repo first-steps guidance"
   grep -Fq "\`deeper use\`" "$REPO/docs/40-cli.md" \

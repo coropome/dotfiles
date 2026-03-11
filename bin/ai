@@ -35,6 +35,7 @@ Main Commands:
 
 First Steps:
   runtime repo  ai doctor -> ai start
+  backend       tmux default | ai start --backend stdio
   starter repo  ai init -> ai doctor -> ai workflows -> ai start
   deeper use    ai code | ai review | ai task | ai agents
 

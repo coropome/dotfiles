@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #93 `docs: make ai-doctor next steps backend-aware`
-- Branch: `docs/93-ai-doctor-backend-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-93.md`
-- Resume Point: ai-doctor next steps now reflect tmux default plus stdio alternative; next sprint can tighten troubleshooting or move to richer backend surfaces
+- Active issue: #95 `docs: teach ai --help the ai-start backend contract`
+- Branch: `docs/95-ai-help-backend-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-95.md`
+- Resume Point: ai --help now shows the tmux-default/stdio-alternative backend note; next sprint can decide whether to tighten troubleshooting or backend contract docs further
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align `ai doctor` next steps with the current `ai start` backend contract so recovery surfaces tell the same story as launch surfaces.
+Align `ai --help` with the current `ai start` backend contract so the highest-traffic CLI discovery surface tells the same story as launch and recovery surfaces.
 
 ## Working Agreement
 
@@ -33,19 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - backend-aware `ai doctor` next steps
+  - backend-aware `ai --help` first steps
   - concrete surfaces
-  - [`bin/ai-doctor`](./bin/ai-doctor)
+  - [`bin/ai`](./bin/ai)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_doctor.sh`](./test/ai_doctor.sh)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - healthy and warn doctor outputs mention the stdio ai-start alternative
-  - fail-case guidance stays focused on fixing reported gaps first
-  - docs explain the backend-aware doctor footer
-  - tests guard the new wording
+  - `ai --help` shows a backend note for tmux default plus the stdio alternative
+  - the backend note stays between the runtime and starter first-step lines
+  - docs explain the backend-aware help output
+  - tests guard the new wording and ordering
 
 ## Squad
 
@@ -59,17 +59,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#93` is the sprint slice for this turn
+  - issue `#95` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 37 was added and converted into issue `#93`
+  - Task 38 was added and converted into issue `#95`
 - Review / Demo
-  - show ai-doctor healthy/warn next steps using tmux default plus stdio alternative
+  - show `ai --help` with the backend note between the runtime and starter first-step paths
 - Retrospective
-  - keep recovery surfaces aligned right after launch-surface changes
+  - keep high-traffic discovery surfaces aligned right after backend contract changes
 
 ## Verification
 
-- `bash test/ai_doctor.sh`
+- `bash test/ai_cli.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -77,13 +77,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - align ai-doctor healthy/warn next steps with `tmux` default plus `stdio` alternative
-  - keep the fail case focused on fixing reported gaps first
-  - lock the wording with doctor and structure guards
+  - align `ai --help` first steps with `tmux` default plus `stdio` alternative
+  - keep the backend note between the runtime and starter paths
+  - lock the wording with CLI and structure guards
 - Retrospective
-  - keep: follow launch-surface changes with recovery-surface alignment in the next sprint
-  - change: treat ai-doctor footer lines as part of the backend contract once they become guidance
-  - stop: leaving doctor output on an older single-path story
+  - keep: follow backend-contract changes through the highest-traffic surfaces first
+  - change: treat `ai --help` first-step lines as part of the durable backend contract
+  - stop: leaving help output on an older single-path story after other surfaces changed
 - System Updates
   - backlog: updated
   - plans: updated
@@ -95,8 +95,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping recovery surfaces aligned with code-level backend changes
+  - keeping high-traffic CLI discovery aligned with backend changes
 - change
-  - move recovery follow-through into the next sprint after launch surfaces land
+  - update `ai --help` immediately after launch and recovery surfaces change
 - stop
-  - assuming launch docs are enough once doctor still says less
+  - assuming deeper docs can carry backend nuance when `ai --help` still hides it
