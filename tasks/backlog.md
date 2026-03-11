@@ -768,3 +768,20 @@ Refactor `bin/ai` around helper functions for direct command execution, workflow
 
 Expected Impact:
 The `ai` entrypoint remains behaviorally stable while becoming easier to maintain as the command surface grows.
+
+## Task 46
+
+Title: Refactor `ai-agent` resolution and describe flows into helpers
+Tracking: pending
+
+Problem:
+`ai-agent` now mixes option parsing, workflow candidate resolution, describe output, remediation output, and final launch handoff in one long control path. The behavior is stable, but the script has become the heaviest remaining shell surface and is harder to evolve safely.
+
+Improvement Idea:
+Keep current `ai-agent` behavior exactly the same, but split workflow resolution, describe rendering, and recovery/reporting into helpers so the script reads as staged resolution instead of one large body.
+
+Implementation Hint:
+Refactor `bin/ai-agent` around helpers for config-path output, candidate deduplication/resolution, describe rendering, and unknown-workflow/agent reporting. Extend `test/ai_cli.sh` with at least one explicit recovery-path assertion for `ai-agent`.
+
+Expected Impact:
+`ai-agent` remains behaviorally stable while becoming easier to maintain, review, and extend as workflow routing grows.
