@@ -309,3 +309,20 @@ Update `demo/sample-project/README.md` together with `docs/05-demo-walkthrough.m
 
 Expected Impact:
 The demo repo becomes a stronger first-run exemplar of AI Dev OS adoption instead of just a minimal fixture listing commands.
+
+## Task 19
+
+Title: Tighten README granularity around beginner path vs deeper surfaces
+Tracking: #46
+
+Problem:
+The top-level `README.md` now tells the right AI Dev OS story, but its granularity is still uneven. The beginner path, host substrate details, optional CI/runtime lanes, and deeper operator surfaces all live in one document at similar visual weight, which makes the README feel denser than the intended newcomer-first entrypoint.
+
+Improvement Idea:
+Keep the README as the durable local-first entrypoint, but push more detailed later-lane and host-substrate explanation into dedicated docs where appropriate.
+
+Implementation Hint:
+Refactor `README.md` so the must-know flow stays visible while more detailed CI/runtime, host bootstrap, and deeper operator material is linked out instead of expanded inline.
+
+Expected Impact:
+The README becomes easier to scan for newcomers without losing the advanced-path framing or the durable daily-tool positioning.
