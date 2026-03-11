@@ -360,3 +360,20 @@ Extend the Scrum docs and plan guidance with a retrospective-to-system update lo
 
 Expected Impact:
 The operating model improves itself over time, and multi-agent work becomes easier to resume after context loss or handoff.
+
+## Task 22
+
+Title: Teach the PR template to capture sprint memory and system updates
+Tracking: #57 (closed)
+
+Problem:
+The repo gained sprint memory artifacts and retrospective-driven system updates, but the PR template still only asked for generic summary and checks. That made the new operating model easy to skip in real delivery.
+
+Improvement Idea:
+Update the PR template so multi-step work can record sprint memory, review/demo evidence, and retrospective-driven system updates in a predictable place, while keeping a lightweight escape hatch for small changes.
+
+Implementation Hint:
+Extend `.github/pull_request_template.md` with `Sprint Memory`, `Review / Demo`, and `System Updates` prompts, and add structure tests that keep those prompts aligned with the Scrum docs.
+
+Expected Impact:
+The repo's delivery template reflects the operating model instead of relying on contributors to remember the new rules from memory.
