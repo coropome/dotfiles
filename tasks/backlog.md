@@ -377,3 +377,20 @@ Extend `.github/pull_request_template.md` with `Sprint Memory`, `Review / Demo`,
 
 Expected Impact:
 The repo's delivery template reflects the operating model instead of relying on contributors to remember the new rules from memory.
+
+## Task 23
+
+Title: Teach issue templates to capture likely system updates and sprint shape
+Tracking: pending
+
+Problem:
+The repo now has stronger Scrum and sprint-memory rules, but issue creation still stops at problem, goal, proposal, and acceptance criteria. That makes likely docs/tests/instructions/ADR impact and sprint shape too easy to defer until implementation starts.
+
+Improvement Idea:
+Extend issue templates so contributors can capture likely system-update surfaces and sprint shape while defining the work, without turning issue creation into heavy ceremony.
+
+Implementation Hint:
+Add a small section to the feature and bug issue templates for expected docs/tests/instructions/ADR impact and optional sprint lane notes, then add narrow structure guards so the prompts stay aligned with the current operating model.
+
+Expected Impact:
+Issue creation better matches the repo's delivery model, and later planning or handoff has fewer hidden assumptions.

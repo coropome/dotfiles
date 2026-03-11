@@ -46,6 +46,26 @@ body:
     validations:
       required: true
   - type: textarea
+    id: system_updates
+    attributes:
+      label: Likely System Updates
+      description: Which surfaces will likely change or need explicit no-op?
+      placeholder: |
+        - docs
+        - tests
+        - instructions
+        - ADR: not needed
+  - type: textarea
+    id: sprint_shape
+    attributes:
+      label: Sprint Shape / Lanes
+      description: Optional hint for likely lanes, handoffs, or whether this is a small change.
+      placeholder: |
+        - Product / Backlog
+        - Implementer
+        - Reviewer / QA
+        - small change: yes/no
+  - type: textarea
     id: links
     attributes:
       label: Notes / Links

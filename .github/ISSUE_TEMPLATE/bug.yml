@@ -44,6 +44,25 @@ body:
       label: Logs / Evidence
       description: Command output, screenshots, or file references.
   - type: textarea
+    id: fix_surfaces
+    attributes:
+      label: Likely Fix Surfaces
+      description: Which surfaces likely need changes or explicit no-op?
+      placeholder: |
+        - code
+        - docs
+        - tests
+        - instructions: not needed
+  - type: textarea
+    id: sprint_shape
+    attributes:
+      label: Sprint Shape / Scope
+      description: Optional hint for likely lanes, handoffs, or whether this is a small fix.
+      placeholder: |
+        - Implementer
+        - Reviewer / QA
+        - small change: yes/no
+  - type: textarea
     id: fix_hint
     attributes:
       label: Suspected Cause / Fix Hint
