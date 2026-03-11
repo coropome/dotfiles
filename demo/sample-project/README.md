@@ -33,7 +33,8 @@ ai start --repo demo/sample-project
 
 Expected result:
 
-- a tmux-based AI Dev OS workspace opens
+- the current default backend is `tmux`
+- `ai start --repo demo/sample-project --backend stdio` is the lighter non-tmux alternative
 - repo-local `.ai-dev-os/` config is used
 - the context pane is refreshed for this fixture
 

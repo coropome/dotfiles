@@ -64,6 +64,10 @@ grep -Fq "ai workflows" "$REPO/demo/sample-project/README.md" \
   || fail "demo README missing ai workflows"
 grep -Fq "ai start --repo demo/sample-project" "$REPO/demo/sample-project/README.md" \
   || fail "demo README missing ai start"
+grep -Fq "current default backend is \`tmux\`" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing the tmux-default backend note"
+grep -Fq "ai start --repo demo/sample-project --backend stdio" "$REPO/demo/sample-project/README.md" \
+  || fail "demo README missing the stdio ai-start alternative"
 grep -Fq "docs/42-github-actions.md" "$REPO/demo/sample-project/README.md" \
   || fail "demo README missing CI/runtime guidance"
 grep -Fq "make doctor" "$REPO/demo/sample-project/README.md" \
@@ -73,6 +77,8 @@ assert_in_order "$REPO/demo/sample-project/README.md" "## Stage 2: inspect the l
 assert_in_order "$REPO/demo/sample-project/README.md" "## Stage 3: start the workspace" "## Stage 4: optional prompt check"
 assert_in_order "$REPO/demo/sample-project/README.md" "ai doctor" "ai workflows"
 assert_in_order "$REPO/demo/sample-project/README.md" "ai workflows" "ai start --repo demo/sample-project"
+assert_in_order "$REPO/demo/sample-project/README.md" "ai start --repo demo/sample-project" "current default backend is \`tmux\`"
+assert_in_order "$REPO/demo/sample-project/README.md" "current default backend is \`tmux\`" "ai start --repo demo/sample-project --backend stdio"
 
 grep -Fq "ai start" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai start"

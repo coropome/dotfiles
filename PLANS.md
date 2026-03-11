@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #99 `docs: teach ai-start --help the backend choice contract`
-- Branch: `docs/99-ai-start-help-backend-contract`
-- Memory Artifact: `tasks/sprint-memory/issue-99.md`
-- Resume Point: ai-start --help now explains tmux default, stdio alternative, and the env override; next sprint can move to the remaining demo/backend drift if any still matters
+- Active issue: #101 `docs: make demo sample-project README backend-aware`
+- Branch: `docs/101-demo-readme-backend-guidance`
+- Memory Artifact: `tasks/sprint-memory/issue-101.md`
+- Resume Point: demo sample-project README now explains tmux default plus the stdio alternative; next sprint can decide whether the remaining foundation work is finished or if one more polish slice is worthwhile
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align `ai-start --help` with the current backend contract so the command-specific help surface tells the same story as launch, recovery, and docs.
+Align the demo sample-project README with the current backend contract so the staged fixture entrypoint tells the same story as the starter README, walkthrough, and CLI surfaces.
 
 ## Working Agreement
 
@@ -33,19 +33,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - backend-aware `ai-start --help`
+  - backend-aware demo sample-project README
   - concrete surfaces
-  - [`bin/ai-start`](./bin/ai-start)
-  - [`docs/40-cli.md`](./docs/40-cli.md)
+  - [`demo/sample-project/README.md`](./demo/sample-project/README.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`test/demo_assets.sh`](./test/demo_assets.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - `ai-start --help` mentions the tmux default
-  - `ai-start --help` mentions the stdio alternative and env override
-  - docs explain the backend-aware help output
-  - tests guard the new wording and ordering
+  - the demo README says `tmux` is the current default backend
+  - the demo README mentions `ai start --repo demo/sample-project --backend stdio`
+  - demo and structure tests guard the wording and order
 
 ## Squad
 
@@ -59,17 +57,17 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#99` is the sprint slice for this turn
+  - issue `#101` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 40 was added and converted into issue `#99`
+  - Task 41 was added and converted into issue `#101`
 - Review / Demo
-  - show `ai-start --help` with tmux default, stdio alternative, and the env override
+  - show Stage 3 of `demo/sample-project/README.md` with tmux default plus the stdio alternative
 - Retrospective
-  - keep command-specific help aligned right after backend contract changes
+  - keep the staged demo entrypoint aligned right after backend contract changes
 
 ## Verification
 
-- `bash test/ai_cli.sh`
+- `bash test/demo_assets.sh`
 - `bash test/repository_structure.sh`
 - `make lint`
 - `make test`
@@ -77,13 +75,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - align `ai-start --help` with `tmux` default plus `stdio` alternative
-  - keep the env override visible without turning help into a long tutorial
-  - lock the wording with CLI and structure guards
+  - align the demo sample-project Stage 3 wording with `tmux` default plus `stdio` alternative
+  - keep the staged local-first flow intact while removing tmux-only wording
+  - lock the wording with demo and structure guards
 - Retrospective
-  - keep: follow backend-contract changes through command-specific help as soon as a command gains multiple viable paths
-  - change: treat `ai-start --help` as a durable contract once it teaches backend selection
-  - stop: relying on broad docs when the command's own help still says less
+  - keep: follow backend-contract changes through every newcomer-facing surface, including demo fixtures
+  - change: treat the demo README as a durable contract once it becomes the sample staged adoption entrypoint
+  - stop: leaving the demo surface on an older tmux-only story after the product has moved on
 - System Updates
   - backlog: updated
   - plans: updated
@@ -95,8 +93,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping command-specific help aligned with backend changes
+  - keeping the staged demo entrypoint aligned with backend changes
 - change
-  - update `ai-start --help` immediately after new backend options are introduced
+  - update demo fixture wording immediately after backend options change
 - stop
-  - assuming broader docs are enough when command help still hides backend choice
+  - assuming walkthroughs are enough when the demo README still hides backend choice
