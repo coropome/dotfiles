@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #95 `docs: teach ai --help the ai-start backend contract`
-- Branch: `docs/95-ai-help-backend-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-95.md`
-- Resume Point: ai --help now shows the tmux-default/stdio-alternative backend note; next sprint can decide whether to tighten troubleshooting or backend contract docs further
+- Active issue: #97 `feat: make ai-start tmux failure mention the stdio path`
+- Branch: `feat/97-ai-start-stdio-recovery`
+- Memory Artifact: `tasks/sprint-memory/issue-97.md`
+- Resume Point: ai-start tmux-missing failures now mention the stdio path; next sprint can decide whether any remaining backend-contract surfaces still lag behind
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align `ai --help` with the current `ai start` backend contract so the highest-traffic CLI discovery surface tells the same story as launch and recovery surfaces.
+Align the direct `ai start` tmux-failure path with the current backend contract so launch recovery tells the same story as help, docs, and starter guidance.
 
 ## Working Agreement
 
@@ -33,19 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - backend-aware `ai --help` first steps
+  - backend-aware `ai start` tmux-failure recovery
   - concrete surfaces
-  - [`bin/ai`](./bin/ai)
+  - [`bin/ai-start`](./bin/ai-start)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
   - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - [`test/repository_structure.sh`](./test/repository_structure.sh)
   - acceptance slice
-  - `ai --help` shows a backend note for tmux default plus the stdio alternative
-  - the backend note stays between the runtime and starter first-step lines
-  - docs explain the backend-aware help output
-  - tests guard the new wording and ordering
+  - `ai start` tmux-missing failures mention `ai start --backend stdio`
+  - tmux remediation stays visible alongside the stdio alternative
+  - docs explain the backend-aware failure path
+  - tests guard the new wording
 
 ## Squad
 
@@ -59,13 +59,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#95` is the sprint slice for this turn
+  - issue `#97` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 38 was added and converted into issue `#95`
+  - Task 39 was added and converted into issue `#97`
 - Review / Demo
-  - show `ai --help` with the backend note between the runtime and starter first-step paths
+  - show the `ai start` tmux-missing failure with both tmux remediation and the stdio alternative
 - Retrospective
-  - keep high-traffic discovery surfaces aligned right after backend contract changes
+  - keep recovery surfaces aligned after backend contract changes, not just docs and help
 
 ## Verification
 
@@ -77,13 +77,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - align `ai --help` first steps with `tmux` default plus `stdio` alternative
-  - keep the backend note between the runtime and starter paths
+  - align `ai start` tmux-missing failures with `tmux` default plus `stdio` alternative
+  - keep tmux remediation visible while adding the stdio fallback
   - lock the wording with CLI and structure guards
 - Retrospective
-  - keep: follow backend-contract changes through the highest-traffic surfaces first
-  - change: treat `ai --help` first-step lines as part of the durable backend contract
-  - stop: leaving help output on an older single-path story after other surfaces changed
+  - keep: follow backend-contract changes through recovery surfaces as soon as they become user-facing guidance
+  - change: treat `ai start` failure stderr as part of the durable backend contract once it teaches a fallback
+  - stop: leaving launch failures on an older tmux-only recovery story
 - System Updates
   - backlog: updated
   - plans: updated
@@ -95,8 +95,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping high-traffic CLI discovery aligned with backend changes
+  - keeping direct launch recovery aligned with backend changes
 - change
-  - update `ai --help` immediately after launch and recovery surfaces change
+  - update `ai start` failure guidance immediately after new backend options are introduced
 - stop
-  - assuming deeper docs can carry backend nuance when `ai --help` still hides it
+  - assuming troubleshooting docs are enough when the direct launch failure still says less

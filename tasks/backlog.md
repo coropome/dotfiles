@@ -649,3 +649,20 @@ Update `bin/ai`, sync `docs/40-cli.md`, and extend `test/ai_cli.sh` plus structu
 
 Expected Impact:
 Users can discover the non-tmux path from `ai --help` without losing the beginner-first ordering or the current tmux-default story.
+
+## Task 39
+
+Title: Make `ai start` tmux-failure recovery mention the stdio path
+Tracking: #97 (closed)
+
+Problem:
+`ai start` now supports `tmux` as the default backend and `stdio` as an alternative, but the direct tmux-missing failure path still only points users at installation remediation. That leaves the launch surface itself weaker than the rest of the backend-aware story.
+
+Improvement Idea:
+Keep the current tmux remediation, but also mention `ai start --backend stdio` when the failure is specifically about the default tmux backend being unavailable.
+
+Implementation Hint:
+Update `bin/ai-start`, sync `docs/40-cli.md` or troubleshooting wording if needed, and extend `test/ai_cli.sh` so the failure contract stays explicit.
+
+Expected Impact:
+Users can recover from a missing tmux dependency faster without reading the tmux default as a hard product requirement.

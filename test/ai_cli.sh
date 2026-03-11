@@ -384,6 +384,7 @@ start_failure="$(
 )"
 [[ "$start_failure" == *"missing dependency: tmux"* ]] || fail "ai-start did not explain missing tmux"
 [[ "$start_failure" == *"run: make install (from the AI Dev OS runtime repo)"* ]] || fail "ai-start did not show tmux remediation"
+[[ "$start_failure" == *"if you only need a non-tmux path: ai start --backend stdio"* ]] || fail "ai-start did not show the stdio alternative on tmux failure"
 
 (
   cd "$GLOBAL_REPO"
