@@ -29,7 +29,10 @@ assert_same_file "$GENERATED/.ai-dev-os/agents.yml" "$DEMO/.ai-dev-os/agents.yml
 assert_same_file "$GENERATED/.ai-dev-os/workflows.yml" "$DEMO/.ai-dev-os/workflows.yml"
 assert_same_file "$GENERATED/.ai-dev-os/README.md" "$DEMO/.ai-dev-os/README.md"
 assert_same_file "$GENERATED/.ai-dev-os/prompts/implementer.md" "$DEMO/.ai-dev-os/prompts/implementer.md"
+assert_same_file "$GENERATED/.ai-dev-os/prompts/reviewer.md" "$DEMO/.ai-dev-os/prompts/reviewer.md"
 assert_same_file "$GENERATED/.ai-dev-os/prompts/review.prompt.yml" "$DEMO/.ai-dev-os/prompts/review.prompt.yml"
+assert_same_file "$GENERATED/.github/workflows/ai-dev-os-pr.yml" "$DEMO/.github/workflows/ai-dev-os-pr.yml"
+assert_same_file "$GENERATED/.github/workflows/ai-dev-os-hosted-eval.yml" "$DEMO/.github/workflows/ai-dev-os-hosted-eval.yml"
 
 grep -Fq "ai start" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai start"
@@ -37,5 +40,21 @@ grep -Fq "ai review" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai review"
 grep -Fq "ai eval review" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai eval review"
+grep -Fq "ai doctor" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing ai doctor"
+grep -Fq "sed -n '1,200p' .ai-dev-os/README.md" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing starter README inspection"
+grep -Fq "Stage 1: local onboarding" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing stage 1 guidance"
+grep -Fq "Stage 2: local workflow" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing stage 2 guidance"
+grep -Fq "Stage 3: local path が見えたあとに optional な prompt check" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing stage 3 guidance"
+grep -Fq "local-only / PR CI / hosted eval" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing adoption model guidance"
+grep -Fq "docs/42-github-actions.md" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing CI guidance link"
+grep -Fq "bootstrap failure は \`make doctor\`" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing failure model guidance"
 
 echo "demo assets test passed"

@@ -5,9 +5,21 @@ agents:
     role: implementer
     description: Project-local implementation workflow
     prompt_file: .ai-dev-os/prompts/implementer.md
+    prompt_handoff: append-system-prompt
+    context_handoff: prompt
   local_reviewer:
     provider: openai
     command: codex
     role: reviewer
     description: Project-local review workflow
-    prompt_file: .ai-dev-os/prompts/review.prompt.yml
+    prompt_file: .ai-dev-os/prompts/reviewer.md
+    prompt_handoff: prompt
+    context_handoff: prompt
+  local_backup_reviewer:
+    provider: google
+    command: gemini
+    role: reviewer
+    description: Project-local review fallback when Codex is unavailable
+    prompt_file: .ai-dev-os/prompts/reviewer.md
+    prompt_handoff: prompt
+    context_handoff: prompt

@@ -16,8 +16,10 @@ ai-init
 ai-start
 ai-agent
 ai-context
+ai-doctor
 ai-task
 ai-eval
+ai-trust
 ai-install
 ai-copy
 ai-open

@@ -71,9 +71,102 @@ expand_home_path() {
   esac
 }
 
-platform_name="$(uname -s)"
+kernel_release() {
+  uname -r 2>/dev/null || true
+}
 
-if [[ "$platform_name" == "Darwin" ]]; then
+proc_version() {
+  if [[ -n "${DITFILES_TEST_PROC_VERSION:-}" ]]; then
+    printf '%s\n' "$DITFILES_TEST_PROC_VERSION"
+    return 0
+  fi
+
+  cat /proc/version 2>/dev/null || true
+}
+
+platform_variant() {
+  if [[ "$platform_name" == "Darwin" ]]; then
+    printf 'mac\n'
+    return 0
+  fi
+
+  if [[ "$platform_name" == "Linux" ]]; then
+    if [[ "$(kernel_release)" == *Microsoft* || "$(proc_version)" == *Microsoft* ]]; then
+      printf 'wsl\n'
+      return 0
+    fi
+    printf 'linux\n'
+    return 0
+  fi
+
+  printf 'other\n'
+}
+
+check_platform_wrapper_readiness() {
+  local variant="$1"
+  local opener=""
+  local clipboard=""
+
+  echo ""
+  echo "--- platform wrappers ---"
+
+  case "$variant" in
+    mac)
+      info "ai-open: uses macOS open"
+      info "ai-copy: uses macOS pbcopy"
+      ;;
+    linux)
+      if command -v xdg-open >/dev/null 2>&1; then
+        opener="$(command -v xdg-open)"
+        ok "ai-open backend: xdg-open ($opener)"
+      else
+        ng "ai-open backend missing: xdg-open (install xdg-utils on Linux)"
+      fi
+
+      if command -v wl-copy >/dev/null 2>&1; then
+        clipboard="$(command -v wl-copy)"
+        ok "ai-copy backend: wl-copy ($clipboard)"
+      elif command -v xclip >/dev/null 2>&1; then
+        clipboard="$(command -v xclip)"
+        ok "ai-copy backend: xclip ($clipboard)"
+      elif command -v xsel >/dev/null 2>&1; then
+        clipboard="$(command -v xsel)"
+        ok "ai-copy backend: xsel ($clipboard)"
+      else
+        ng "ai-copy backend missing: install wl-copy, xclip, or xsel on Linux"
+      fi
+      ;;
+    wsl)
+      if command -v wslview >/dev/null 2>&1; then
+        opener="$(command -v wslview)"
+        ok "ai-open backend: wslview ($opener)"
+      elif command -v explorer.exe >/dev/null 2>&1; then
+        opener="$(command -v explorer.exe)"
+        ok "ai-open backend: explorer.exe ($opener)"
+      elif command -v xdg-open >/dev/null 2>&1; then
+        opener="$(command -v xdg-open)"
+        warn "ai-open backend fallback: xdg-open ($opener; install wslu for wslview if you want native Windows handoff)"
+      else
+        ng "ai-open backend missing: install wslu for wslview or ensure explorer.exe is available in WSL"
+      fi
+
+      if command -v clip.exe >/dev/null 2>&1; then
+        clipboard="$(command -v clip.exe)"
+        ok "ai-copy backend: clip.exe ($clipboard)"
+      else
+        ng "ai-copy backend missing: clip.exe (run from WSL with Windows integration enabled)"
+      fi
+      ;;
+    *)
+      info "platform wrapper readiness: no dedicated checks for $platform_name"
+      ;;
+  esac
+}
+
+platform_name="$(uname -s)"
+platform_variant_name="$(platform_variant)"
+
+if [[ "$platform_variant_name" == "mac" ]]; then
   bootstrap_hint="run: make install"
   package_hint="run: make mac"
   agent_cli_hint="run: make agent"
@@ -85,6 +178,7 @@ else
   agent_cli_hint="manual agent setup on non-macOS; see docs/31-support-matrix.md"
   warn "not macOS (bootstrap is macOS-first; doctor is best-effort here)"
   info "platform: $platform_name"
+  [[ "$platform_variant_name" == "wsl" ]] && info "platform variant: WSL"
 fi
 info "arch: $(uname -m)"
 
@@ -162,6 +256,8 @@ if ! echo ":$PATH:" | grep -Fq ":$HOME/.local/bin:"; then
 else
   ok "$HOME/.local/bin in PATH"
 fi
+
+check_platform_wrapper_readiness "$platform_variant_name"
 
 echo ""
 echo "--- dotfiles links ---"

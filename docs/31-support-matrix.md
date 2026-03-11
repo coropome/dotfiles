@@ -42,6 +42,8 @@ Linux / WSL では、現状は **自己責任の手動適用** 扱い。
 
 `make doctor` は Linux / WSL でも使えるが、出力は best-effort health check。
 不足項目の remediation は `make install` / `make mac` ではなく、manual setup を案内する。
+AI Dev OS の workflow / prompt / trust / fallback / runtime config を見る時は `make doctor` ではなく `ai doctor` を使う。
+Linux / WSL では `make doctor` が `ai-open` / `ai-copy` backend readiness も best-effort で見る。
 
 ### current wrapper behavior
 

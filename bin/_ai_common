@@ -55,6 +55,66 @@ ai_context_dir() {
   printf '%s/.context\n' "$target_repo"
 }
 
+ai_context_summary_file() {
+  local target_repo="${1:-$(ai_target_repo_root)}"
+  printf '%s/summary.md\n' "$(ai_context_dir "$target_repo")"
+}
+
+ai_expand_home_path() {
+  local raw_path="${1:-}"
+
+  if [[ "$raw_path" == "~" ]]; then
+    printf '%s\n' "$HOME"
+    return 0
+  fi
+
+  if [[ "${raw_path:0:1}" == "~" && "${raw_path:1:1}" == "/" ]]; then
+    printf '%s/%s\n' "$HOME" "${raw_path:2}"
+    return 0
+  fi
+
+  printf '%s\n' "$raw_path"
+}
+
+ai_candidate_repo_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+  local raw_path="${3:-}"
+  local expanded_path
+
+  [[ -n "$raw_path" ]] || return 1
+  expanded_path="$(ai_expand_home_path "$raw_path")"
+
+  if [[ "$expanded_path" = /* ]]; then
+    printf '%s\n' "$expanded_path"
+    return 0
+  fi
+
+  if [[ "$expanded_path" == .ai-dev-os/* ]]; then
+    printf '%s/%s\n' "$target_repo" "$expanded_path"
+    return 0
+  fi
+
+  if [[ -e "$target_repo/$expanded_path" ]]; then
+    printf '%s/%s\n' "$target_repo" "$expanded_path"
+    return 0
+  fi
+
+  printf '%s/%s\n' "$repo_root" "$expanded_path"
+}
+
+ai_resolve_repo_file() {
+  local repo_root="${1:-$(ai_repo_root)}"
+  local target_repo="${2:-$(ai_target_repo_root)}"
+  local raw_path="${3:-}"
+  local candidate
+
+  candidate="$(ai_candidate_repo_file "$repo_root" "$target_repo" "$raw_path" || true)"
+  [[ -n "$candidate" ]] || return 1
+  [[ -e "$candidate" ]] || return 1
+  printf '%s\n' "$candidate"
+}
+
 ai_load_os_layer() {
   local bin_dir="${1:-$(ai_bin_dir)}"
   local repo_root="${2:-$(ai_repo_root "$bin_dir")}"
@@ -146,6 +206,62 @@ ai_has_named_key() {
   local key="$3"
 
   ai_section_keys "$file" "$section" | grep -Fxq "$key"
+}
+
+ai_trim() {
+  local value="${1:-}"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s\n' "$value"
+}
+
+ai_list_items() {
+  local raw_value="${1:-}"
+  local item trimmed
+
+  [[ -n "$raw_value" ]] || return 0
+
+  while IFS= read -r item; do
+    trimmed="$(ai_trim "$item")"
+    [[ -n "$trimmed" ]] || continue
+    printf '%s\n' "$trimmed"
+  done < <(printf '%s\n' "$raw_value" | tr ',' '\n')
+}
+
+ai_workflow_fallback_agents() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local fallback_agents
+
+  fallback_agents="$(ai_config_value "$workflows_file" workflows "$workflow_name" fallback_agents)"
+  ai_list_items "$fallback_agents"
+}
+
+ai_workflow_candidate_agents() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local default_agent
+
+  default_agent="$(ai_config_value "$workflows_file" workflows "$workflow_name" default_agent)"
+  [[ -n "$default_agent" ]] && printf '%s\n' "$default_agent"
+  ai_workflow_fallback_agents "$workflows_file" "$workflow_name"
+}
+
+ai_workflow_candidate_chain() {
+  local workflows_file="$1"
+  local workflow_name="$2"
+  local candidate chain=""
+
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    if [[ -z "$chain" ]]; then
+      chain="$candidate"
+    else
+      chain="$chain -> $candidate"
+    fi
+  done < <(ai_workflow_candidate_agents "$workflows_file" "$workflow_name")
+
+  printf '%s\n' "$chain"
 }
 
 ai_session_name() {
