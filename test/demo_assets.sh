@@ -76,6 +76,8 @@ assert_in_order "$REPO/demo/sample-project/README.md" "ai workflows" "ai start -
 
 grep -Fq "ai start" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai start"
+grep -Fq "ai start --repo \"\$(pwd)\" --backend stdio" "$REPO/docs/05-demo-walkthrough.md" \
+  || fail "walkthrough missing stdio backend guidance"
 grep -Fq "ai review" "$REPO/docs/05-demo-walkthrough.md" \
   || fail "walkthrough missing ai review"
 grep -Fq "ai eval review" "$REPO/docs/05-demo-walkthrough.md" \

@@ -60,8 +60,9 @@ ai start --repo "$(pwd)"
 
 期待すること:
 
-- tmux workspace が起動する
-- context pane が開く
+- default では tmux workspace が起動する
+- `ai start --repo "$(pwd)" --backend stdio` なら tmux なしでも同じ beginner guidance が見える
+- tmux default path では context pane が開く
 - repo-local `.ai-dev-os/` 設定が使われる
 
 ## 6. Inspect A Review Flow
