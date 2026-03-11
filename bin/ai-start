@@ -18,6 +18,14 @@ source "$TMUX_LAYOUT"
 usage() {
   cat <<'EOF'
 usage: ai-start [--repo PATH] [--backend <tmux|stdio>] [--stop]
+
+Workspace backends:
+  tmux   current default; durable session with a context pane
+  stdio  lighter non-tmux path when terminal choice should stay flexible
+
+Hints:
+  env override: AI_WORKSPACE_BACKEND=stdio ai start
+  stop the default tmux workspace: ai start --stop
 EOF
 }
 
