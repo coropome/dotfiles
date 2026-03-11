@@ -15,7 +15,7 @@
   - AI Dev OS の workflow / prompt / trust / fallback / runtime config を診断する
   - starter repo で `ai init` 後に困った時の first response
 - `make doctor`
-  - dotfiles install / symlink / PATH / shell / bootstrap / system state を見る
+  - host bootstrap / symlink / PATH / shell / system state を見る
   - `./install` や `make agent` の前後で system 側の異常を疑う時に使う
 
 迷ったら:
@@ -24,6 +24,9 @@
 2. `tmux` や `~/.local/bin` や symlink や install 自体が怪しければ `make doctor`
 
 ## AI Dev OS Starter Repos
+
+判断に迷った時は、まず local path を `ai doctor -> ai workflows -> ai start` で安定させる。
+generated CI, hosted eval, runtime pinning は local onboarding が通ったあとに切り分ける。
 
 - `ai init` した repo で最初に何を見るか分からない
   - `ai doctor`
@@ -134,7 +137,7 @@
   - `command -v delta`
   - `git config --global --get-all include.path`
   - `git config --global --includes --get core.pager`
-- ditfiles の gitconfig が効かない
+- host git layer の gitconfig が効かない
   - `git config --global --get-all include.path`
   - `git config --global --show-origin --get-all include.path`
   - `git config --global --includes --get core.excludesfile`

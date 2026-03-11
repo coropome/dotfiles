@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: AI Dev OS Development Workflow
     url: https://github.com/coropome/dotfiles/blob/main/docs/92-development-workflow.md
-    about: Read the repo rules for backlog, issues, ADRs, branches, and PRs.
+    about: Read the AI Dev OS repo rules for backlog, issues, ADRs, branches, and PRs.

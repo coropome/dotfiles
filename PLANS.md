@@ -1,8 +1,17 @@
 # AI Dev OS Plan
 
 - Date: 2026-03-11
-- Active issue: #33 `docs/init: keep skip-mode generated README aligned with the default failure and adoption model`
-- Branch: `docs/33-skip-mode-readme-parity`
+- Active issue: #42 `docs: make demo sample-project README follow staged AI Dev OS adoption`
+- Branch: `docs/42-demo-readme-staged-adoption`
+
+## North Star
+
+- make AI Dev OS feel like an OS-level workbench for AI workflows: obvious for beginners, faster and deeper for experienced users
+- make it durable enough to still be the right daily tool a year later, not a one-shot workflow wrapper tied to a short-lived trend
+- make the first successful repo-local path obvious in any repo: `ai init -> ai doctor -> ai workflows -> ai start`
+- keep local onboarding as the default story; CI, hosted eval, and runtime pinning stay as later lanes
+- prefer project-local config and vendor-native capability over shell-wrapper reimplementation
+- keep every newcomer-facing surface aligned on the same failure model and next-step guidance
 
 ## MVP
 
@@ -17,14 +26,53 @@ Current newcomer MVP:
 
 ## Current Goal
 
-Keep skip-mode generated READMEs semantically aligned with the default starter README so `--no-github-actions` and `--no-hosted-eval` do not lose the same failure/adoption model.
+Finish the staged-adoption docs pack so the demo fixture, generated starter, quickstart, CLI reference, troubleshooting, and GitHub Actions guidance all tell the same newcomer-first story without losing the deeper daily-tool path.
 
 ## Acceptance Slice
 
-- `--no-github-actions` output still explains when to use `ai doctor`, `docs/42-github-actions.md`, and `make doctor`
-- `--no-hosted-eval` output still preserves the local-only / PR CI / hosted eval later model
-- variant READMEs are not semantically thinner than the default README apart from skipped optional surfaces
-- tests cover skip-mode remediation and adoption guidance explicitly
+- `demo/sample-project/README.md` explains the local-first staged adoption flow
+- the demo README points to `ai doctor`, `ai workflows`, and `ai start` in order
+- CI/runtime guidance remains secondary and points back to the runtime repo doc split
+- walkthrough and demo tests stay aligned with the new README
+
+## Delivery Shape
+
+- primary deliverable
+  - a newcomer-first, durable docs narrative for AI Dev OS
+- concrete surfaces
+  - root README and quickstart
+  - generated starter README from `ai init`
+  - demo walkthrough and demo fixture README
+  - CLI reference for beginner surface vs deeper surface
+  - GitHub Actions / troubleshooting split for later lanes
+- review contract
+  - `ai doctor` is the first diagnostic step
+  - `ai workflows` / `ai-agent --describe` are discovery and deep-inspection steps
+  - CI, hosted eval, and runtime pinning stay optional later lanes
+  - docs and tests preserve the same failure model across surfaces
+
+## PR Shape
+
+- suggested title
+  - `docs: align AI Dev OS around a durable local-first adoption path`
+- issue links
+  - `Closes #42`
+  - `Refs #23`
+  - `Refs #27`
+  - `Refs #29`
+  - `Refs #32`
+- summary bullets
+  - align demo README and walkthrough around `ai doctor` first staged adoption
+  - align generated starter guidance and `ai init` next steps around `ai doctor -> ai workflows -> ai start`
+  - align README, quickstart, CLI, and philosophy around a durable daily-tool north star
+  - keep GitHub Actions, hosted eval, and runtime pinning as later lanes instead of the main path
+  - add order-based regression guards so docs do not drift back into a flat checklist
+- verification bullets
+  - `bash test/ai_init.sh`
+  - `bash test/demo_assets.sh`
+  - `bash test/repository_structure.sh`
+  - `make lint`
+  - `make test`
 
 ## Scout Lanes
 
@@ -37,6 +85,6 @@ Keep skip-mode generated READMEs semantically aligned with the default starter R
 
 ## Next Queue
 
-- `docs: normalize ai doctor vs make doctor guidance across newcomer docs`
-- `feat: deepen ai doctor for vendor-native runtime consistency`
-- `docs/demo: sample-project root README を staged adoption と doctor split に揃える`
+- `docs/demo: sample-project root README を staged adoption と AI Dev OS-first framing に揃える`
+- `refactor: separate runtime-repo docs from adopter-repo troubleshooting more explicitly`
+- `refactor: rename remaining DITFILES-specific internal/help surfaces after user-facing aliases settle`

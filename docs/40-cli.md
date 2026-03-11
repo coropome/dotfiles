@@ -1,6 +1,6 @@
-# CLIツール最小チートシート（ditfiles）
+# CLIツール最小チートシート（AI Dev OS）
 
-目的：入れたはいいが使わない、を防ぐための「最小だけ」まとめ。
+目的：AI Dev OS の newcomer path と、必要最小限の host/runtime helper を短くまとめる。
 
 ## agent CLI の位置づけ
 
@@ -16,12 +16,11 @@ codex --version
 
 ## まず使うコマンド
 
-AI Dev OS の入口は `ai --help` と `ai start`。
+AI Dev OS の入口は `ai --help` と `ai start`。starter repo で最初に困り方を切り分ける command は `ai doctor`。
 
 ```bash
 ai --help
 ai init
-ai trust init claude --project
 ai doctor
 ai workflows
 ai agents
@@ -32,6 +31,23 @@ ai start
 `ai --help` は main commands に加えて、現在の repo で有効な workflow alias を表示する。
 workflow に fallback chain がある場合は、`ai --help` がその discovery の入口になる。
 repo に `.ai-dev-os/workflows.yml` や `.ai-dev-os/agents.yml` があれば、その override も discovery output に反映される。
+
+## beginner surface と deeper surface
+
+- beginner surface
+  - `ai start`
+  - `ai init`
+  - `ai doctor`
+  - まず workspace を開き、困り方を切り分けるところまでを担当する
+- deeper surface
+  - `ai workflows`
+  - `ai agents`
+  - `ai-agent --describe --workflow <name>`
+  - fallback chain, prompt metadata, provider/runtime config の見え方を掘る時に使う
+
+この分け方は「初心者には入口を明快にし、慣れた利用者には深く降りられるようにする」ためのもの。
+一時的な wrapper ではなく、長く使う daily tool として surface を整理する。
+trust 設定は beginner surface の常時コマンドというより、`ai doctor` が trust gap を示した時の remediation として使う。
 
 `ai workflows` は `workflow | default agent | description` を基本に、必要なら fallback chain も含めて確認するための一覧。
 `ai agents` は `agent | provider | role | command | description` を表示する。
@@ -244,7 +260,7 @@ gh pr list
 
 ## delta: git diffを読みやすく
 
-ditfilesでは git の pager を delta に寄せている（install時に ~/.gitconfig に include を追加）。
+host git layer では pager を delta に寄せている（install 時に ~/.gitconfig に include を追加）。
 
 ```bash
 delta --version
@@ -259,7 +275,7 @@ z <dir>           # 近いディレクトリへジャンプ（履歴から）
 zi                # fzfがあれば対話的
 ```
 
-ditfilesでは zshrc で自動的に有効化する（zoxideが入っている場合）。
+host shell layer では zshrc で自動的に有効化する（zoxide が入っている場合）。
 
 ## htop: プロセス監視
 
@@ -279,14 +295,14 @@ eza -la
 p
 ```
 
-探索ルートは `DITFILES_PROJECT_ROOTS` で `:` 区切り指定できる。
+探索ルートは `AI_DEV_OS_PROJECT_ROOTS` で `:` 区切り指定できる。
 
 ```bash
-export DITFILES_PROJECT_ROOTS="$HOME/work:$HOME/oss:$HOME/dotfiles"
-export DITFILES_PROJECT_MAX_DEPTH=4
+export AI_DEV_OS_PROJECT_ROOTS="$HOME/work:$HOME/oss:$HOME/dotfiles"
+export AI_DEV_OS_PROJECT_MAX_DEPTH=4
 ```
 
-古い `P_ROOTS` も後方互換で受け付けるが、新規設定は `DITFILES_PROJECT_ROOTS` を使う。
+`DITFILES_PROJECT_ROOTS` / `DITFILES_PROJECT_MAX_DEPTH` と古い `P_ROOTS` も後方互換で受け付けるが、新規設定は `AI_DEV_OS_PROJECT_ROOTS` / `AI_DEV_OS_PROJECT_MAX_DEPTH` を使う。
 
 ## zsh 起動時間の計測
 
@@ -305,4 +321,4 @@ ZSH_PROFILE=1 zsh -i -c exit
 ccat file.txt
 ```
 
-※ ditfilesは `cat` を上書きしない（事故防止）。
+※ host layer は `cat` を上書きしない（事故防止）。

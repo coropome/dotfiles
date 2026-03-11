@@ -1,13 +1,13 @@
 # Bootstrap Flow
 
-ditfiles のセットアップを「何が変わるか」を含めて短く整理したガイド。
+AI Dev OS runtime repo に含まれる host bootstrap layer を、「何が変わるか」を含めて短く整理したガイド。
 
 ## 前提
 
 - 現在のサポート対象は **macOS**。Linux / WSL 向けの設定片は一部あるが、bootstrap は macOS 前提
 - `make install` / `make mac` の前に **Homebrew** が必要
 - 実運用上は **Xcode Command Line Tools** も必要
-- 既存の dotfiles がある場合、ditfiles は上書き前に `*.bak.YYYYMMDD-HHMMSS` を作る
+- 既存の host config がある場合、この repo は上書き前に `*.bak.YYYYMMDD-HHMMSS` を作る
 - Linux / WSL ではこのドキュメントは runtime reference 扱いで、bootstrap 手順そのものはサポート外
 
 ## フェーズ
@@ -100,7 +100,7 @@ make keyboard
 
 `make uninstall` が戻すのは主に以下。
 
-- ditfiles が作った symlink
+- この repo が作った symlink
 - `~/.gitconfig` の `include.path`
 - 直近バックアップの復元
 

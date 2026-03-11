@@ -10,14 +10,16 @@ dedupe_lines() {
 }
 
 project_roots=()
-project_max_depth="${DITFILES_PROJECT_MAX_DEPTH:-3}"
+project_max_depth="${AI_DEV_OS_PROJECT_MAX_DEPTH:-${DITFILES_PROJECT_MAX_DEPTH:-3}}"
 
 if [[ ! "$project_max_depth" =~ ^[0-9]+$ ]]; then
-  echo "DITFILES_PROJECT_MAX_DEPTH must be a non-negative integer" >&2
+  echo "AI_DEV_OS_PROJECT_MAX_DEPTH must be a non-negative integer" >&2
   exit 1
 fi
 
-if [[ -n "${DITFILES_PROJECT_ROOTS:-}" ]]; then
+if [[ -n "${AI_DEV_OS_PROJECT_ROOTS:-}" ]]; then
+  IFS=: read -r -a project_roots <<< "$AI_DEV_OS_PROJECT_ROOTS"
+elif [[ -n "${DITFILES_PROJECT_ROOTS:-}" ]]; then
   IFS=: read -r -a project_roots <<< "$DITFILES_PROJECT_ROOTS"
 elif [[ -n "${P_ROOTS:-}" ]]; then
   IFS=: read -r -a project_roots <<< "$P_ROOTS"

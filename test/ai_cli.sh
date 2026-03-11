@@ -274,7 +274,7 @@ start_failure="$(
   PATH="$STUB_BIN:/usr/bin:/bin" "$REPO/bin/ai-start" --repo "$TEST_REPO" 2>&1 >/dev/null || true
 )"
 [[ "$start_failure" == *"missing dependency: tmux"* ]] || fail "ai-start did not explain missing tmux"
-[[ "$start_failure" == *"run: make install"* ]] || fail "ai-start did not show tmux remediation"
+[[ "$start_failure" == *"run: make install (from the AI Dev OS runtime repo)"* ]] || fail "ai-start did not show tmux remediation"
 
 (
   cd "$GLOBAL_REPO"

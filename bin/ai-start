@@ -24,7 +24,7 @@ EOF
 platform_remediation() {
   case "$(uname -s)" in
     Darwin)
-      printf 'run: make install\n'
+      printf 'run: make install (from the AI Dev OS runtime repo)\n'
       ;;
     *)
       printf 'manual setup on non-macOS; see docs/31-support-matrix.md\n'
