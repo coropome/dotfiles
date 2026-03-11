@@ -99,7 +99,8 @@ fi
 
 printf 'AI Dev OS workspace ready: %s\n' "$session_name"
 printf 'Workspace: %s\n' "$target_repo"
-printf 'Commands: ai code | ai review | ai agents | ai task\n'
+printf 'Next: ai doctor | ai workflows\n'
+printf 'Then: ai code | ai review | ai task | ai agents\n'
 
 if [[ -t 1 && -z "${TMUX:-}" ]]; then
   exec tmux attach-session -t "$session_name"

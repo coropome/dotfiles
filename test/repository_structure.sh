@@ -280,6 +280,12 @@ verify_ai_dev_os_docs() {
     || fail "docs/40-cli.md does not document ai trust"
   grep -Fq "ai init" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document ai init"
+  grep -Fq "ai start" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not mention ai start guidance"
+  grep -Fq "ai doctor" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not keep ai doctor in ai start guidance"
+  grep -Fq "ai workflows" "$REPO/docs/40-cli.md" \
+    || fail "docs/40-cli.md does not keep ai workflows in ai start guidance"
   grep -Fq "AI_DEV_OS_PROJECT_ROOTS" "$REPO/docs/40-cli.md" \
     || fail "docs/40-cli.md does not document AI Dev OS project root aliases"
   grep -Fq "prompt_file" "$REPO/docs/40-cli.md" \
