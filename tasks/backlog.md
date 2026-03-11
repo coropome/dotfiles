@@ -700,3 +700,20 @@ Update `demo/sample-project/README.md`, extend `test/demo_assets.sh`, and add a 
 
 Expected Impact:
 The demo fixture tells the same backend story as the starter README, walkthrough, and CLI surfaces, so the sample no longer reads like tmux is mandatory.
+
+## Task 42
+
+Title: Refactor `ai-start` backend handling into dedicated helpers
+Tracking: #103 (closed)
+
+Problem:
+`ai-start` now carries backend validation, help text, stop handling, launch handling, and attach behavior in one linear script body. The behavior is still small, but the branching is starting to scatter the backend contract across multiple case blocks.
+
+Improvement Idea:
+Keep the current `tmux` / `stdio` behavior exactly the same, but move backend-specific work into small helpers so the control flow reads as one orchestration path instead of repeated branching.
+
+Implementation Hint:
+Refactor `bin/ai-start` around helper functions for backend validation, stop handling, launch handling, and attach behavior. Extend `test/ai_cli.sh` with at least one extra assertion that locks unknown-backend behavior down during the refactor.
+
+Expected Impact:
+`ai-start` stays behaviorally stable while becoming easier to read, test, and extend if more backends or launch nuances appear later.

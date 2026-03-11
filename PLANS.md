@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #101 `docs: make demo sample-project README backend-aware`
-- Branch: `docs/101-demo-readme-backend-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-101.md`
-- Resume Point: demo sample-project README now explains tmux default plus the stdio alternative; next sprint can decide whether the remaining foundation work is finished or if one more polish slice is worthwhile
+- Active issue: #103 `chore: refactor ai-start backend handling into helpers`
+- Branch: `chore/103-ai-start-backend-helpers`
+- Memory Artifact: `tasks/sprint-memory/issue-103.md`
+- Resume Point: ai-start now routes backend validation, stop, launch, and attach behavior through helpers; next sprint can either keep polishing shell internals or shift fully into expansion work
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align the demo sample-project README with the current backend contract so the staged fixture entrypoint tells the same story as the starter README, walkthrough, and CLI surfaces.
+Refactor `ai-start` backend handling so the code stays easy to read and extend without changing the current tmux/stdio contract.
 
 ## Working Agreement
 
@@ -33,17 +33,16 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
   - primary deliverable
-  - backend-aware demo sample-project README
+  - cleaner `ai-start` backend orchestration
   - concrete surfaces
-  - [`demo/sample-project/README.md`](./demo/sample-project/README.md)
+  - [`bin/ai-start`](./bin/ai-start)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`PLANS.md`](./PLANS.md)
-  - [`test/demo_assets.sh`](./test/demo_assets.sh)
-  - [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - [`test/ai_cli.sh`](./test/ai_cli.sh)
   - acceptance slice
-  - the demo README says `tmux` is the current default backend
-  - the demo README mentions `ai start --repo demo/sample-project --backend stdio`
-  - demo and structure tests guard the wording and order
+  - `ai-start` keeps the current tmux/stdio behavior unchanged
+  - backend validation, stop, launch, and attach logic move into clearer helpers
+  - tests lock the refactor with at least one explicit edge-case assertion
 
 ## Squad
 
@@ -57,31 +56,30 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#101` is the sprint slice for this turn
+  - issue `#103` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 41 was added and converted into issue `#101`
+  - Task 42 was added and converted into issue `#103`
 - Review / Demo
-  - show Stage 3 of `demo/sample-project/README.md` with tmux default plus the stdio alternative
+  - show `bin/ai-start` reading as helper-based orchestration while keeping the same tmux/stdio behavior
 - Retrospective
-  - keep the staged demo entrypoint aligned right after backend contract changes
+  - keep code cleanup moving once the surface-level contract settles
 
 ## Verification
 
-- `bash test/demo_assets.sh`
-- `bash test/repository_structure.sh`
+- `bash test/ai_cli.sh`
 - `make lint`
 - `make test`
 
 ## Closeout
 
 - Review / Demo
-  - align the demo sample-project Stage 3 wording with `tmux` default plus `stdio` alternative
-  - keep the staged local-first flow intact while removing tmux-only wording
-  - lock the wording with demo and structure guards
+  - refactor `ai-start` into backend helpers without changing the tmux/stdio contract
+  - keep help, start, stop, attach, and failure behavior stable
+  - lock the refactor with CLI tests, including the unknown-backend path
 - Retrospective
-  - keep: follow backend-contract changes through every newcomer-facing surface, including demo fixtures
-  - change: treat the demo README as a durable contract once it becomes the sample staged adoption entrypoint
-  - stop: leaving the demo surface on an older tmux-only story after the product has moved on
+  - keep: use small refactors once product wording has stabilized
+  - change: add one extra edge-case assertion when refactoring shell control flow
+  - stop: leaving backend branching to grow linearly inside one script body
 - System Updates
   - backlog: updated
   - plans: updated
@@ -93,8 +91,8 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Retrospective
 
 - keep
-  - keeping the staged demo entrypoint aligned with backend changes
+  - cleaning shell control flow once outward behavior is stable
 - change
-  - update demo fixture wording immediately after backend options change
+  - lock refactors with a targeted edge-case assertion instead of relying only on happy-path coverage
 - stop
-  - assuming walkthroughs are enough when the demo README still hides backend choice
+  - allowing backend orchestration logic to keep spreading across repeated case blocks
