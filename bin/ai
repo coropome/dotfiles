@@ -33,6 +33,11 @@ Main Commands:
   copy          copy stdin through the AI clipboard wrapper
   open          open a path or URL through the AI open wrapper
 
+First Steps:
+  runtime repo  ai doctor -> ai start
+  starter repo  ai init -> ai doctor -> ai workflows -> ai start
+  deeper use    ai code | ai review | ai task | ai agents
+
 Workflow Shortcuts:
 $(render_workflow_help)
 

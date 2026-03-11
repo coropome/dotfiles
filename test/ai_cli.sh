@@ -237,6 +237,10 @@ setup_project
 setup_stubs
 
 help_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" --help)"
+[[ "$help_output" == *"First Steps:"* ]] || fail "ai help did not print the first-steps section"
+[[ "$help_output" == *"runtime repo  ai doctor -> ai start"* ]] || fail "ai help did not print the runtime repo path"
+[[ "$help_output" == *"starter repo  ai init -> ai doctor -> ai workflows -> ai start"* ]] || fail "ai help did not print the starter repo path"
+[[ "$help_output" == *"deeper use    ai code | ai review | ai task | ai agents"* ]] || fail "ai help did not print the deeper command path"
 [[ "$help_output" == *"Workflow Shortcuts:"* ]] || fail "ai help did not print workflow shortcuts"
 [[ "$help_output" == *"code"* ]] || fail "ai help did not list code workflow"
 [[ "$help_output" == *"[candidates: implementer -> codex -> gemini]"* ]] || fail "ai help did not include workflow candidate metadata"
@@ -244,6 +248,15 @@ help_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" -
 [[ "$help_output" == *"doctor        inspect workflow resolution and agent readiness"* ]] || fail "ai help did not list the doctor command"
 [[ "$help_output" == *"task          summarize pending backlog work for refinement and print the backlog"* ]] || fail "ai help did not list the updated task command"
 [[ "$help_output" == *"trust         generate or apply vendor-native trust config"* ]] || fail "ai help did not list the trust command"
+help_first_steps="${help_output%%Workflow Shortcuts:*}"
+[[ "$help_first_steps" == *"starter repo  ai init -> ai doctor -> ai workflows -> ai start"* ]] || fail "ai help did not keep starter guidance before workflow shortcuts"
+[[ "$help_first_steps" == *"deeper use    ai code | ai review | ai task | ai agents"* ]] || fail "ai help did not keep deeper commands in first steps"
+runtime_help_line="$(printf '%s\n' "$help_output" | rg '^  runtime repo' -n)"
+starter_help_line="$(printf '%s\n' "$help_output" | rg '^  starter repo' -n)"
+deeper_help_line="$(printf '%s\n' "$help_output" | rg '^  deeper use' -n)"
+[[ -n "$runtime_help_line" && -n "$starter_help_line" && -n "$deeper_help_line" ]] || fail "ai help did not print ordered first-step lines"
+[[ "${runtime_help_line%%:*}" -lt "${starter_help_line%%:*}" ]] || fail "ai help did not print runtime guidance before starter guidance"
+[[ "${starter_help_line%%:*}" -lt "${deeper_help_line%%:*}" ]] || fail "ai help did not print starter guidance before deeper commands"
 
 agents_output="$(cd "$GLOBAL_REPO" && PATH="$STUB_BIN:$ORIG_PATH" "$REPO/bin/ai" agents)"
 [[ "$agents_output" == *"agent | provider | role | command | description"* ]] || fail "ai agents did not print the metadata header"

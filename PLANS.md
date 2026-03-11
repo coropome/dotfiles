@@ -3,10 +3,10 @@
 - Date: 2026-03-11
 - Sprint Status: `closed`
 - Sprint Scope: `turn-scoped`
-- Active issue: #75 `docs: align ai start workspace-ready guidance with the beginner path`
-- Branch: `docs/75-ai-start-guidance`
-- Memory Artifact: `tasks/sprint-memory/issue-75.md`
-- Resume Point: ai-start guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
+- Active issue: #77 `docs: teach ai --help to show the beginner path before deeper commands`
+- Branch: `docs/77-ai-help-beginner-path`
+- Memory Artifact: `tasks/sprint-memory/issue-77.md`
+- Resume Point: ai help guidance is aligned; start the next sprint from a new issue-backed branch and refresh this plan from the template
 
 ## North Star
 
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-Align `ai start` workspace-ready guidance with the repo's beginner path so the first post-launch next steps are `ai doctor` and `ai workflows`.
+Make `ai --help` a beginner-first discovery surface by showing the recommended next-step path before deeper commands.
 
 ## Working Agreement
 
@@ -33,19 +33,19 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Sprint Slice
 
 - primary deliverable
-  - beginner-first `ai start` workspace-ready guidance
+  - beginner-first `ai --help` guidance
 - concrete surfaces
-  - [`bin/ai-start`](./bin/ai-start)
-  - [`docs/40-cli.md`](./docs/40-cli.md)
+  - [`bin/ai`](./bin/ai)
   - [`docs/40-cli.md`](./docs/40-cli.md)
   - [`PLANS.md`](./PLANS.md)
   - [`tasks/backlog.md`](./tasks/backlog.md)
   - [`test/ai_cli.sh`](./test/ai_cli.sh)
+  - [`test/repository_structure.sh`](./test/repository_structure.sh)
 - acceptance slice
-  - `ai start` prints `ai doctor` and `ai workflows` in its ready guidance
-  - beginner guidance appears before deeper commands
-  - deeper commands remain visible after the beginner guidance
-  - tests lock the updated guidance ordering
+  - `ai --help` includes a short beginner-first path
+  - starter-repo guidance puts `ai doctor` / `ai workflows` ahead of deeper commands
+  - deeper commands remain visible after the first-steps section
+  - tests lock the help ordering
 
 ## Squad
 
@@ -59,13 +59,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Current Sprint Ceremonies
 
 - Sprint Planning
-  - issue `#75` is the sprint slice for this turn
+  - issue `#77` is the sprint slice for this turn
 - Backlog Refinement
-  - Task 28 was added and converted into issue `#75`
+  - Task 29 was added and converted into issue `#77`
 - Review / Demo
-  - show the post-start next-step guidance and its ordering
+  - show the new `First Steps` section in `ai --help` and its ordering
 - Retrospective
-  - keep the workspace-ready message short and terminal-friendly
+  - keep `ai --help` compact while making the next step obvious
 
 ## Verification
 
@@ -76,14 +76,13 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 ## Closeout
 
 - Review / Demo
-  - update [`bin/ai-start`](./bin/ai-start) so workspace-ready guidance starts with `ai doctor | ai workflows`
-  - keep deeper commands visible after the beginner guidance
-  - lock the guidance ordering and success path in [`test/ai_cli.sh`](./test/ai_cli.sh)
-  - add a docs drift guard in [`test/repository_structure.sh`](./test/repository_structure.sh)
+  - add a `First Steps` block to [`bin/ai`](./bin/ai) with runtime repo, starter repo, and deeper-use paths
+  - align [`docs/40-cli.md`](./docs/40-cli.md) and [`README.md`](./README.md) with the new beginner-first role of `ai --help`
+  - lock the line ordering in [`test/ai_cli.sh`](./test/ai_cli.sh) and the docs wording in [`test/repository_structure.sh`](./test/repository_structure.sh)
 - Retrospective
-  - keep: make post-launch guidance match the same beginner path used in docs
-  - change: assert command success as part of UX guidance tests instead of only inspecting output text
-  - stop: leaving `ai start` on an older command list after the rest of the repo moved to `ai doctor -> ai workflows -> ai start`
+  - keep: upgrade the most common entry surfaces before adding new ones
+  - change: treat docs/help shape as a tested contract, not just a copy edit
+  - stop: leaving `ai --help` as a flat command catalog after the rest of the repo moved to guided next steps
 - System Updates
   - backlog: updated
   - plans: updated
@@ -97,6 +96,6 @@ Active multi-step work follows [`docs/93-scrum-delivery.md`](./docs/93-scrum-del
 - keep
   - treating workflow rules as repo artifacts, not just chat habits
 - change
-  - align workspace launch messaging with the same beginner path used everywhere else
+  - align top-level CLI discovery with the same beginner path used in runtime messages
 - stop
-  - leaving `ai start` on an older command list that does not match current onboarding guidance
+  - treating `ai --help` as a flat catalog after the rest of the repo moved to guided next steps
